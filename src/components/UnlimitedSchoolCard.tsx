@@ -49,13 +49,13 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
     <Card
       className={cn(
         'relative cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl mb-8',
-        'bg-gradient-to-r from-indigo-500 to-purple-600 border-0 text-white',
-        isSelected ? 'ring-4 ring-yellow-400 ring-opacity-70 shadow-2xl' : 'shadow-lg'
+        'bg-gradient-to-r from-teal-600 to-teal-700 border-0 text-white',
+        isSelected ? 'ring-4 ring-orange-400 ring-opacity-70 shadow-2xl' : 'shadow-lg'
       )}
       onClick={onSelect}
     >
       <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-2 text-lg font-bold">
+        <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-6 py-2 text-lg font-bold">
           🏫 BEST VALUE FOR SCHOOLS
         </Badge>
       </div>
@@ -77,7 +77,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
 
             {/* Best For */}
             <div className="mb-6 p-4 bg-white/10 rounded-lg">
-              <div className="flex items-center text-yellow-300">
+              <div className="flex items-center text-orange-300">
                 <Star className="h-5 w-5 mr-2" />
                 <span className="font-semibold">Best for: {tier.bestFor}</span>
               </div>
@@ -87,7 +87,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
             <div className="bg-white/10 rounded-lg p-4 mb-6">
               <div className="text-4xl font-bold mb-2">${tier.basePrice.toLocaleString()}</div>
               <div className="text-white/90">Base unlimited access for all teachers and students</div>
-              <div className="text-white/70 text-sm mt-1">+ GST (included in total below)</div>
+              <div className="text-white/70 text-sm mt-1">Price includes GST</div>
             </div>
 
             {/* Add-on Options */}
@@ -97,7 +97,12 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
               {/* Teacher Books */}
               <div className="bg-white/10 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold">Teacher Hard-Copy Books (${tier.addOns.teacherBooks} each + GST)</span>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-white/20 rounded flex items-center justify-center border border-white/30">
+                      <Image className="h-6 w-6 text-white/70" />
+                    </div>
+                    <span className="font-semibold">Teacher Hard-Copy Books (${tier.addOns.teacherBooks} each)</span>
+                  </div>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -127,14 +132,19 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   </div>
                 </div>
                 <div className="text-white/80 text-sm">
-                  ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()} + GST = ${((addOns.teacherBooks * tier.addOns.teacherBooks) * 1.1).toLocaleString()} total
+                  ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()} total (inc. GST)
                 </div>
               </div>
 
               {/* Student Books */}
               <div className="bg-white/10 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold">Student Hard-Copy Books (${tier.addOns.studentBooks} each + GST)</span>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-white/20 rounded flex items-center justify-center border border-white/30">
+                      <Image className="h-6 w-6 text-white/70" />
+                    </div>
+                    <span className="font-semibold">Student Hard-Copy Books (${tier.addOns.studentBooks} each)</span>
+                  </div>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -164,7 +174,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   </div>
                 </div>
                 <div className="text-white/80 text-sm">
-                  ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()} + GST = ${((addOns.studentBooks * tier.addOns.studentBooks) * 1.1).toLocaleString()} total
+                  ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()} total (inc. GST)
                 </div>
               </div>
             </div>
@@ -175,21 +185,9 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
             {/* Total Pricing */}
             <div className="bg-white/20 rounded-lg p-6 mb-6">
               <h4 className="text-xl font-semibold mb-4">Total Price</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span>${pricing.subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>GST (10%):</span>
-                  <span>${pricing.gst.toLocaleString()}</span>
-                </div>
-                <div className="border-t border-white/30 pt-2">
-                  <div className="flex justify-between text-2xl font-bold">
-                    <span>Total (inc. GST):</span>
-                    <span>${pricing.total.toLocaleString()}</span>
-                  </div>
-                </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">${pricing.total.toLocaleString()}</div>
+                <div className="text-white/90 text-sm">Total (inc. GST)</div>
               </div>
             </div>
 
@@ -198,7 +196,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
               <h4 className="text-xl font-semibold">What's Included</h4>
               {tier.inclusions.slice(0, 6).map((inclusion, index) => (
                 <div key={index} className="flex items-center text-white/90">
-                  <Check className="h-5 w-5 text-yellow-400 mr-3 flex-shrink-0" />
+                  <Check className="h-5 w-5 text-orange-400 mr-3 flex-shrink-0" />
                   <span>{inclusion}</span>
                 </div>
               ))}
@@ -211,7 +209,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
 
             {/* Selection Indicator */}
             {isSelected && (
-              <div className="mt-6 p-3 bg-yellow-400 text-black rounded-lg">
+              <div className="mt-6 p-3 bg-orange-400 text-white rounded-lg">
                 <div className="flex items-center justify-center font-bold">
                   <Check className="h-5 w-5 mr-2" />
                   Selected Option
