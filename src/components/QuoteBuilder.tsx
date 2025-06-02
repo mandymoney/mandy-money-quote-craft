@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -11,7 +12,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, AlertTriangle, ArrowDown } from 'lucide-react';
+import { X, AlertTriangle, ArrowDown, Check } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -45,6 +46,7 @@ export interface UnlimitedTier {
   addOns: {
     teacherBooks: number;
     studentBooks: number;
+    posterA0: number;
   };
   inclusions: string[];
   bestFor: string;
@@ -83,7 +85,7 @@ const teacherTiers: PricingTier[] = [
   },
   {
     id: 'teacher-both',
-    name: 'Teacher Digital + Physical',
+    name: 'Teacher Digital + Hard Copy',
     description: 'Complete teacher package',
     basePrice: { teacher: 189, student: 0 }, // GST inclusive
     volumeDiscounts: { students12Plus: 0, students50Plus: 0 },
@@ -131,7 +133,7 @@ const studentTiers: PricingTier[] = [
   },
   {
     id: 'student-both',
-    name: 'Student Digital + Physical',
+    name: 'Student Digital + Hard Copy',
     description: 'Complete student package',
     basePrice: { teacher: 0, student: 55 }, // GST inclusive
     volumeDiscounts: { students12Plus: 49, students50Plus: 46 }, // GST inclusive
@@ -153,7 +155,8 @@ const unlimitedTier: UnlimitedTier = {
   basePrice: 3199, // GST inclusive
   addOns: {
     teacherBooks: 89, // GST inclusive
-    studentBooks: 49 // GST inclusive
+    studentBooks: 49, // GST inclusive
+    posterA0: 89 // GST inclusive
   },
   inclusions: [
     'Unlimited Digital Access',
@@ -176,7 +179,8 @@ export const QuoteBuilder = () => {
   const [useUnlimited, setUseUnlimited] = useState<boolean>(false);
   const [unlimitedAddOns, setUnlimitedAddOns] = useState({
     teacherBooks: 0,
-    studentBooks: 0
+    studentBooks: 0,
+    posterA0: 0
   });
   const [programStartDate, setProgramStartDate] = useState<Date>(new Date());
 
@@ -221,7 +225,8 @@ export const QuoteBuilder = () => {
   const calculateUnlimitedTotal = (): { subtotal: number; gst: number; total: number } => {
     const total = unlimitedTier.basePrice + 
       (unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks) +
-      (unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks);
+      (unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks) +
+      (unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0);
     
     const subtotal = total / (1 + GST_RATE);
     const gst = total - subtotal;
@@ -255,11 +260,12 @@ export const QuoteBuilder = () => {
 
   const hasValidSelection = selectedTeacherData || selectedStudentData;
   const showUnlimitedSuggestion = regularPricing.total > 2000 && !useUnlimited && hasValidSelection;
+  const hasVolumeDiscount = studentCount >= 12 && selectedStudentData;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header with Logo */}
+        {/* Artistic Header with Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img 
@@ -268,10 +274,14 @@ export const QuoteBuilder = () => {
               className="h-24 object-contain"
             />
           </div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Quote Builder
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <div className="relative">
+            <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              ✨ Quote Builder ✨
+            </h1>
+            <div className="absolute -top-2 -right-4 text-2xl animate-bounce">💫</div>
+            <div className="absolute -bottom-2 -left-4 text-2xl animate-pulse">🌟</div>
+          </div>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
             Build your custom quote for Australia's leading financial literacy program
           </p>
         </div>
@@ -356,7 +366,7 @@ export const QuoteBuilder = () => {
 
               {nextDiscount && (
                 <div className="mb-6 text-center">
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-lg px-4 py-2 animate-pulse">
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-lg px-4 py-2">
                     🎯 Add {nextDiscount.studentsToGo} more student{nextDiscount.studentsToGo > 1 ? 's' : ''} to unlock volume discounts at {nextDiscount.threshold}+ students!
                   </Badge>
                 </div>
@@ -384,8 +394,8 @@ export const QuoteBuilder = () => {
                         colorScheme="yellow"
                         customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)"
                       />
-                      {savings > 0 && (
-                        <div className="absolute -top-2 -right-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-bounce">
+                      {savings > 0 && hasVolumeDiscount && (
+                        <div className="absolute -top-2 -right-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                           Save ${savings}/student!
                         </div>
                       )}
@@ -393,7 +403,7 @@ export const QuoteBuilder = () => {
                         <div style={{ color: '#fea100' }} className="text-sm font-medium">
                           ${currentPrice}/student
                         </div>
-                        {savings > 0 && (
+                        {savings > 0 && hasVolumeDiscount && (
                           <div className="text-xs text-green-600">
                             (${savings} savings per student)
                           </div>
@@ -446,17 +456,24 @@ export const QuoteBuilder = () => {
             </div>
 
             {/* Unlimited School Access */}
-            <UnlimitedSchoolCard
-              tier={unlimitedTier}
-              isSelected={useUnlimited}
-              onSelect={handleUnlimitedSelection}
-              addOns={unlimitedAddOns}
-              onAddOnsChange={setUnlimitedAddOns}
-              pricing={unlimitedPricing}
-              teacherCount={teacherCount}
-              studentCount={studentCount}
-              regularPricing={regularPricing}
-            />
+            <div className="mb-8">
+              <div className="mb-4 text-center">
+                <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-6 py-2 text-lg font-bold animate-pulse">
+                  🏫 Perfect for schools with 50+ students seeking maximum value
+                </Badge>
+              </div>
+              <UnlimitedSchoolCard
+                tier={unlimitedTier}
+                isSelected={useUnlimited}
+                onSelect={handleUnlimitedSelection}
+                addOns={unlimitedAddOns}
+                onAddOnsChange={setUnlimitedAddOns}
+                pricing={unlimitedPricing}
+                teacherCount={teacherCount}
+                studentCount={studentCount}
+                regularPricing={regularPricing}
+              />
+            </div>
 
             {useUnlimited && (
               <div className="text-center mt-4">
@@ -476,13 +493,23 @@ export const QuoteBuilder = () => {
           <div className="lg:col-span-1">
             <div className="sticky top-6">
               <Card className="p-6 bg-white shadow-sm border-2 border-gray-200">
-                <h3 className="text-xl font-bold mb-4 text-gray-800">Running Total</h3>
+                <h3 className="text-xl font-bold mb-4 text-gray-800">Complete Package Cost</h3>
                 
                 {useUnlimited ? (
                   <div className="space-y-3">
                     <div className="text-3xl font-bold text-gray-800">${unlimitedPricing.total.toLocaleString()}</div>
                     <div className="text-gray-600 text-sm">Unlimited School Access (inc. GST)</div>
                     <div className="text-xs text-gray-500">Includes 12 month access</div>
+                    
+                    <div className="mt-4 space-y-2">
+                      <h4 className="font-semibold text-gray-700 text-sm">Key Inclusions:</h4>
+                      {unlimitedTier.inclusions.map((inclusion, index) => (
+                        <div key={index} className="flex items-center text-xs text-gray-600">
+                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                          <span>{inclusion}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : hasValidSelection ? (
                   <div className="space-y-3">
@@ -495,11 +522,37 @@ export const QuoteBuilder = () => {
                     </div>
                     <div className="text-xs text-gray-500">Includes 12 month access</div>
                     
-                    {studentCount >= 12 && selectedStudentData && (
+                    {hasVolumeDiscount && (
                       <Badge className="bg-green-100 text-green-800 hover:bg-green-100 w-full justify-center">
                         🎉 Volume discount active!
                       </Badge>
                     )}
+
+                    <div className="mt-4 space-y-2">
+                      <h4 className="font-semibold text-gray-700 text-sm">Key Inclusions:</h4>
+                      {selectedTeacherData && (
+                        <div>
+                          <h5 className="text-xs font-medium text-teal-700 mb-1">Teacher:</h5>
+                          {[...selectedTeacherData.inclusions.teacher, ...selectedTeacherData.inclusions.classroom].map((inclusion, index) => (
+                            <div key={index} className="flex items-center text-xs text-gray-600 mb-1">
+                              <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
+                              <span>{inclusion}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {selectedStudentData && (
+                        <div>
+                          <h5 className="text-xs font-medium text-yellow-700 mb-1">Student:</h5>
+                          {selectedStudentData.inclusions.student.map((inclusion, index) => (
+                            <div key={index} className="flex items-center text-xs text-gray-600 mb-1">
+                              <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
+                              <span>{inclusion}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center">
@@ -550,30 +603,39 @@ export const QuoteBuilder = () => {
               programStartDate={programStartDate}
               onStartDateChange={setProgramStartDate}
               programEndDate={addMonths(programStartDate, 12)}
-              volumeSavings={selectedStudentData && studentCount >= 12 ? 
+              volumeSavings={selectedStudentData && hasVolumeDiscount ? 
                 (selectedStudentData.basePrice.student - calculateStudentPrice(selectedStudentData)) * studentCount : 0}
             />
 
             {/* Action Buttons */}
-            <ActionButtons
-              selectedTier={useUnlimited ? unlimitedTier : { 
-                name: `${selectedTeacherData?.name || ''}${selectedTeacherData && selectedStudentData ? ' + ' : ''}${selectedStudentData?.name || ''}`,
-                id: 'combined'
-              }}
-              totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
-              teacherCount={teacherCount}
-              studentCount={studentCount}
-            />
+            <div style={{ background: 'linear-gradient(135deg, #fe5510, #fea700, #fe8303)' }} className="p-6 rounded-lg mt-6">
+              <ActionButtons
+                selectedTier={useUnlimited ? unlimitedTier : { 
+                  name: `${selectedTeacherData?.name || ''}${selectedTeacherData && selectedStudentData ? ' + ' : ''}${selectedStudentData?.name || ''}`,
+                  id: 'combined'
+                }}
+                totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
+                teacherCount={teacherCount}
+                studentCount={studentCount}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Divider */}
+        {((hasValidSelection && !useUnlimited) || useUnlimited) && (
+          <div className="my-12">
+            <div className="border-t-2 border-gray-300"></div>
           </div>
         )}
 
         {/* Extra Materials Section Signpost */}
         {((hasValidSelection && !useUnlimited) || useUnlimited) && (
           <div className="mt-8 text-center">
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <h3 className="text-lg font-semibold text-green-800 mb-2">📚 Explore Program Materials</h3>
-              <p className="text-green-700">Browse all 42 lessons, watch preview videos, and explore textbook samples below</p>
-              <ArrowDown className="h-6 w-6 text-green-600 mx-auto mt-2 animate-bounce" />
+            <div className="p-6 bg-white border-2 border-gray-200 rounded-lg shadow-sm">
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">📚 Explore Program Materials</h3>
+              <p className="text-lg text-gray-600 mb-4">Browse all 42 lessons, watch preview videos, and explore textbook samples below</p>
+              <ArrowDown className="h-6 w-6 text-gray-600 mx-auto animate-bounce" />
             </div>
           </div>
         )}

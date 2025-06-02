@@ -141,13 +141,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         </div>
 
-        {/* Key Inclusions */}
+        {/* All Inclusions */}
         <div className="space-y-2 mb-4">
           <h4 className={cn(
             "font-semibold text-sm",
             colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
           )}>Inclusions:</h4>
-          {allInclusions.slice(0, 3).map((inclusion, index) => (
+          {allInclusions.map((inclusion, index) => (
             <div key={index} className="flex items-center text-sm text-gray-700">
               <Check className={cn(
                 "h-4 w-4 mr-2 flex-shrink-0",
@@ -156,21 +156,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               <span>{inclusion}</span>
             </div>
           ))}
-          {allInclusions.length > 3 && (
-            <div className={cn(
-              "text-sm font-medium",
-              colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
-            )}>
-              +{allInclusions.length - 3} more inclusions
-            </div>
-          )}
         </div>
 
         {/* What's Not Included */}
         {tier.notIncluded && tier.notIncluded.length > 0 && (
           <div className="space-y-2 mb-4">
             <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
-            {tier.notIncluded.slice(0, 2).map((notIncluded, index) => (
+            {tier.notIncluded.map((notIncluded, index) => (
               <div key={index} className="flex items-center text-sm text-gray-500">
                 <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
                 <span>{notIncluded}</span>

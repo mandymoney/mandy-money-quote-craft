@@ -150,7 +150,7 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
               <p className="text-green-600 text-sm mt-1">Unlimited access for all teachers and students</p>
             </div>
             
-            {unlimitedAddOns && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0) && (
+            {unlimitedAddOns && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0) && (
               <div className="space-y-2">
                 <h4 className="font-medium text-gray-700">Add-ons:</h4>
                 {unlimitedAddOns.teacherBooks > 0 && (
@@ -163,6 +163,12 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                   <div className="flex justify-between p-3 bg-gray-50 rounded">
                     <span>Student Books × {unlimitedAddOns.studentBooks}</span>
                     <span className="font-medium">${(unlimitedAddOns.studentBooks * (unlimitedTier?.addOns.studentBooks || 0)).toLocaleString()}</span>
+                  </div>
+                )}
+                {unlimitedAddOns.posterA0 > 0 && (
+                  <div className="flex justify-between p-3 bg-gray-50 rounded">
+                    <span>A0 Poster × {unlimitedAddOns.posterA0}</span>
+                    <span className="font-medium">${(unlimitedAddOns.posterA0 * (unlimitedTier?.addOns.posterA0 || 0)).toLocaleString()}</span>
                   </div>
                 )}
               </div>
@@ -178,17 +184,18 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                 </div>
                 <div className="mt-2 space-y-1">
                   <h5 className="font-medium text-sm opacity-90">Teacher Inclusions:</h5>
-                  {teacherTier.inclusions.teacher.slice(0, 3).map((inclusion, index) => (
+                  {teacherTier.inclusions.teacher.map((inclusion, index) => (
                     <div key={index} className="flex items-center text-sm opacity-80">
                       <Check className="h-3 w-3 mr-2 flex-shrink-0" />
                       <span>{inclusion}</span>
                     </div>
                   ))}
-                  {teacherTier.inclusions.teacher.length > 3 && (
-                    <div className="text-sm opacity-80">
-                      +{teacherTier.inclusions.teacher.length - 3} more inclusions
+                  {teacherTier.inclusions.classroom.map((inclusion, index) => (
+                    <div key={index} className="flex items-center text-sm opacity-80">
+                      <Check className="h-3 w-3 mr-2 flex-shrink-0" />
+                      <span>{inclusion}</span>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
             )}
@@ -201,7 +208,7 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                     <div className="text-sm opacity-90">${studentPrice}/student</div>
                     {volumeSavings > 0 && (
                       <div className="text-sm font-bold text-green-200">
-                        💰 Volume Savings: ${volumeSavings.toLocaleString()}
+                        💰 Volume Savings: ${volumeSavings.toLocaleString()} (${((studentTier.basePrice.student - studentPrice) || 0).toFixed(0)} per student)
                       </div>
                     )}
                   </div>
@@ -209,17 +216,12 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                 </div>
                 <div className="mt-2 space-y-1">
                   <h5 className="font-medium text-sm opacity-90">Student Inclusions:</h5>
-                  {studentTier.inclusions.student.slice(0, 3).map((inclusion, index) => (
+                  {studentTier.inclusions.student.map((inclusion, index) => (
                     <div key={index} className="flex items-center text-sm opacity-80">
                       <Check className="h-3 w-3 mr-2 flex-shrink-0" />
                       <span>{inclusion}</span>
                     </div>
                   ))}
-                  {studentTier.inclusions.student.length > 3 && (
-                    <div className="text-sm opacity-80">
-                      +{studentTier.inclusions.student.length - 3} more inclusions
-                    </div>
-                  )}
                 </div>
               </div>
             )}
