@@ -27,6 +27,7 @@ export interface PricingTier {
     student: string[];
     classroom: string[];
   };
+  notIncluded?: string[];
   isPopular?: boolean;
   type: 'teacher' | 'student' | 'combined';
   bestFor?: string;

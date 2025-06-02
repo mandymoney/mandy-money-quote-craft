@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Image, Star } from 'lucide-react';
+import { Check, Image, Star, X } from 'lucide-react';
 import { PricingTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -33,25 +33,25 @@ export const PricingCard: React.FC<PricingCardProps> = ({
 }) => {
   const getGradientClass = () => {
     if (tier.type === 'teacher') {
-      if (tier.id.includes('digital')) return 'from-blue-500 to-cyan-500';
+      if (tier.id.includes('digital')) return 'from-orange-500 to-orange-600';
       if (tier.id.includes('physical')) return 'from-green-500 to-teal-500';
-      return 'from-purple-500 to-indigo-500';
+      return 'from-orange-600 to-red-500';
     } else {
-      if (tier.id.includes('digital')) return 'from-orange-500 to-red-500';
+      if (tier.id.includes('digital')) return 'from-blue-500 to-cyan-500';
       if (tier.id.includes('physical')) return 'from-emerald-500 to-green-500';
-      return 'from-pink-500 to-rose-500';
+      return 'from-blue-600 to-purple-500';
     }
   };
 
   const getBorderClass = () => {
     if (tier.type === 'teacher') {
-      if (tier.id.includes('digital')) return 'border-blue-200';
-      if (tier.id.includes('physical')) return 'border-green-200';
-      return 'border-purple-200';
-    } else {
       if (tier.id.includes('digital')) return 'border-orange-200';
+      if (tier.id.includes('physical')) return 'border-green-200';
+      return 'border-orange-200';
+    } else {
+      if (tier.id.includes('digital')) return 'border-blue-200';
       if (tier.id.includes('physical')) return 'border-emerald-200';
-      return 'border-pink-200';
+      return 'border-blue-200';
     }
   };
 
@@ -61,27 +61,11 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     ...tier.inclusions.classroom
   ];
 
-  const getItemPrice = () => {
-    if (tier.type === 'teacher') {
-      return tier.basePrice.teacher;
-    } else {
-      return studentPrice || tier.basePrice.student;
-    }
-  };
-
-  const getQuantity = () => {
-    return tier.type === 'teacher' ? teacherCount : studentCount;
-  };
-
-  const basePrice = getItemPrice() * getQuantity();
-  const gstAmount = basePrice * 0.1;
-  const totalWithGST = basePrice + gstAmount;
-
   return (
     <Card
       className={cn(
         'relative cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl',
-        'bg-white/90 backdrop-blur-sm border-2',
+        'bg-white border-2',
         isSelected ? `${getBorderClass()} shadow-lg ring-4 ring-opacity-50` : 'border-gray-200',
         'animate-scale-in'
       )}
@@ -90,7 +74,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     >
       {tier.isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <Badge className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-1">
+          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1">
             Most Popular
           </Badge>
         </div>
@@ -126,41 +110,19 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Pricing Breakdown */}
-        <div className="mb-6 bg-gray-50 rounded-lg p-4">
-          <div className="text-sm text-gray-600 mb-2">Per {tier.type} price:</div>
-          <div className="text-xl font-bold text-gray-900 mb-1">
-            ${getItemPrice().toLocaleString()}{includeGST && ' + GST'}
+        {/* Simple Pricing */}
+        <div className="mb-6 bg-gray-50 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-gray-900">
+            ${(studentPrice || price).toLocaleString()}
           </div>
-          <div className="text-sm text-gray-500 mb-3">
-            × {getQuantity()} {tier.type}{getQuantity() > 1 ? 's' : ''}
-          </div>
-          
-          {includeGST && (
-            <div className="text-sm text-gray-600 mb-2 space-y-1">
-              <div className="flex justify-between">
-                <span>Subtotal:</span>
-                <span>${basePrice.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>GST (10%):</span>
-                <span>${gstAmount.toLocaleString()}</span>
-              </div>
-            </div>
-          )}
-          
-          <div className="border-t pt-2">
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">Total{includeGST ? ' (inc. GST)' : ''}:</span>
-              <span className="text-xl font-bold text-gray-900">
-                ${(includeGST ? totalWithGST : basePrice).toLocaleString()}
-              </span>
-            </div>
+          <div className="text-sm text-gray-600">
+            per {tier.type}{includeGST ? '' : ' (exc. GST)'}
           </div>
         </div>
 
         {/* Key Inclusions */}
-        <div className="space-y-2">
+        <div className="space-y-2 mb-4">
+          <h4 className="font-semibold text-gray-700 text-sm">What's Included:</h4>
           {allInclusions.slice(0, 3).map((inclusion, index) => (
             <div key={index} className="flex items-center text-sm text-gray-700">
               <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
@@ -174,12 +136,16 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           )}
         </div>
 
-        {/* Classroom Space Notice */}
-        {(teacherCount > 0 && studentCount > 0) && tier.inclusions.classroom.length > 0 && (
-          <div className="mt-4 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="text-blue-700 font-medium text-sm">
-              ✓ Includes classroom space & student tracking
-            </div>
+        {/* What's Not Included */}
+        {tier.notIncluded && tier.notIncluded.length > 0 && (
+          <div className="space-y-2 mb-4">
+            <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
+            {tier.notIncluded.slice(0, 2).map((notIncluded, index) => (
+              <div key={index} className="flex items-center text-sm text-gray-500">
+                <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
+                <span>{notIncluded}</span>
+              </div>
+            ))}
           </div>
         )}
 

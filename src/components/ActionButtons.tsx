@@ -49,7 +49,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   if (!selectedTier) return null;
 
   return (
-    <Card className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 border-0 shadow-2xl animate-scale-in">
+    <Card className="bg-gradient-to-r from-orange-500 to-orange-600 border-0 shadow-2xl animate-scale-in">
       <div className="p-8 text-center">
         <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
         <p className="text-white/90 mb-6">
@@ -78,7 +78,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         </div>
         
         <p className="text-white/80 text-sm mt-4">
-          Questions? Contact our team at sales@mandymoney.com.au
+          Questions? Contact our team at hello@mandymoney.com.au
         </p>
       </div>
     </Card>
