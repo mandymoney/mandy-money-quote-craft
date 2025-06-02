@@ -266,7 +266,7 @@ export const QuoteBuilder = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header with improved title gradient */}
+        {/* Header with stars and improved title gradient */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img 
@@ -275,9 +275,13 @@ export const QuoteBuilder = () => {
               className="h-24 object-contain"
             />
           </div>
-          <h1 className="text-6xl font-extrabold mb-4 bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
-            Quote Builder
-          </h1>
+          <div className="flex items-center justify-center gap-8 mb-4">
+            <div className="text-6xl">✨</div>
+            <h1 className="text-6xl font-extrabold bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
+              Quote Builder
+            </h1>
+            <div className="text-6xl">✨</div>
+          </div>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
             Build your custom quote for Australia's leading financial literacy program
           </p>
