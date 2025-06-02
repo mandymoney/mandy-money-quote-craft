@@ -19,6 +19,8 @@ interface PricingCardProps {
   includeGST?: boolean;
   colorScheme?: 'teal' | 'yellow';
   customGradient?: string;
+  showSavings?: boolean;
+  savings?: number;
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
@@ -33,7 +35,9 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   studentPrice,
   includeGST = false,
   colorScheme = 'teal',
-  customGradient
+  customGradient,
+  showSavings = false,
+  savings = 0
 }) => {
   const getGradientClass = () => {
     if (customGradient) return '';
@@ -53,10 +57,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       return isSelected ? 'border-yellow-400' : 'border-gray-200';
     }
     return isSelected ? 'border-teal-400' : 'border-gray-200';
-  };
-
-  const getAccentColor = () => {
-    return colorScheme === 'yellow' ? 'yellow' : 'teal';
   };
 
   const allInclusions = [
@@ -122,7 +122,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Simple Pricing */}
+        {/* Pricing with savings */}
         <div className={cn(
           "mb-6 rounded-lg p-4 text-center",
           colorScheme === 'yellow' ? 'bg-yellow-50' : 'bg-teal-50'
@@ -139,9 +139,16 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           )}>
             per {tier.type} (inc. GST)
           </div>
+          
+          {/* Volume savings display */}
+          {showSavings && savings > 0 && (
+            <div className="mt-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+              Save ${savings}/student!
+            </div>
+          )}
         </div>
 
-        {/* All Inclusions */}
+        {/* All Inclusions - displayed without expandable */}
         <div className="space-y-2 mb-4">
           <h4 className={cn(
             "font-semibold text-sm",

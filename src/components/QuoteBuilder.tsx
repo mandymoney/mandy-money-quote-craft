@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -154,8 +153,8 @@ const unlimitedTier: UnlimitedTier = {
   description: 'Complete digital access for entire school',
   basePrice: 3199, // GST inclusive
   addOns: {
-    teacherBooks: 89, // GST inclusive
-    studentBooks: 49, // GST inclusive
+    teacherBooks: 79, // GST inclusive
+    studentBooks: 42, // GST inclusive
     posterA0: 89 // GST inclusive
   },
   inclusions: [
@@ -168,7 +167,7 @@ const unlimitedTier: UnlimitedTier = {
     'Unlimited Classroom Spaces',
     'Advanced Analytics'
   ],
-  bestFor: 'Large schools with 50+ students seeking maximum value'
+  bestFor: 'Perfect for schools prioritising financial empowerment as a core student outcome'
 };
 
 export const QuoteBuilder = () => {
@@ -261,11 +260,13 @@ export const QuoteBuilder = () => {
   const hasValidSelection = selectedTeacherData || selectedStudentData;
   const showUnlimitedSuggestion = regularPricing.total > 2000 && !useUnlimited && hasValidSelection;
   const hasVolumeDiscount = studentCount >= 12 && selectedStudentData;
+  const volumeSavings = selectedStudentData && hasVolumeDiscount ? 
+    (selectedStudentData.basePrice.student - calculateStudentPrice(selectedStudentData)) * studentCount : 0;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Artistic Header with Logo */}
+        {/* Header with improved title gradient */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img 
@@ -274,13 +275,9 @@ export const QuoteBuilder = () => {
               className="h-24 object-contain"
             />
           </div>
-          <div className="relative">
-            <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-              ✨ Quote Builder ✨
-            </h1>
-            <div className="absolute -top-2 -right-4 text-2xl animate-bounce">💫</div>
-            <div className="absolute -bottom-2 -left-4 text-2xl animate-pulse">🌟</div>
-          </div>
+          <h1 className="text-6xl font-extrabold mb-4 bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
+            ✨ Quote Builder ✨
+          </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
             Build your custom quote for Australia's leading financial literacy program
           </p>
@@ -300,15 +297,17 @@ export const QuoteBuilder = () => {
                 <p style={{ color: '#45c0a9' }}>Choose the teaching resources that work best for your classroom</p>
               </div>
               
-              <div className="mb-6">
-                <VolumeSelector
-                  label="Number of Teachers"
-                  value={teacherCount}
-                  onChange={setTeacherCount}
-                  min={1}
-                  max={20}
-                  color="teal"
-                />
+              <div className="mb-6 flex justify-center">
+                <div className="w-full max-w-md">
+                  <VolumeSelector
+                    label="Number of Teachers"
+                    value={teacherCount}
+                    onChange={setTeacherCount}
+                    min={1}
+                    max={20}
+                    color="teal"
+                  />
+                </div>
               </div>
 
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
@@ -353,15 +352,17 @@ export const QuoteBuilder = () => {
                 <p style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
               </div>
               
-              <div className="mb-6">
-                <VolumeSelector
-                  label="Number of Students"
-                  value={studentCount}
-                  onChange={setStudentCount}
-                  min={1}
-                  max={200}
-                  color="yellow"
-                />
+              <div className="mb-6 flex justify-center">
+                <div className="w-full max-w-md">
+                  <VolumeSelector
+                    label="Number of Students"
+                    value={studentCount}
+                    onChange={setStudentCount}
+                    min={1}
+                    max={200}
+                    color="yellow"
+                  />
+                </div>
               </div>
 
               {nextDiscount && (
@@ -393,22 +394,9 @@ export const QuoteBuilder = () => {
                         includeGST={true}
                         colorScheme="yellow"
                         customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)"
+                        showSavings={savings > 0 && hasVolumeDiscount}
+                        savings={savings}
                       />
-                      {savings > 0 && hasVolumeDiscount && (
-                        <div className="absolute -top-2 -right-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                          Save ${savings}/student!
-                        </div>
-                      )}
-                      <div className="mt-2 text-center">
-                        <div style={{ color: '#fea100' }} className="text-sm font-medium">
-                          ${currentPrice}/student
-                        </div>
-                        {savings > 0 && hasVolumeDiscount && (
-                          <div className="text-xs text-green-600">
-                            (${savings} savings per student)
-                          </div>
-                        )}
-                      </div>
                     </div>
                   );
                 })}
@@ -430,14 +418,15 @@ export const QuoteBuilder = () => {
 
             {/* Unlimited School Access Suggestion */}
             {showUnlimitedSuggestion && (
-              <Card className="mb-8 p-6 bg-orange-50 border-orange-200 animate-pulse">
+              <Card className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
                 <div className="flex items-center space-x-3">
-                  <AlertTriangle className="h-6 w-6 text-orange-600" />
+                  <div className="text-4xl">🎓</div>
                   <div>
-                    <h3 className="font-semibold text-orange-800">💰 Consider Unlimited School Access</h3>
-                    <p className="text-orange-700">
-                      Your current quote is ${regularPricing.total.toLocaleString()}. The Unlimited School Access option might offer better value at ${unlimitedPricing.total.toLocaleString()}.
+                    <h3 className="font-bold text-blue-800 text-lg">💰 Consider Our Unlimited School Access Option!</h3>
+                    <p className="text-blue-700">
+                      Your current quote is ${regularPricing.total.toLocaleString()}. Our Unlimited School Access option at ${unlimitedPricing.total.toLocaleString()} might offer exceptional value for your entire school community.
                     </p>
+                    <p className="text-blue-600 text-sm mt-1">✨ See the unlimited option below for complete school-wide access</p>
                   </div>
                 </div>
               </Card>
@@ -457,11 +446,6 @@ export const QuoteBuilder = () => {
 
             {/* Unlimited School Access */}
             <div className="mb-8">
-              <div className="mb-4 text-center">
-                <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-6 py-2 text-lg font-bold animate-pulse">
-                  🏫 Perfect for schools with 50+ students seeking maximum value
-                </Badge>
-              </div>
               <UnlimitedSchoolCard
                 tier={unlimitedTier}
                 isSelected={useUnlimited}
@@ -522,10 +506,15 @@ export const QuoteBuilder = () => {
                     </div>
                     <div className="text-xs text-gray-500">Includes 12 month access</div>
                     
-                    {hasVolumeDiscount && (
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 w-full justify-center">
-                        🎉 Volume discount active!
-                      </Badge>
+                    {hasVolumeDiscount && volumeSavings > 0 && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <div className="text-green-800 font-bold text-sm text-center">
+                          🎉 Volume Discount Active!
+                        </div>
+                        <div className="text-green-700 text-xs text-center">
+                          Saving ${volumeSavings.toLocaleString()} total (${((selectedStudentData?.basePrice.student || 0) - calculateStudentPrice(selectedStudentData!)).toFixed(0)} per student)
+                        </div>
+                      </div>
                     )}
 
                     <div className="mt-4 space-y-2">
@@ -586,7 +575,7 @@ export const QuoteBuilder = () => {
               </p>
               <div className="flex items-center justify-center mt-2">
                 <ArrowDown className="h-5 w-5 text-green-600 mr-2 animate-bounce" />
-                <span className="text-sm text-green-600 font-semibold">Summary of all information from above</span>
+                <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
               </div>
             </div>
 
@@ -603,12 +592,11 @@ export const QuoteBuilder = () => {
               programStartDate={programStartDate}
               onStartDateChange={setProgramStartDate}
               programEndDate={addMonths(programStartDate, 12)}
-              volumeSavings={selectedStudentData && hasVolumeDiscount ? 
-                (selectedStudentData.basePrice.student - calculateStudentPrice(selectedStudentData)) * studentCount : 0}
+              volumeSavings={volumeSavings}
             />
 
-            {/* Action Buttons */}
-            <div style={{ background: 'linear-gradient(135deg, #fe5510, #fea700, #fe8303)' }} className="p-6 rounded-lg mt-6">
+            {/* Action Buttons with orange gradient */}
+            <div className="mt-6">
               <ActionButtons
                 selectedTier={useUnlimited ? unlimitedTier : { 
                   name: `${selectedTeacherData?.name || ''}${selectedTeacherData && selectedStudentData ? ' + ' : ''}${selectedStudentData?.name || ''}`,

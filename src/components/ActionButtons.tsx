@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { FileText, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -49,38 +48,36 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   if (!selectedTier) return null;
 
   return (
-    <Card className="bg-gradient-to-r from-teal-500 to-teal-600 border-0 shadow-2xl animate-scale-in">
-      <div className="p-8 text-center">
-        <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
-        <p className="text-white/90 mb-6">
-          Your quote for {selectedTier.name} is ready at ${totalPrice.toLocaleString()} (inc. GST)
-        </p>
+    <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
+      <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
+      <p className="text-white/90 mb-6">
+        Your quote for {selectedTier.name} is ready at ${totalPrice.toLocaleString()} (inc. GST)
+      </p>
+      
+      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+        <Button
+          onClick={handleExportPDF}
+          variant="secondary"
+          size="lg"
+          className="flex-1 bg-white/90 hover:bg-white text-orange-900 font-semibold transition-all duration-200 hover:scale-105"
+        >
+          <FileText className="h-5 w-5 mr-2" />
+          Export Quote as PDF
+        </Button>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-          <Button
-            onClick={handleExportPDF}
-            variant="secondary"
-            size="lg"
-            className="flex-1 bg-white/90 hover:bg-white text-teal-900 font-semibold transition-all duration-200 hover:scale-105"
-          >
-            <FileText className="h-5 w-5 mr-2" />
-            Export Quote as PDF
-          </Button>
-          
-          <Button
-            onClick={handlePlaceOrder}
-            size="lg"
-            className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold transition-all duration-200 hover:scale-105 shadow-lg"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Place Order Now
-          </Button>
-        </div>
-        
-        <p className="text-white/80 text-sm mt-4">
-          Questions? Contact our team at hello@mandymoney.com.au
-        </p>
+        <Button
+          onClick={handlePlaceOrder}
+          size="lg"
+          className="flex-1 bg-white text-orange-600 hover:bg-gray-100 font-bold transition-all duration-200 hover:scale-110 shadow-lg border-2 border-white text-lg"
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          + PLACE ORDER NOW
+        </Button>
       </div>
-    </Card>
+      
+      <p className="text-white/80 text-sm mt-4">
+        Questions? Contact our team at hello@mandymoney.com.au
+      </p>
+    </div>
   );
 };
