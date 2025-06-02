@@ -18,6 +18,7 @@ interface PricingCardProps {
   studentPrice?: number;
   includeGST?: boolean;
   colorScheme?: 'teal' | 'yellow';
+  customGradient?: string;
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
@@ -31,9 +32,11 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   showImages = false,
   studentPrice,
   includeGST = false,
-  colorScheme = 'teal'
+  colorScheme = 'teal',
+  customGradient
 }) => {
   const getGradientClass = () => {
+    if (customGradient) return '';
     if (colorScheme === 'yellow') {
       if (tier.id.includes('digital')) return 'from-yellow-400 to-yellow-500';
       if (tier.id.includes('physical')) return 'from-yellow-500 to-yellow-600';
@@ -98,7 +101,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         )}
 
         {/* Header */}
-        <div className={cn('h-20 rounded-lg mb-4 bg-gradient-to-r', getGradientClass())}>
+        <div 
+          className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-r ' + getGradientClass())}
+          style={customGradient ? { background: customGradient } : {}}
+        >
           <div className="flex items-center justify-center h-full">
             <h3 className="text-white font-bold text-lg text-center">{tier.name}</h3>
           </div>
@@ -135,12 +141,12 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         </div>
 
-        {/* Key Features */}
+        {/* Key Inclusions */}
         <div className="space-y-2 mb-4">
           <h4 className={cn(
             "font-semibold text-sm",
             colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
-          )}>Features Included:</h4>
+          )}>Inclusions:</h4>
           {allInclusions.slice(0, 3).map((inclusion, index) => (
             <div key={index} className="flex items-center text-sm text-gray-700">
               <Check className={cn(
@@ -155,7 +161,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               "text-sm font-medium",
               colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
             )}>
-              +{allInclusions.length - 3} more features
+              +{allInclusions.length - 3} more inclusions
             </div>
           )}
         </div>

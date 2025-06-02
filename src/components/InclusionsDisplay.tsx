@@ -29,6 +29,7 @@ interface InclusionsDisplayProps {
   programStartDate: Date;
   onStartDateChange: (date: Date) => void;
   programEndDate: Date;
+  volumeSavings?: number;
 }
 
 const lessonsByMicroCredential = {
@@ -91,248 +92,200 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
   teacherCount,
   studentCount,
   studentPrice,
-  isUnlimited = false,
+  isUnlimited,
   unlimitedTier,
   unlimitedAddOns,
   programStartDate,
   onStartDateChange,
-  programEndDate
+  programEndDate,
+  volumeSavings = 0
 }) => {
-  const [showAllLessons, setShowAllLessons] = useState(false);
-  const [expandedMicroCredential, setExpandedMicroCredential] = useState<string | null>(null);
-
-  const getPriceBreakdown = () => {
-    if (isUnlimited && unlimitedTier) {
-      const breakdown = [
-        { label: 'Unlimited School Access', amount: unlimitedTier.basePrice }
-      ];
-      if (unlimitedAddOns?.teacherBooks) {
-        breakdown.push({
-          label: `${unlimitedAddOns.teacherBooks} Teacher Book${unlimitedAddOns.teacherBooks > 1 ? 's' : ''} × $${unlimitedTier.addOns.teacherBooks}`,
-          amount: unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks
-        });
-      }
-      if (unlimitedAddOns?.studentBooks) {
-        breakdown.push({
-          label: `${unlimitedAddOns.studentBooks} Student Book${unlimitedAddOns.studentBooks > 1 ? 's' : ''} × $${unlimitedTier.addOns.studentBooks}`,
-          amount: unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks
-        });
-      }
-      return breakdown;
-    }
-
-    const breakdown = [];
-    if (teacherTier) {
-      breakdown.push({ 
-        label: `${teacherCount} Teacher${teacherCount > 1 ? 's' : ''} × $${teacherTier.basePrice.teacher}`, 
-        amount: teacherTier.basePrice.teacher * teacherCount 
-      });
-    }
-    if (studentTier) {
-      const originalPrice = studentTier.basePrice.student;
-      const savings = studentCount >= 12 ? (originalPrice - studentPrice) * studentCount : 0;
-      breakdown.push({ 
-        label: `${studentCount} Student${studentCount > 1 ? 's' : ''} × $${studentPrice}`, 
-        amount: studentPrice * studentCount,
-        savings: savings > 0 ? savings : undefined,
-        originalAmount: savings > 0 ? originalPrice * studentCount : undefined
-      });
-    }
-    return breakdown;
-  };
+  const formatDate = (date: Date) => format(date, 'MMMM d, yyyy');
 
   return (
-    <Card className="mb-8 bg-white border-2 border-gray-800 shadow-2xl">
-      <div className="p-8">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg p-6 mb-8 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Official Program Quote</h2>
-              <p className="text-gray-200">
-                {isUnlimited ? 'Unlimited School Access' : 
-                  `${teacherTier?.name || ''}${teacherTier && studentTier ? ' + ' : ''}${studentTier?.name || ''}`}
-              </p>
+    <Card className="mb-8 p-8 bg-white shadow-lg border-2 border-green-200">
+      {/* Program Details with Start Date */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold text-green-800 mb-4">Program Details</h3>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Program Duration:</span>
+              <span className="font-medium">12 months</span>
             </div>
-            <div className="text-right">
-              <div className="text-4xl font-bold">${pricing.total.toLocaleString()}</div>
-              <div className="text-gray-200">Total Price (inc. GST)</div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Program Start:</span>
+              <span className="font-medium">{formatDate(programStartDate)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Program End:</span>
+              <span className="font-medium">{formatDate(programEndDate)}</span>
             </div>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Price Breakdown */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Investment Breakdown</h3>
-            <div className="space-y-3">
-              {getPriceBreakdown().map((item, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700 text-sm">{item.label}</span>
-                    <div className="text-right">
-                      {item.originalAmount && (
-                        <div className="text-xs text-gray-500 line-through">
-                          ${item.originalAmount.toLocaleString()}
-                        </div>
-                      )}
-                      <span className="font-semibold text-gray-900">${item.amount.toLocaleString()}</span>
-                    </div>
-                  </div>
-                  {item.savings && (
-                    <div className="text-center">
-                      <Badge className="bg-green-100 text-green-800 text-xs">
-                        You save ${item.savings.toLocaleString()}!
-                      </Badge>
-                    </div>
-                  )}
-                </div>
-              ))}
-              
-              <div className="border-t pt-3 mt-3">
-                <div className="flex justify-between items-center text-xl font-bold">
-                  <span>Total Investment</span>
-                  <span className="text-2xl">${pricing.total.toLocaleString()}</span>
-                </div>
-                <div className="text-sm text-gray-600 text-right mt-1">
-                  (Price includes 10% GST)
-                </div>
-              </div>
-            </div>
-
-            {/* Program Start Date */}
-            <div className="mt-6">
-              <h4 className="font-semibold text-gray-800 mb-3">Program Timeline</h4>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !programStartDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={programStartDate}
-                    onSelect={(date) => date && onStartDateChange(date)}
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
-                <div className="text-blue-800 text-sm">
-                  <p className="font-semibold mb-1">12 Month Access Period</p>
-                  <p>Starts: <span className="font-medium">{format(programStartDate, 'PPP')}</span></p>
-                  <p>Ends: <span className="font-medium">{format(programEndDate, 'PPP')}</span></p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Teacher Features */}
-          {(teacherTier || isUnlimited) && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-teal-800 mb-4 flex items-center">
-                <div className="w-4 h-4 bg-teal-500 rounded mr-2"></div>
-                Teacher Inclusions
-              </h3>
-              <div className="space-y-3">
-                {(isUnlimited ? unlimitedTier?.inclusions.slice(0, 5) : 
-                  [...(teacherTier?.inclusions.teacher || []), ...(teacherTier?.inclusions.classroom || [])]
-                )?.map((inclusion, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-teal-50 to-teal-100 rounded-lg">
-                    <Check className="h-5 w-5 text-teal-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-teal-700">{inclusion}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Student Features */}
-          {(studentTier || isUnlimited) && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-yellow-800 mb-4 flex items-center">
-                <div className="w-4 h-4 bg-yellow-500 rounded mr-2"></div>
-                Student Inclusions
-              </h3>
-              <div className="space-y-3">
-                {(isUnlimited ? unlimitedTier?.inclusions.slice(5) : 
-                  studentTier?.inclusions.student
-                )?.map((inclusion, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg">
-                    <Check className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-yellow-700">{inclusion}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        <div>
+          <h4 className="text-lg font-semibold text-green-800 mb-4">Select Program Start Date</h4>
+          <ProgramStartDate
+            programStartDate={programStartDate}
+            onStartDateChange={onStartDateChange}
+          />
         </div>
+      </div>
 
-        {/* 42 Lessons Showcase */}
-        <div className="mt-12 border-t pt-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-semibold text-gray-800 flex items-center">
-              <Book className="h-6 w-6 mr-2 text-blue-600" />
-              All 42 Financial Literacy Lessons Included
-            </h3>
-            <Button
-              variant="outline"
-              onClick={() => setShowAllLessons(!showAllLessons)}
-              className="flex items-center space-x-2 border-blue-200 text-blue-600 hover:bg-blue-50"
-            >
-              <span>{showAllLessons ? 'Show Less' : 'Show All Lessons'}</span>
-              {showAllLessons ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
-          </div>
-          
+      {/* Selections Summary */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-green-800 mb-4">Your Selections</h3>
+        
+        {isUnlimited ? (
           <div className="space-y-4">
-            {Object.entries(lessonsByMicroCredential).map(([microCredential, lessons]) => (
-              <div key={microCredential} className="border border-blue-200 rounded-lg">
-                <div 
-                  className="p-4 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors"
-                  onClick={() => setExpandedMicroCredential(expandedMicroCredential === microCredential ? null : microCredential)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Badge className="bg-blue-600 text-white">{microCredential}</Badge>
-                      <span className="font-semibold text-blue-800">{lessons.length} Lessons</span>
-                    </div>
-                    {expandedMicroCredential === microCredential ? 
-                      <ChevronDown className="h-5 w-5 text-blue-600" /> : 
-                      <ChevronUp className="h-5 w-5 text-blue-600" />
-                    }
+            <div className="p-4 bg-green-50 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-green-800">{unlimitedTier?.name}</span>
+                <span className="text-green-700 font-bold">${unlimitedTier?.basePrice.toLocaleString()}</span>
+              </div>
+              <p className="text-green-600 text-sm mt-1">Unlimited access for all teachers and students</p>
+            </div>
+            
+            {unlimitedAddOns && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0) && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-gray-700">Add-ons:</h4>
+                {unlimitedAddOns.teacherBooks > 0 && (
+                  <div className="flex justify-between p-3 bg-gray-50 rounded">
+                    <span>Teacher Books × {unlimitedAddOns.teacherBooks}</span>
+                    <span className="font-medium">${(unlimitedAddOns.teacherBooks * (unlimitedTier?.addOns.teacherBooks || 0)).toLocaleString()}</span>
                   </div>
-                </div>
-                
-                {(expandedMicroCredential === microCredential || showAllLessons) && (
-                  <div className="p-4 bg-white border-t">
-                    <div className="grid gap-2">
-                      {lessons.map((lesson) => (
-                        <div key={lesson.lesson} className="flex items-center space-x-3 p-2 hover:bg-blue-50 rounded">
-                          <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                            {lesson.lesson}
-                          </div>
-                          <div className="flex-1">
-                            <span className="font-medium text-blue-700">{lesson.title}</span>
-                            <div className="text-sm text-blue-500">{lesson.topic}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                )}
+                {unlimitedAddOns.studentBooks > 0 && (
+                  <div className="flex justify-between p-3 bg-gray-50 rounded">
+                    <span>Student Books × {unlimitedAddOns.studentBooks}</span>
+                    <span className="font-medium">${(unlimitedAddOns.studentBooks * (unlimitedTier?.addOns.studentBooks || 0)).toLocaleString()}</span>
                   </div>
                 )}
               </div>
-            ))}
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {teacherTier && (
+              <div className="p-4 rounded-lg" style={{ background: 'linear-gradient(135deg, #005653, #45c0a9, #80dec4)', color: 'white' }}>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{teacherTier.name} × {teacherCount}</span>
+                  <span className="font-bold">${(teacherTier.basePrice.teacher * teacherCount).toLocaleString()}</span>
+                </div>
+                <div className="mt-2 space-y-1">
+                  <h5 className="font-medium text-sm opacity-90">Teacher Inclusions:</h5>
+                  {teacherTier.inclusions.teacher.slice(0, 3).map((inclusion, index) => (
+                    <div key={index} className="flex items-center text-sm opacity-80">
+                      <Check className="h-3 w-3 mr-2 flex-shrink-0" />
+                      <span>{inclusion}</span>
+                    </div>
+                  ))}
+                  {teacherTier.inclusions.teacher.length > 3 && (
+                    <div className="text-sm opacity-80">
+                      +{teacherTier.inclusions.teacher.length - 3} more inclusions
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {studentTier && (
+              <div className="p-4 rounded-lg" style={{ background: 'linear-gradient(135deg, #ffb512, #ffde5a, #fea100)', color: 'white' }}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className="font-medium">{studentTier.name} × {studentCount}</span>
+                    <div className="text-sm opacity-90">${studentPrice}/student</div>
+                    {volumeSavings > 0 && (
+                      <div className="text-sm font-bold text-green-200">
+                        💰 Volume Savings: ${volumeSavings.toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                  <span className="font-bold">${(studentPrice * studentCount).toLocaleString()}</span>
+                </div>
+                <div className="mt-2 space-y-1">
+                  <h5 className="font-medium text-sm opacity-90">Student Inclusions:</h5>
+                  {studentTier.inclusions.student.slice(0, 3).map((inclusion, index) => (
+                    <div key={index} className="flex items-center text-sm opacity-80">
+                      <Check className="h-3 w-3 mr-2 flex-shrink-0" />
+                      <span>{inclusion}</span>
+                    </div>
+                  ))}
+                  {studentTier.inclusions.student.length > 3 && (
+                    <div className="text-sm opacity-80">
+                      +{studentTier.inclusions.student.length - 3} more inclusions
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Program Content */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-green-800 mb-4">All 42 Financial Literacy Lessons Included</h3>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h4 className="font-semibold text-blue-800 mb-2">Level 1 - Foundations</h4>
+            <div className="text-sm text-blue-600 space-y-1">
+              <div>• Setting the Scene</div>
+              <div>• Budgeting Level 1</div>
+              <div>• Spending</div>
+              <div>• Super</div>
+              <div>• Tax</div>
+            </div>
+            <div className="text-xs text-blue-500 mt-2">Lessons 1-10</div>
+          </div>
+          
+          <div className="p-4 bg-green-50 rounded-lg">
+            <h4 className="font-semibold text-green-800 mb-2">Level 2 - Building Skills</h4>
+            <div className="text-sm text-green-600 space-y-1">
+              <div>• Budgeting Level 2</div>
+              <div>• Saving</div>
+              <div>• Employment</div>
+              <div>• Real World</div>
+            </div>
+            <div className="text-xs text-green-500 mt-2">Lessons 11-21</div>
+          </div>
+          
+          <div className="p-4 bg-orange-50 rounded-lg">
+            <h4 className="font-semibold text-orange-800 mb-2">Level 3 - Advanced Topics</h4>
+            <div className="text-sm text-orange-600 space-y-1">
+              <div>• Budgeting Level 3</div>
+              <div>• Systems</div>
+              <div>• Safety</div>
+            </div>
+            <div className="text-xs text-orange-500 mt-2">Lessons 22-31</div>
+          </div>
+          
+          <div className="p-4 bg-purple-50 rounded-lg">
+            <h4 className="font-semibold text-purple-800 mb-2">Level 4 - Mastery</h4>
+            <div className="text-sm text-purple-600 space-y-1">
+              <div>• Wealth</div>
+              <div>• Debt</div>
+              <div>• Investing</div>
+            </div>
+            <div className="text-xs text-purple-500 mt-2">Lessons 32-42</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Final Pricing */}
+      <div className="border-t pt-6">
+        <div className="flex justify-between items-end">
+          <div>
+            <h3 className="text-2xl font-bold text-green-800">Total Investment</h3>
+            {volumeSavings > 0 && (
+              <p className="text-green-600 font-medium">Including ${volumeSavings.toLocaleString()} volume discount savings!</p>
+            )}
+            <p className="text-gray-600">12-month program access (inc. GST)</p>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-green-800">${pricing.total.toLocaleString()}</div>
           </div>
         </div>
       </div>
