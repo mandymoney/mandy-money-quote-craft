@@ -1,14 +1,17 @@
-
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
 import { InclusionsDisplay } from './InclusionsDisplay';
 import { ActionButtons } from './ActionButtons';
 import { UnlimitedSchoolCard } from './UnlimitedSchoolCard';
+import { VideoEmbed } from './VideoEmbed';
+import { ProgramStartDate } from './ProgramStartDate';
+import { LessonExplorer } from './LessonExplorer';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
+import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
   id: string;
@@ -170,8 +173,10 @@ export const QuoteBuilder = () => {
     teacherBooks: 0,
     studentBooks: 0
   });
+  const [programStartDate, setProgramStartDate] = useState<Date>(new Date());
 
   const GST_RATE = 0.1;
+  const programEndDate = addMonths(programStartDate, 12);
 
   const calculateStudentPrice = (tier: PricingTier): number => {
     let studentPrice = tier.basePrice.student;
@@ -219,31 +224,60 @@ export const QuoteBuilder = () => {
     return { subtotal, gst, total };
   };
 
+  const handleTeacherSelection = (tierId: string) => {
+    if (useUnlimited) setUseUnlimited(false);
+    setSelectedTeacherTier(tierId);
+  };
+
+  const handleStudentSelection = (tierId: string) => {
+    if (useUnlimited) setUseUnlimited(false);
+    setSelectedStudentTier(tierId);
+  };
+
+  const handleUnlimitedSelection = () => {
+    if (!useUnlimited) {
+      setSelectedTeacherTier('');
+      setSelectedStudentTier('');
+    }
+    setUseUnlimited(!useUnlimited);
+  };
+
   const selectedTeacherData = teacherTiers.find(tier => tier.id === selectedTeacherTier);
   const selectedStudentData = studentTiers.find(tier => tier.id === selectedStudentTier);
   const regularPricing = calculateRegularTotal();
   const unlimitedPricing = calculateUnlimitedTotal();
   const nextDiscount = getNextDiscountThreshold();
 
-  const hasValidSelection = selectedTeacherData && selectedStudentData;
+  const hasValidSelection = selectedTeacherData || selectedStudentData;
+  const showUnlimitedSuggestion = regularPricing.total > 2000 && !useUnlimited && hasValidSelection;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent mb-4">
-            The Mandy Money Program
+        {/* Header with Logo */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/lovable-uploads/25655841-ce46-4847-b1b0-63cf9fc9699e.png" 
+              alt="Mandy Money High School Program Logo" 
+              className="h-24 object-contain"
+            />
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Quote Builder
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Build your custom quote and see live pricing for Australia's leading financial literacy program
+            Build your custom quote for Australia's leading financial literacy program
           </p>
         </div>
+
+        {/* Video Embed */}
+        <VideoEmbed />
 
         <div className="grid lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3">
             {/* Teacher Section */}
-            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <Card className="mb-8 p-6 bg-white shadow-sm">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6">Teacher Options</h2>
               
               <div className="mb-6">
@@ -262,13 +296,13 @@ export const QuoteBuilder = () => {
                   <PricingCard
                     key={tier.id}
                     tier={tier}
-                    price={(tier.basePrice.teacher * teacherCount) + ((tier.basePrice.teacher * teacherCount) * GST_RATE)}
+                    price={tier.basePrice.teacher}
                     isSelected={selectedTeacherTier === tier.id}
-                    onSelect={() => setSelectedTeacherTier(tier.id)}
+                    onSelect={() => handleTeacherSelection(tier.id)}
                     teacherCount={teacherCount}
                     studentCount={0}
                     animationDelay={index * 100}
-                    showImages={true}
+                    showImages={false}
                     includeGST={true}
                   />
                 ))}
@@ -289,7 +323,7 @@ export const QuoteBuilder = () => {
             </Card>
 
             {/* Student Section */}
-            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+            <Card className="mb-8 p-6 bg-white shadow-sm">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6">Student Options</h2>
               
               <div className="mb-6">
@@ -303,7 +337,6 @@ export const QuoteBuilder = () => {
                 />
               </div>
 
-              {/* Discount Progress */}
               {nextDiscount && (
                 <div className="mb-6 text-center">
                   <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-lg px-4 py-2">
@@ -317,13 +350,13 @@ export const QuoteBuilder = () => {
                   <PricingCard
                     key={tier.id}
                     tier={tier}
-                    price={(calculateStudentPrice(tier) * studentCount) + ((calculateStudentPrice(tier) * studentCount) * GST_RATE)}
+                    price={calculateStudentPrice(tier)}
                     isSelected={selectedStudentTier === tier.id}
-                    onSelect={() => setSelectedStudentTier(tier.id)}
+                    onSelect={() => handleStudentSelection(tier.id)}
                     teacherCount={0}
                     studentCount={studentCount}
                     animationDelay={index * 100}
-                    showImages={true}
+                    showImages={false}
                     studentPrice={calculateStudentPrice(tier)}
                     includeGST={true}
                   />
@@ -344,6 +377,21 @@ export const QuoteBuilder = () => {
               )}
             </Card>
 
+            {/* Unlimited School Access Suggestion */}
+            {showUnlimitedSuggestion && (
+              <Card className="mb-8 p-6 bg-orange-50 border-orange-200">
+                <div className="flex items-center space-x-3">
+                  <AlertTriangle className="h-6 w-6 text-orange-600" />
+                  <div>
+                    <h3 className="font-semibold text-orange-800">Consider Unlimited School Access</h3>
+                    <p className="text-orange-700">
+                      Your current quote is ${regularPricing.total.toLocaleString()}. The Unlimited School Access option might offer better value at ${unlimitedPricing.total.toLocaleString()}.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )}
+
             {/* OR Divider */}
             <div className="mb-8 text-center">
               <div className="relative">
@@ -351,7 +399,7 @@ export const QuoteBuilder = () => {
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-lg">
-                  <span className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 px-6 text-2xl font-bold text-gray-700">OR</span>
+                  <span className="bg-gray-50 px-6 text-2xl font-bold text-gray-700">OR</span>
                 </div>
               </div>
             </div>
@@ -360,7 +408,7 @@ export const QuoteBuilder = () => {
             <UnlimitedSchoolCard
               tier={unlimitedTier}
               isSelected={useUnlimited}
-              onSelect={() => setUseUnlimited(!useUnlimited)}
+              onSelect={handleUnlimitedSelection}
               addOns={unlimitedAddOns}
               onAddOnsChange={setUnlimitedAddOns}
               pricing={unlimitedPricing}
@@ -385,60 +433,46 @@ export const QuoteBuilder = () => {
           {/* Running Total Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-              <Card className="p-6 bg-gradient-to-br from-purple-500 to-pink-500 text-white border-0 shadow-xl">
-                <h3 className="text-xl font-bold mb-4">Running Total</h3>
+              <Card className="p-6 bg-white shadow-sm border-2 border-gray-200">
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Running Total</h3>
                 
                 {useUnlimited ? (
                   <div className="space-y-3">
-                    <div className="text-2xl font-bold">${unlimitedPricing.total.toLocaleString()}</div>
-                    <div className="text-white/90 text-sm">Unlimited School Access</div>
-                    <div className="border-t border-white/30 pt-3 space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span>Subtotal:</span>
-                        <span>${unlimitedPricing.subtotal.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>GST (10%):</span>
-                        <span>${unlimitedPricing.gst.toLocaleString()}</span>
-                      </div>
-                    </div>
+                    <div className="text-3xl font-bold text-gray-900">${unlimitedPricing.total.toLocaleString()}</div>
+                    <div className="text-gray-600 text-sm">Unlimited School Access (inc. GST)</div>
+                    <div className="text-xs text-gray-500">Includes 12 month access</div>
                   </div>
                 ) : hasValidSelection ? (
                   <div className="space-y-3">
-                    <div className="text-2xl font-bold">${regularPricing.total.toLocaleString()}</div>
-                    <div className="text-white/90 text-sm">
-                      {teacherCount} Teacher{teacherCount > 1 ? 's' : ''} + {studentCount} Student{studentCount > 1 ? 's' : ''}
+                    <div className="text-3xl font-bold text-gray-900">${regularPricing.total.toLocaleString()}</div>
+                    <div className="text-gray-600 text-sm">
+                      {selectedTeacherData ? `${teacherCount} Teacher${teacherCount > 1 ? 's' : ''}` : ''}
+                      {selectedTeacherData && selectedStudentData ? ' + ' : ''}
+                      {selectedStudentData ? `${studentCount} Student${studentCount > 1 ? 's' : ''}` : ''}
+                      {' (inc. GST)'}
                     </div>
-                    <div className="border-t border-white/30 pt-3 space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span>Subtotal:</span>
-                        <span>${regularPricing.subtotal.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>GST (10%):</span>
-                        <span>${regularPricing.gst.toLocaleString()}</span>
-                      </div>
-                    </div>
+                    <div className="text-xs text-gray-500">Includes 12 month access</div>
                     
-                    {/* Volume Discount Badge */}
-                    {studentCount >= 12 && (
-                      <Badge className="bg-green-400 text-green-900 hover:bg-green-400 w-full justify-center">
+                    {studentCount >= 12 && selectedStudentData && (
+                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 w-full justify-center">
                         🎉 Volume discount active!
                       </Badge>
                     )}
                   </div>
                 ) : (
                   <div className="text-center">
-                    <div className="text-white/80 text-sm mb-2">Select teacher & student options to see pricing</div>
-                    <div className="text-lg">$0</div>
+                    <div className="text-gray-500 text-sm mb-2">Select options to see pricing</div>
+                    <div className="text-2xl text-gray-400">$0</div>
                   </div>
                 )}
 
-                {/* Classroom Space Notice */}
-                {((hasValidSelection && teacherCount > 0 && studentCount > 0) || useUnlimited) && (
-                  <div className="mt-4 p-3 bg-white/20 rounded-lg">
-                    <div className="text-white font-medium text-sm text-center">
-                      ✨ Includes {useUnlimited ? 'unlimited' : teacherCount} classroom space{useUnlimited || teacherCount > 1 ? 's' : ''} with student progress tracking
+                {/* Digital Pass Benefits */}
+                {((selectedTeacherData && selectedTeacherData.id.includes('digital')) || 
+                  (selectedStudentData && selectedStudentData.id.includes('digital')) || 
+                  useUnlimited) && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <div className="text-blue-800 font-medium text-sm text-center">
+                      ✨ Includes free intro lesson + pre & post-program testing
                     </div>
                   </div>
                 )}
@@ -446,6 +480,15 @@ export const QuoteBuilder = () => {
             </div>
           </div>
         </div>
+
+        {/* Program Start Date */}
+        {((hasValidSelection && !useUnlimited) || useUnlimited) && (
+          <ProgramStartDate
+            startDate={programStartDate}
+            onStartDateChange={setProgramStartDate}
+            endDate={programEndDate}
+          />
+        )}
 
         {/* Detailed Quote Breakdown */}
         {((hasValidSelection && !useUnlimited) || useUnlimited) && (
@@ -464,7 +507,7 @@ export const QuoteBuilder = () => {
             {/* Action Buttons */}
             <ActionButtons
               selectedTier={useUnlimited ? unlimitedTier : { 
-                name: `${selectedTeacherData?.name} + ${selectedStudentData?.name}`,
+                name: `${selectedTeacherData?.name || ''}${selectedTeacherData && selectedStudentData ? ' + ' : ''}${selectedStudentData?.name || ''}`,
                 id: 'combined'
               }}
               totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
@@ -473,6 +516,9 @@ export const QuoteBuilder = () => {
             />
           </>
         )}
+
+        {/* Lesson Explorer */}
+        <LessonExplorer />
       </div>
     </div>
   );
