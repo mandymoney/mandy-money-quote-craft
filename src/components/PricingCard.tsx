@@ -17,6 +17,7 @@ interface PricingCardProps {
   showImages?: boolean;
   studentPrice?: number;
   includeGST?: boolean;
+  colorScheme?: 'teal' | 'yellow';
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
@@ -29,13 +30,14 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   animationDelay,
   showImages = false,
   studentPrice,
-  includeGST = false
+  includeGST = false,
+  colorScheme = 'teal'
 }) => {
   const getGradientClass = () => {
-    if (tier.type === 'teacher') {
-      if (tier.id.includes('digital')) return 'from-teal-500 to-teal-600';
-      if (tier.id.includes('physical')) return 'from-teal-600 to-teal-700';
-      return 'from-teal-700 to-teal-800';
+    if (colorScheme === 'yellow') {
+      if (tier.id.includes('digital')) return 'from-yellow-400 to-yellow-500';
+      if (tier.id.includes('physical')) return 'from-yellow-500 to-yellow-600';
+      return 'from-yellow-600 to-yellow-700';
     } else {
       if (tier.id.includes('digital')) return 'from-teal-400 to-teal-500';
       if (tier.id.includes('physical')) return 'from-teal-500 to-teal-600';
@@ -44,7 +46,14 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   };
 
   const getBorderClass = () => {
-    return isSelected ? 'border-teal-300' : 'border-gray-200';
+    if (colorScheme === 'yellow') {
+      return isSelected ? 'border-yellow-400' : 'border-gray-200';
+    }
+    return isSelected ? 'border-teal-400' : 'border-gray-200';
+  };
+
+  const getAccentColor = () => {
+    return colorScheme === 'yellow' ? 'yellow' : 'teal';
   };
 
   const allInclusions = [
@@ -75,10 +84,15 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       <div className="p-6">
         {/* Image Placeholder */}
         {showImages && (
-          <div className="h-32 bg-teal-50 rounded-lg mb-4 flex items-center justify-center border-2 border-dashed border-teal-300">
+          <div className={cn(
+            "h-32 rounded-lg mb-4 flex items-center justify-center border-2 border-dashed",
+            colorScheme === 'yellow' ? 'bg-yellow-50 border-yellow-300' : 'bg-teal-50 border-teal-300'
+          )}>
             <div className="text-center">
-              <Image className="h-8 w-8 text-teal-400 mx-auto mb-2" />
-              <p className="text-sm text-teal-500 font-medium">Upload {tier.name} Image</p>
+              <Image className={cn("h-8 w-8 mx-auto mb-2", colorScheme === 'yellow' ? 'text-yellow-400' : 'text-teal-400')} />
+              <p className={cn("text-sm font-medium", colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500')}>
+                Upload {tier.name} Image
+              </p>
             </div>
           </div>
         )}
@@ -94,35 +108,53 @@ export const PricingCard: React.FC<PricingCardProps> = ({
 
         {/* Best For */}
         {tier.bestFor && (
-          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center text-yellow-800">
-              <Star className="h-4 w-4 mr-2 text-yellow-600" />
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-center text-amber-800">
+              <Star className="h-4 w-4 mr-2 text-amber-600" />
               <span className="text-sm font-medium">Best for: {tier.bestFor}</span>
             </div>
           </div>
         )}
 
         {/* Simple Pricing */}
-        <div className="mb-6 bg-teal-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-teal-900">
+        <div className={cn(
+          "mb-6 rounded-lg p-4 text-center",
+          colorScheme === 'yellow' ? 'bg-yellow-50' : 'bg-teal-50'
+        )}>
+          <div className={cn(
+            "text-2xl font-bold",
+            colorScheme === 'yellow' ? 'text-yellow-900' : 'text-teal-900'
+          )}>
             ${(studentPrice || price).toLocaleString()}
           </div>
-          <div className="text-sm text-teal-600">
+          <div className={cn(
+            "text-sm",
+            colorScheme === 'yellow' ? 'text-yellow-600' : 'text-teal-600'
+          )}>
             per {tier.type} (inc. GST)
           </div>
         </div>
 
         {/* Key Features */}
         <div className="space-y-2 mb-4">
-          <h4 className="font-semibold text-teal-700 text-sm">Features Included:</h4>
+          <h4 className={cn(
+            "font-semibold text-sm",
+            colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
+          )}>Features Included:</h4>
           {allInclusions.slice(0, 3).map((inclusion, index) => (
             <div key={index} className="flex items-center text-sm text-gray-700">
-              <Check className="h-4 w-4 text-teal-500 mr-2 flex-shrink-0" />
+              <Check className={cn(
+                "h-4 w-4 mr-2 flex-shrink-0",
+                colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
+              )} />
               <span>{inclusion}</span>
             </div>
           ))}
           {allInclusions.length > 3 && (
-            <div className="text-sm text-teal-500 font-medium">
+            <div className={cn(
+              "text-sm font-medium",
+              colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
+            )}>
               +{allInclusions.length - 3} more features
             </div>
           )}
@@ -143,8 +175,16 @@ export const PricingCard: React.FC<PricingCardProps> = ({
 
         {/* Selection Indicator */}
         {isSelected && (
-          <div className="mt-4 p-2 bg-teal-50 border border-teal-200 rounded-lg">
-            <div className="flex items-center justify-center text-teal-700 font-medium text-sm">
+          <div className={cn(
+            "mt-4 p-2 border rounded-lg",
+            colorScheme === 'yellow' 
+              ? 'bg-yellow-50 border-yellow-200' 
+              : 'bg-teal-50 border-teal-200'
+          )}>
+            <div className={cn(
+              "flex items-center justify-center font-medium text-sm",
+              colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
+            )}>
               <Check className="h-4 w-4 mr-1" />
               Selected
             </div>
