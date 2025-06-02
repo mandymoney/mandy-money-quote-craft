@@ -27,7 +27,6 @@ interface InclusionsDisplayProps {
   unlimitedAddOns?: {
     teacherBooks: number;
     studentBooks: number;
-    posterA0: number;
   };
   programStartDate: Date;
   onStartDateChange: (date: Date) => void;
