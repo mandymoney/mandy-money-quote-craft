@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, Image, ChevronDown, ChevronUp, Book } from 'lucide-react';
 import { PricingTier } from './QuoteBuilder';
+import { cn } from '@/lib/utils';
 
 interface InclusionsDisplayProps {
   teacherTier: PricingTier;
