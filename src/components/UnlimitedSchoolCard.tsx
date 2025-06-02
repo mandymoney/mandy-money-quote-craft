@@ -3,7 +3,8 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Check, Image, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, Image, Star, Plus, Zap, TrendingUp } from 'lucide-react';
 import { UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -14,8 +15,9 @@ interface UnlimitedSchoolCardProps {
   addOns: {
     teacherBooks: number;
     studentBooks: number;
+    posterA0: number;
   };
-  onAddOnsChange: (addOns: { teacherBooks: number; studentBooks: number }) => void;
+  onAddOnsChange: (addOns: { teacherBooks: number; studentBooks: number; posterA0: number }) => void;
   pricing: {
     subtotal: number;
     gst: number;
@@ -45,24 +47,29 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
     onAddOnsChange({ ...addOns, studentBooks: newCount });
   };
 
-  return (
-    <Card className="mb-8">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Alternative: Unlimited School Access</h2>
-        <p className="text-gray-600">Perfect for schools with 50+ students seeking maximum value</p>
-      </div>
+  const handlePosterA0Change = (value: string) => {
+    const newCount = Math.max(0, parseInt(value) || 0);
+    onAddOnsChange({ ...addOns, posterA0: newCount });
+  };
 
+  const regularPrice = studentCount * 55 + teacherCount * 189; // Approximate comparison
+  const savings = regularPrice > tier.basePrice ? regularPrice - tier.basePrice : 0;
+
+  return (
+    <div className="mb-8 relative">
       <Card
         className={cn(
-          'relative cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl',
-          'bg-gradient-to-r from-green-400 to-green-500 border-0 text-white',
-          isSelected ? 'ring-4 ring-green-300 ring-opacity-70 shadow-2xl' : 'shadow-lg'
+          'relative cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl',
+          'bg-gradient-to-r from-yellow-400 via-lime-300 to-green-400 border-0 text-gray-800 overflow-hidden',
+          isSelected ? 'ring-4 ring-yellow-300 ring-opacity-70 shadow-2xl scale-[1.02]' : 'shadow-lg',
+          'animate-pulse hover:animate-none'
         )}
         onClick={onSelect}
       >
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <Badge className="bg-gradient-to-r from-orange-400 to-orange-500 text-white px-6 py-2 text-lg font-bold">
-            🏫 BEST VALUE FOR SCHOOLS
+        {/* Exciting Banner */}
+        <div className="absolute top-4 right-4 transform rotate-12 z-10">
+          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 text-sm font-bold shadow-lg">
+            🔥 BEST VALUE
           </Badge>
         </div>
 
@@ -70,27 +77,55 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Main Content */}
             <div>
-              <h3 className="text-3xl font-bold mb-2">{tier.name}</h3>
-              <p className="text-white/90 text-lg mb-6">{tier.description}</p>
+              <div className="flex items-center space-x-3 mb-3">
+                <Zap className="h-8 w-8 text-yellow-600 animate-bounce" />
+                <h3 className="text-3xl font-bold">{tier.name}</h3>
+              </div>
+              <p className="text-gray-700 text-lg mb-6">{tier.description}</p>
+
+              {/* Value Comparison */}
+              {savings > 0 && (
+                <div className="bg-white/80 rounded-lg p-4 mb-6 border-2 border-green-500">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    <span className="font-bold text-green-800">MASSIVE SAVINGS!</span>
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    Save over ${savings.toLocaleString()} vs individual pricing!
+                  </div>
+                </div>
+              )}
 
               {/* Base Price */}
-              <div className="bg-white/20 rounded-lg p-6 mb-6">
-                <div className="text-4xl font-bold mb-2">${tier.basePrice.toLocaleString()}</div>
-                <div className="text-white/90">Base unlimited access for all teachers and students</div>
+              <div className="bg-white/90 rounded-lg p-6 mb-6 border-l-4 border-green-500">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm text-gray-600 mb-1">Base Package</div>
+                    <div className="text-3xl font-bold text-gray-800">${tier.basePrice.toLocaleString()}</div>
+                    <div className="text-sm text-gray-600">Unlimited digital access for all</div>
+                  </div>
+                  <Check className="h-8 w-8 text-green-500" />
+                </div>
               </div>
 
               {/* Add-on Options */}
               <div className="space-y-4">
-                <h4 className="text-xl font-semibold text-white">Optional Hard-Copy Add-ons</h4>
+                <div className="flex items-center space-x-2 mb-3">
+                  <Plus className="h-5 w-5 text-gray-700" />
+                  <h4 className="text-xl font-semibold">Optional Hard-Copy Add-ons</h4>
+                </div>
                 
                 {/* Teacher Books */}
-                <div className="bg-white/10 rounded-lg p-4">
+                <div className="bg-white/70 rounded-lg p-4 hover:bg-white/90 transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-white/20 rounded flex items-center justify-center">
-                        <Image className="h-6 w-6 text-white/70" />
+                      <div className="w-12 h-12 bg-teal-500 rounded flex items-center justify-center">
+                        <Image className="h-6 w-6 text-white" />
                       </div>
-                      <span className="font-semibold">Teacher Books (${tier.addOns.teacherBooks} each)</span>
+                      <div>
+                        <span className="font-semibold">+ Teacher Books</span>
+                        <div className="text-sm text-gray-600">${tier.addOns.teacherBooks} each</div>
+                      </div>
                     </div>
                     <Input
                       type="number"
@@ -101,22 +136,25 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                         handleTeacherBooksChange(e.target.value);
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-20 bg-white/20 text-white border-white/30"
+                      className="w-20 bg-white border-gray-300"
                     />
                   </div>
-                  <div className="text-white/80 text-sm">
-                    ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()} total
+                  <div className="text-sm text-gray-600">
+                    Total: ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()}
                   </div>
                 </div>
 
                 {/* Student Books */}
-                <div className="bg-white/10 rounded-lg p-4">
+                <div className="bg-white/70 rounded-lg p-4 hover:bg-white/90 transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-white/20 rounded flex items-center justify-center">
-                        <Image className="h-6 w-6 text-white/70" />
+                      <div className="w-12 h-12 bg-yellow-500 rounded flex items-center justify-center">
+                        <Image className="h-6 w-6 text-white" />
                       </div>
-                      <span className="font-semibold">Student Books (${tier.addOns.studentBooks} each)</span>
+                      <div>
+                        <span className="font-semibold">+ Student Books</span>
+                        <div className="text-sm text-gray-600">${tier.addOns.studentBooks} each</div>
+                      </div>
                     </div>
                     <Input
                       type="number"
@@ -127,49 +165,64 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                         handleStudentBooksChange(e.target.value);
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-20 bg-white/20 text-white border-white/30"
+                      className="w-20 bg-white border-gray-300"
                     />
                   </div>
-                  <div className="text-white/80 text-sm">
-                    ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()} total
+                  <div className="text-sm text-gray-600">
+                    Total: ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()}
+                  </div>
+                </div>
+
+                {/* A0 Poster */}
+                <div className="bg-white/70 rounded-lg p-4 hover:bg-white/90 transition-colors">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-blue-500 rounded flex items-center justify-center">
+                        <Image className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <span className="font-semibold">+ A0 Poster</span>
+                        <div className="text-sm text-gray-600">${tier.addOns.posterA0} each</div>
+                      </div>
+                    </div>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={addOns.posterA0}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handlePosterA0Change(e.target.value);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-20 bg-white border-gray-300"
+                    />
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Total: ${(addOns.posterA0 * tier.addOns.posterA0).toLocaleString()}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Pricing & Inclusions */}
+            {/* Inclusions */}
             <div>
-              {/* Total Pricing */}
-              <div className="bg-white/20 rounded-lg p-6 mb-6">
-                <h4 className="text-xl font-semibold mb-4">Total Price</h4>
-                <div className="text-center">
-                  <div className="text-3xl font-bold mb-2">${pricing.total.toLocaleString()}</div>
-                  <div className="text-white/90 text-sm">Total Price</div>
-                </div>
-              </div>
-
               {/* Key Inclusions */}
-              <div className="space-y-3">
+              <div className="space-y-3 mb-6">
                 <h4 className="text-xl font-semibold">What's Included</h4>
-                {tier.inclusions.slice(0, 6).map((inclusion, index) => (
-                  <div key={index} className="flex items-center text-white/90">
-                    <Check className="h-5 w-5 text-green-200 mr-3 flex-shrink-0" />
+                {tier.inclusions.map((inclusion, index) => (
+                  <div key={index} className="flex items-center text-gray-700">
+                    <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
                     <span>{inclusion}</span>
                   </div>
                 ))}
-                {tier.inclusions.length > 6 && (
-                  <div className="text-white/80 font-medium">
-                    +{tier.inclusions.length - 6} more features
-                  </div>
-                )}
               </div>
 
-              {/* Selection Indicator */}
+              {/* Call to Action */}
               {isSelected && (
-                <div className="mt-6 p-3 bg-orange-400 text-white rounded-lg">
-                  <div className="flex items-center justify-center font-bold">
-                    <Check className="h-5 w-5 mr-2" />
-                    Selected Option
+                <div className="mt-6 p-4 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-lg">
+                  <div className="flex items-center justify-center font-bold text-lg">
+                    <Check className="h-6 w-6 mr-2" />
+                    Selected Option ✨
                   </div>
                 </div>
               )}
@@ -177,6 +230,13 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
           </div>
         </div>
       </Card>
-    </Card>
+
+      {/* Bottom Banner */}
+      <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 rotate-1">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-2 rounded-full shadow-lg transform skew-x-12">
+          <span className="font-bold text-sm">Perfect for schools with 50+ students seeking maximum value</span>
+        </div>
+      </div>
+    </div>
   );
 };

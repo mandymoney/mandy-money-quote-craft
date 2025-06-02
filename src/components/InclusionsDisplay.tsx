@@ -20,11 +20,13 @@ interface InclusionsDisplayProps {
   teacherCount: number;
   studentCount: number;
   studentPrice: number;
+  studentSavings?: number;
   isUnlimited?: boolean;
   unlimitedTier?: UnlimitedTier;
   unlimitedAddOns?: {
     teacherBooks: number;
     studentBooks: number;
+    posterA0: number;
   };
   programStartDate: Date;
   onStartDateChange: (date: Date) => void;
@@ -91,6 +93,7 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
   teacherCount,
   studentCount,
   studentPrice,
+  studentSavings = 0,
   isUnlimited = false,
   unlimitedTier,
   unlimitedAddOns,
@@ -118,6 +121,12 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
           amount: unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks
         });
       }
+      if (unlimitedAddOns?.posterA0) {
+        breakdown.push({
+          label: `${unlimitedAddOns.posterA0} A0 Poster${unlimitedAddOns.posterA0 > 1 ? 's' : ''} × $${unlimitedTier.addOns.posterA0}`,
+          amount: unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0
+        });
+      }
       return breakdown;
     }
 
@@ -135,7 +144,8 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
         label: `${studentCount} Student${studentCount > 1 ? 's' : ''} × $${studentPrice}`, 
         amount: studentPrice * studentCount,
         savings: savings > 0 ? savings : undefined,
-        originalAmount: savings > 0 ? originalPrice * studentCount : undefined
+        originalAmount: savings > 0 ? originalPrice * studentCount : undefined,
+        savingsPerStudent: savings > 0 ? originalPrice - studentPrice : undefined
       });
     }
     return breakdown;
@@ -179,10 +189,10 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                       <span className="font-semibold text-gray-900">${item.amount.toLocaleString()}</span>
                     </div>
                   </div>
-                  {item.savings && (
-                    <div className="text-center">
+                  {item.savings && item.savingsPerStudent && (
+                    <div className="text-center mt-1">
                       <Badge className="bg-green-100 text-green-800 text-xs">
-                        You save ${item.savings.toLocaleString()}!
+                        You save ${item.savingsPerStudent}/student = ${item.savings.toLocaleString()} total!
                       </Badge>
                     </div>
                   )}
@@ -282,13 +292,13 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
         <div className="mt-12 border-t pt-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-semibold text-gray-800 flex items-center">
-              <Book className="h-6 w-6 mr-2 text-blue-600" />
+              <Book className="h-6 w-6 mr-2 text-green-600" />
               All 42 Financial Literacy Lessons Included
             </h3>
             <Button
               variant="outline"
               onClick={() => setShowAllLessons(!showAllLessons)}
-              className="flex items-center space-x-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+              className="flex items-center space-x-2 border-green-200 text-green-600 hover:bg-green-50"
             >
               <span>{showAllLessons ? 'Show Less' : 'Show All Lessons'}</span>
               {showAllLessons ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -297,19 +307,19 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
           
           <div className="space-y-4">
             {Object.entries(lessonsByMicroCredential).map(([microCredential, lessons]) => (
-              <div key={microCredential} className="border border-blue-200 rounded-lg">
+              <div key={microCredential} className="border border-green-200 rounded-lg">
                 <div 
-                  className="p-4 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors"
+                  className="p-4 bg-green-50 cursor-pointer hover:bg-green-100 transition-colors"
                   onClick={() => setExpandedMicroCredential(expandedMicroCredential === microCredential ? null : microCredential)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <Badge className="bg-blue-600 text-white">{microCredential}</Badge>
-                      <span className="font-semibold text-blue-800">{lessons.length} Lessons</span>
+                      <Badge className="bg-green-600 text-white">{microCredential}</Badge>
+                      <span className="font-semibold text-green-800">{lessons.length} Lessons</span>
                     </div>
                     {expandedMicroCredential === microCredential ? 
-                      <ChevronDown className="h-5 w-5 text-blue-600" /> : 
-                      <ChevronUp className="h-5 w-5 text-blue-600" />
+                      <ChevronDown className="h-5 w-5 text-green-600" /> : 
+                      <ChevronUp className="h-5 w-5 text-green-600" />
                     }
                   </div>
                 </div>
@@ -318,13 +328,13 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                   <div className="p-4 bg-white border-t">
                     <div className="grid gap-2">
                       {lessons.map((lesson) => (
-                        <div key={lesson.lesson} className="flex items-center space-x-3 p-2 hover:bg-blue-50 rounded">
-                          <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        <div key={lesson.lesson} className="flex items-center space-x-3 p-2 hover:bg-green-50 rounded">
+                          <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                             {lesson.lesson}
                           </div>
                           <div className="flex-1">
-                            <span className="font-medium text-blue-700">{lesson.title}</span>
-                            <div className="text-sm text-blue-500">{lesson.topic}</div>
+                            <span className="font-medium text-green-700">{lesson.title}</span>
+                            <div className="text-sm text-green-500">{lesson.topic}</div>
                           </div>
                         </div>
                       ))}

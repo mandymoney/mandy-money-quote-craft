@@ -12,7 +12,7 @@ interface VolumeSelectorProps {
   onChange: (value: number) => void;
   min: number;
   max: number;
-  color: 'purple' | 'pink' | 'blue' | 'green';
+  color: 'purple' | 'pink' | 'blue' | 'green' | 'yellow' | 'teal';
 }
 
 export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
@@ -42,6 +42,18 @@ export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
           gradient: 'from-blue-500 to-cyan-600',
           button: 'hover:bg-blue-100 text-blue-600',
           focus: 'focus:ring-blue-500'
+        };
+      case 'yellow':
+        return {
+          gradient: 'from-yellow-400 via-yellow-300 to-yellow-500',
+          button: 'hover:bg-yellow-100 text-yellow-600',
+          focus: 'focus:ring-yellow-500'
+        };
+      case 'teal':
+        return {
+          gradient: 'from-teal-800 via-teal-500 to-teal-300',
+          button: 'hover:bg-teal-100 text-teal-600',
+          focus: 'focus:ring-teal-500'
         };
       default:
         return {
@@ -73,7 +85,7 @@ export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       <div className={cn('h-16 rounded-lg bg-gradient-to-r', colorClasses.gradient)}>
         <div className="flex items-center justify-center h-full">
           <h3 className="text-white font-semibold text-lg">{label}</h3>

@@ -16,6 +16,7 @@ interface PricingCardProps {
   animationDelay: number;
   showImages?: boolean;
   studentPrice?: number;
+  studentSavings?: number;
   includeGST?: boolean;
   colorScheme?: 'teal' | 'yellow';
 }
@@ -30,18 +31,21 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   animationDelay,
   showImages = false,
   studentPrice,
+  studentSavings = 0,
   includeGST = false,
   colorScheme = 'teal'
 }) => {
   const getGradientClass = () => {
     if (colorScheme === 'yellow') {
-      if (tier.id.includes('digital')) return 'from-yellow-400 to-yellow-500';
-      if (tier.id.includes('physical')) return 'from-yellow-500 to-yellow-600';
-      return 'from-yellow-600 to-yellow-700';
+      // Student gradient: #ffb512 #ffde5a #fea100
+      if (tier.id.includes('digital')) return 'from-yellow-400 via-yellow-300 to-yellow-500';
+      if (tier.id.includes('physical')) return 'from-yellow-500 via-yellow-400 to-yellow-600';
+      return 'from-yellow-600 via-yellow-500 to-yellow-700';
     } else {
-      if (tier.id.includes('digital')) return 'from-teal-400 to-teal-500';
-      if (tier.id.includes('physical')) return 'from-teal-500 to-teal-600';
-      return 'from-teal-600 to-teal-700';
+      // Teacher gradient: #005653 #45c0a9 #80dec4
+      if (tier.id.includes('digital')) return 'from-teal-800 via-teal-500 to-teal-300';
+      if (tier.id.includes('physical')) return 'from-teal-700 via-teal-500 to-teal-400';
+      return 'from-teal-900 via-teal-600 to-teal-400';
     }
   };
 
@@ -50,10 +54,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       return isSelected ? 'border-yellow-400' : 'border-gray-200';
     }
     return isSelected ? 'border-teal-400' : 'border-gray-200';
-  };
-
-  const getAccentColor = () => {
-    return colorScheme === 'yellow' ? 'yellow' : 'teal';
   };
 
   const allInclusions = [
@@ -116,11 +116,19 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Simple Pricing */}
+        {/* Pricing with Savings */}
         <div className={cn(
           "mb-6 rounded-lg p-4 text-center",
           colorScheme === 'yellow' ? 'bg-yellow-50' : 'bg-teal-50'
         )}>
+          {studentSavings > 0 && studentCount >= 12 && (
+            <div className="mb-2">
+              <div className="text-sm text-gray-500 line-through">${tier.basePrice.student}</div>
+              <Badge className="bg-green-100 text-green-800 text-xs">
+                Save ${studentSavings}/student
+              </Badge>
+            </div>
+          )}
           <div className={cn(
             "text-2xl font-bold",
             colorScheme === 'yellow' ? 'text-yellow-900' : 'text-teal-900'
@@ -135,13 +143,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         </div>
 
-        {/* Key Features */}
+        {/* All Features */}
         <div className="space-y-2 mb-4">
           <h4 className={cn(
             "font-semibold text-sm",
             colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
           )}>Features Included:</h4>
-          {allInclusions.slice(0, 3).map((inclusion, index) => (
+          {allInclusions.map((inclusion, index) => (
             <div key={index} className="flex items-center text-sm text-gray-700">
               <Check className={cn(
                 "h-4 w-4 mr-2 flex-shrink-0",
@@ -150,21 +158,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               <span>{inclusion}</span>
             </div>
           ))}
-          {allInclusions.length > 3 && (
-            <div className={cn(
-              "text-sm font-medium",
-              colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
-            )}>
-              +{allInclusions.length - 3} more features
-            </div>
-          )}
         </div>
 
         {/* What's Not Included */}
         {tier.notIncluded && tier.notIncluded.length > 0 && (
           <div className="space-y-2 mb-4">
             <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
-            {tier.notIncluded.slice(0, 2).map((notIncluded, index) => (
+            {tier.notIncluded.map((notIncluded, index) => (
               <div key={index} className="flex items-center text-sm text-gray-500">
                 <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
                 <span>{notIncluded}</span>
