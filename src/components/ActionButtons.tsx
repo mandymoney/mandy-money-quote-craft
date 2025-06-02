@@ -3,11 +3,10 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FileText, Plus } from 'lucide-react';
-import { PricingTier } from './QuoteBuilder';
 import { toast } from '@/hooks/use-toast';
 
 interface ActionButtonsProps {
-  selectedTier: PricingTier | undefined;
+  selectedTier: any;
   totalPrice: number;
   teacherCount: number;
   studentCount: number;
@@ -20,13 +19,11 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   studentCount
 }) => {
   const handleExportPDF = () => {
-    // In a real application, this would generate and download a PDF
     toast({
       title: "PDF Export Started",
-      description: `Generating quote for ${selectedTier?.name} - $${totalPrice.toLocaleString()}`,
+      description: `Generating quote for ${selectedTier?.name} - $${totalPrice.toLocaleString()} (inc. GST)`,
     });
     
-    // Simulate PDF generation
     setTimeout(() => {
       toast({
         title: "Quote Ready!",
@@ -36,7 +33,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   };
 
   const handlePlaceOrder = () => {
-    // In a real application, this would redirect to checkout or order form
     toast({
       title: "Redirecting to Order",
       description: `Processing order for ${teacherCount} teacher${teacherCount > 1 ? 's' : ''} and ${studentCount} student${studentCount > 1 ? 's' : ''}`,
@@ -57,7 +53,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       <div className="p-8 text-center">
         <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
         <p className="text-white/90 mb-6">
-          Your quote for {selectedTier.name} is ready at ${totalPrice.toLocaleString()}
+          Your quote for {selectedTier.name} is ready at ${totalPrice.toLocaleString()} (inc. GST)
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
