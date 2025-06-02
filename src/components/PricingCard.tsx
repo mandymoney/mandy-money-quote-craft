@@ -18,7 +18,6 @@ interface PricingCardProps {
   studentPrice?: number;
   includeGST?: boolean;
   colorScheme?: 'teal' | 'yellow';
-  customGradient?: string;
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
@@ -32,11 +31,9 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   showImages = false,
   studentPrice,
   includeGST = false,
-  colorScheme = 'teal',
-  customGradient
+  colorScheme = 'teal'
 }) => {
   const getGradientClass = () => {
-    if (customGradient) return '';
     if (colorScheme === 'yellow') {
       if (tier.id.includes('digital')) return 'from-yellow-400 to-yellow-500';
       if (tier.id.includes('physical')) return 'from-yellow-500 to-yellow-600';
@@ -101,10 +98,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         )}
 
         {/* Header */}
-        <div 
-          className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-r ' + getGradientClass())}
-          style={customGradient ? { background: customGradient } : {}}
-        >
+        <div className={cn('h-20 rounded-lg mb-4 bg-gradient-to-r', getGradientClass())}>
           <div className="flex items-center justify-center h-full">
             <h3 className="text-white font-bold text-lg text-center">{tier.name}</h3>
           </div>
@@ -141,13 +135,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         </div>
 
-        {/* All Inclusions */}
+        {/* Key Features */}
         <div className="space-y-2 mb-4">
           <h4 className={cn(
             "font-semibold text-sm",
             colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
-          )}>Inclusions:</h4>
-          {allInclusions.map((inclusion, index) => (
+          )}>Features Included:</h4>
+          {allInclusions.slice(0, 3).map((inclusion, index) => (
             <div key={index} className="flex items-center text-sm text-gray-700">
               <Check className={cn(
                 "h-4 w-4 mr-2 flex-shrink-0",
@@ -156,13 +150,21 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               <span>{inclusion}</span>
             </div>
           ))}
+          {allInclusions.length > 3 && (
+            <div className={cn(
+              "text-sm font-medium",
+              colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
+            )}>
+              +{allInclusions.length - 3} more features
+            </div>
+          )}
         </div>
 
         {/* What's Not Included */}
         {tier.notIncluded && tier.notIncluded.length > 0 && (
           <div className="space-y-2 mb-4">
             <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
-            {tier.notIncluded.map((notIncluded, index) => (
+            {tier.notIncluded.slice(0, 2).map((notIncluded, index) => (
               <div key={index} className="flex items-center text-sm text-gray-500">
                 <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
                 <span>{notIncluded}</span>
