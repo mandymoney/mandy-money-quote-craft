@@ -7,6 +7,8 @@ import { ActionButtons } from './ActionButtons';
 import { UnlimitedSchoolCard } from './UnlimitedSchoolCard';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 export interface PricingTier {
   id: string;
@@ -27,6 +29,7 @@ export interface PricingTier {
   };
   isPopular?: boolean;
   type: 'teacher' | 'student' | 'combined';
+  bestFor?: string;
 }
 
 export interface UnlimitedTier {
@@ -39,6 +42,7 @@ export interface UnlimitedTier {
     studentBooks: number;
   };
   inclusions: string[];
+  bestFor: string;
 }
 
 const teacherTiers: PricingTier[] = [
@@ -53,7 +57,8 @@ const teacherTiers: PricingTier[] = [
       student: [],
       classroom: ['1 Classroom Space per Teacher', 'Student Progress Tracking', 'Class Management Tools']
     },
-    type: 'teacher'
+    type: 'teacher',
+    bestFor: 'Tech-savvy teachers with digital classrooms'
   },
   {
     id: 'teacher-physical',
@@ -66,7 +71,8 @@ const teacherTiers: PricingTier[] = [
       student: [],
       classroom: ['1 Classroom Space per Teacher', 'Basic Progress Tracking']
     },
-    type: 'teacher'
+    type: 'teacher',
+    bestFor: 'Traditional classroom teachers who prefer print materials'
   },
   {
     id: 'teacher-both',
@@ -80,7 +86,8 @@ const teacherTiers: PricingTier[] = [
       classroom: ['1 Classroom Space per Teacher', 'Advanced Progress Tracking', 'Full Class Management']
     },
     isPopular: true,
-    type: 'teacher'
+    type: 'teacher',
+    bestFor: 'Teachers who want maximum flexibility and resources'
   }
 ];
 
@@ -96,7 +103,8 @@ const studentTiers: PricingTier[] = [
       student: ['42 Interactive Lessons', 'Mobile & Tablet Access', 'Downloadable Resources', 'Progress Tracking'],
       classroom: []
     },
-    type: 'student'
+    type: 'student',
+    bestFor: '1:1 device schools and tech-comfortable students'
   },
   {
     id: 'student-physical',
@@ -109,7 +117,8 @@ const studentTiers: PricingTier[] = [
       student: ['42 Lesson Textbook', 'Workbook Pages', 'No Internet Required', 'Durable Print Materials'],
       classroom: []
     },
-    type: 'student'
+    type: 'student',
+    bestFor: 'Students who learn better with physical materials'
   },
   {
     id: 'student-both',
@@ -123,7 +132,8 @@ const studentTiers: PricingTier[] = [
       classroom: []
     },
     isPopular: true,
-    type: 'student'
+    type: 'student',
+    bestFor: 'Schools wanting comprehensive learning resources'
   }
 ];
 
@@ -145,12 +155,13 @@ const unlimitedTier: UnlimitedTier = {
     'Admin Dashboard',
     'Unlimited Classroom Spaces',
     'Advanced Analytics'
-  ]
+  ],
+  bestFor: 'Large schools with 50+ students seeking maximum value'
 };
 
 export const QuoteBuilder = () => {
-  const [selectedTeacherTier, setSelectedTeacherTier] = useState<string>('teacher-both');
-  const [selectedStudentTier, setSelectedStudentTier] = useState<string>('student-both');
+  const [selectedTeacherTier, setSelectedTeacherTier] = useState<string>('');
+  const [selectedStudentTier, setSelectedStudentTier] = useState<string>('');
   const [teacherCount, setTeacherCount] = useState<number>(1);
   const [studentCount, setStudentCount] = useState<number>(25);
   const [useUnlimited, setUseUnlimited] = useState<boolean>(false);
@@ -213,6 +224,8 @@ export const QuoteBuilder = () => {
   const unlimitedPricing = calculateUnlimitedTotal();
   const nextDiscount = getNextDiscountThreshold();
 
+  const hasValidSelection = selectedTeacherData && selectedStudentData;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -226,127 +239,239 @@ export const QuoteBuilder = () => {
           </p>
         </div>
 
-        {/* Volume Selectors */}
-        <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            How many teachers and students?
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <VolumeSelector
-              label="Number of Teachers"
-              value={teacherCount}
-              onChange={setTeacherCount}
-              min={1}
-              max={20}
-              color="purple"
-            />
-            <VolumeSelector
-              label="Number of Students"
-              value={studentCount}
-              onChange={setStudentCount}
-              min={1}
-              max={200}
-              color="pink"
-            />
-          </div>
-          
-          {/* Discount Progress */}
-          {nextDiscount && (
-            <div className="mt-6 text-center">
-              <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-lg px-4 py-2">
-                🎯 Add {nextDiscount.studentsToGo} more student{nextDiscount.studentsToGo > 1 ? 's' : ''} to unlock volume discounts at {nextDiscount.threshold}+ students!
-              </Badge>
-            </div>
-          )}
-        </Card>
+        <div className="grid lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-3">
+            {/* Teacher Section */}
+            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Teacher Options</h2>
+              
+              <div className="mb-6">
+                <VolumeSelector
+                  label="Number of Teachers"
+                  value={teacherCount}
+                  onChange={setTeacherCount}
+                  min={1}
+                  max={20}
+                  color="purple"
+                />
+              </div>
 
-        {/* Teacher Options */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Teacher Options</h2>
-          <div className="grid lg:grid-cols-3 gap-6">
-            {teacherTiers.map((tier, index) => (
-              <PricingCard
-                key={tier.id}
-                tier={tier}
-                price={tier.basePrice.teacher * teacherCount}
-                isSelected={selectedTeacherTier === tier.id}
-                onSelect={() => setSelectedTeacherTier(tier.id)}
+              <div className="grid lg:grid-cols-3 gap-6 mb-4">
+                {teacherTiers.map((tier, index) => (
+                  <PricingCard
+                    key={tier.id}
+                    tier={tier}
+                    price={(tier.basePrice.teacher * teacherCount) + ((tier.basePrice.teacher * teacherCount) * GST_RATE)}
+                    isSelected={selectedTeacherTier === tier.id}
+                    onSelect={() => setSelectedTeacherTier(tier.id)}
+                    teacherCount={teacherCount}
+                    studentCount={0}
+                    animationDelay={index * 100}
+                    showImages={true}
+                    includeGST={true}
+                  />
+                ))}
+              </div>
+
+              {selectedTeacherTier && (
+                <div className="flex justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedTeacherTier('')}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Unselect Teacher Option
+                  </Button>
+                </div>
+              )}
+            </Card>
+
+            {/* Student Section */}
+            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Student Options</h2>
+              
+              <div className="mb-6">
+                <VolumeSelector
+                  label="Number of Students"
+                  value={studentCount}
+                  onChange={setStudentCount}
+                  min={1}
+                  max={200}
+                  color="pink"
+                />
+              </div>
+
+              {/* Discount Progress */}
+              {nextDiscount && (
+                <div className="mb-6 text-center">
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-lg px-4 py-2">
+                    🎯 Add {nextDiscount.studentsToGo} more student{nextDiscount.studentsToGo > 1 ? 's' : ''} to unlock volume discounts at {nextDiscount.threshold}+ students!
+                  </Badge>
+                </div>
+              )}
+
+              <div className="grid lg:grid-cols-3 gap-6 mb-4">
+                {studentTiers.map((tier, index) => (
+                  <PricingCard
+                    key={tier.id}
+                    tier={tier}
+                    price={(calculateStudentPrice(tier) * studentCount) + ((calculateStudentPrice(tier) * studentCount) * GST_RATE)}
+                    isSelected={selectedStudentTier === tier.id}
+                    onSelect={() => setSelectedStudentTier(tier.id)}
+                    teacherCount={0}
+                    studentCount={studentCount}
+                    animationDelay={index * 100}
+                    showImages={true}
+                    studentPrice={calculateStudentPrice(tier)}
+                    includeGST={true}
+                  />
+                ))}
+              </div>
+
+              {selectedStudentTier && (
+                <div className="flex justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedStudentTier('')}
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Unselect Student Option
+                  </Button>
+                </div>
+              )}
+            </Card>
+
+            {/* OR Divider */}
+            <div className="mb-8 text-center">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-lg">
+                  <span className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 px-6 text-2xl font-bold text-gray-700">OR</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Unlimited School Access */}
+            <UnlimitedSchoolCard
+              tier={unlimitedTier}
+              isSelected={useUnlimited}
+              onSelect={() => setUseUnlimited(!useUnlimited)}
+              addOns={unlimitedAddOns}
+              onAddOnsChange={setUnlimitedAddOns}
+              pricing={unlimitedPricing}
+              teacherCount={teacherCount}
+              studentCount={studentCount}
+            />
+
+            {useUnlimited && (
+              <div className="text-center mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setUseUnlimited(false)}
+                  className="text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Unselect Unlimited Option
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Running Total Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-6">
+              <Card className="p-6 bg-gradient-to-br from-purple-500 to-pink-500 text-white border-0 shadow-xl">
+                <h3 className="text-xl font-bold mb-4">Running Total</h3>
+                
+                {useUnlimited ? (
+                  <div className="space-y-3">
+                    <div className="text-2xl font-bold">${unlimitedPricing.total.toLocaleString()}</div>
+                    <div className="text-white/90 text-sm">Unlimited School Access</div>
+                    <div className="border-t border-white/30 pt-3 space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span>Subtotal:</span>
+                        <span>${unlimitedPricing.subtotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>GST (10%):</span>
+                        <span>${unlimitedPricing.gst.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : hasValidSelection ? (
+                  <div className="space-y-3">
+                    <div className="text-2xl font-bold">${regularPricing.total.toLocaleString()}</div>
+                    <div className="text-white/90 text-sm">
+                      {teacherCount} Teacher{teacherCount > 1 ? 's' : ''} + {studentCount} Student{studentCount > 1 ? 's' : ''}
+                    </div>
+                    <div className="border-t border-white/30 pt-3 space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span>Subtotal:</span>
+                        <span>${regularPricing.subtotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>GST (10%):</span>
+                        <span>${regularPricing.gst.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Volume Discount Badge */}
+                    {studentCount >= 12 && (
+                      <Badge className="bg-green-400 text-green-900 hover:bg-green-400 w-full justify-center">
+                        🎉 Volume discount active!
+                      </Badge>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <div className="text-white/80 text-sm mb-2">Select teacher & student options to see pricing</div>
+                    <div className="text-lg">$0</div>
+                  </div>
+                )}
+
+                {/* Classroom Space Notice */}
+                {((hasValidSelection && teacherCount > 0 && studentCount > 0) || useUnlimited) && (
+                  <div className="mt-4 p-3 bg-white/20 rounded-lg">
+                    <div className="text-white font-medium text-sm text-center">
+                      ✨ Includes {useUnlimited ? 'unlimited' : teacherCount} classroom space{useUnlimited || teacherCount > 1 ? 's' : ''} with student progress tracking
+                    </div>
+                  </div>
+                )}
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Quote Breakdown */}
+        {((hasValidSelection && !useUnlimited) || useUnlimited) && (
+          <>
+            {!useUnlimited && selectedTeacherData && selectedStudentData && (
+              <InclusionsDisplay
+                teacherTier={selectedTeacherData}
+                studentTier={selectedStudentData}
+                pricing={regularPricing}
                 teacherCount={teacherCount}
-                studentCount={0}
-                animationDelay={index * 100}
-                showImages={true}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Student Options */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Student Options</h2>
-          <div className="grid lg:grid-cols-3 gap-6">
-            {studentTiers.map((tier, index) => (
-              <PricingCard
-                key={tier.id}
-                tier={tier}
-                price={calculateStudentPrice(tier) * studentCount}
-                isSelected={selectedStudentTier === tier.id}
-                onSelect={() => setSelectedStudentTier(tier.id)}
-                teacherCount={0}
                 studentCount={studentCount}
-                animationDelay={index * 100}
-                showImages={true}
-                studentPrice={calculateStudentPrice(tier)}
+                studentPrice={calculateStudentPrice(selectedStudentData)}
               />
-            ))}
-          </div>
-        </div>
+            )}
 
-        {/* OR Divider */}
-        <div className="mb-8 text-center">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-lg">
-              <span className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 px-6 text-2xl font-bold text-gray-700">OR</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Unlimited School Access */}
-        <UnlimitedSchoolCard
-          tier={unlimitedTier}
-          isSelected={useUnlimited}
-          onSelect={() => setUseUnlimited(!useUnlimited)}
-          addOns={unlimitedAddOns}
-          onAddOnsChange={setUnlimitedAddOns}
-          pricing={unlimitedPricing}
-          teacherCount={teacherCount}
-          studentCount={studentCount}
-        />
-
-        {/* Selected Options Details */}
-        {!useUnlimited && selectedTeacherData && selectedStudentData && (
-          <InclusionsDisplay
-            teacherTier={selectedTeacherData}
-            studentTier={selectedStudentData}
-            pricing={regularPricing}
-            teacherCount={teacherCount}
-            studentCount={studentCount}
-            studentPrice={calculateStudentPrice(selectedStudentData)}
-          />
+            {/* Action Buttons */}
+            <ActionButtons
+              selectedTier={useUnlimited ? unlimitedTier : { 
+                name: `${selectedTeacherData?.name} + ${selectedStudentData?.name}`,
+                id: 'combined'
+              }}
+              totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
+              teacherCount={teacherCount}
+              studentCount={studentCount}
+            />
+          </>
         )}
-
-        {/* Action Buttons */}
-        <ActionButtons
-          selectedTier={useUnlimited ? unlimitedTier : { 
-            name: `${selectedTeacherData?.name} + ${selectedStudentData?.name}`,
-            id: 'combined'
-          }}
-          totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
-          teacherCount={teacherCount}
-          studentCount={studentCount}
-        />
       </div>
     </div>
   );

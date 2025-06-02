@@ -3,7 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, Image, Plus, X } from 'lucide-react';
+import { Check, Image, Plus, X, Star } from 'lucide-react';
 import { UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -73,12 +73,21 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
             </div>
 
             <h3 className="text-3xl font-bold mb-2">{tier.name}</h3>
-            <p className="text-white/90 text-lg mb-6">{tier.description}</p>
+            <p className="text-white/90 text-lg mb-4">{tier.description}</p>
+
+            {/* Best For */}
+            <div className="mb-6 p-4 bg-white/10 rounded-lg">
+              <div className="flex items-center text-yellow-300">
+                <Star className="h-5 w-5 mr-2" />
+                <span className="font-semibold">Best for: {tier.bestFor}</span>
+              </div>
+            </div>
 
             {/* Base Price */}
             <div className="bg-white/10 rounded-lg p-4 mb-6">
               <div className="text-4xl font-bold mb-2">${tier.basePrice.toLocaleString()}</div>
               <div className="text-white/90">Base unlimited access for all teachers and students</div>
+              <div className="text-white/70 text-sm mt-1">+ GST (included in total below)</div>
             </div>
 
             {/* Add-on Options */}
@@ -88,7 +97,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
               {/* Teacher Books */}
               <div className="bg-white/10 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold">Teacher Hard-Copy Books (${tier.addOns.teacherBooks} each)</span>
+                  <span className="font-semibold">Teacher Hard-Copy Books (${tier.addOns.teacherBooks} each + GST)</span>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -118,14 +127,14 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   </div>
                 </div>
                 <div className="text-white/80 text-sm">
-                  ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()} total
+                  ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()} + GST = ${((addOns.teacherBooks * tier.addOns.teacherBooks) * 1.1).toLocaleString()} total
                 </div>
               </div>
 
               {/* Student Books */}
               <div className="bg-white/10 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold">Student Hard-Copy Books (${tier.addOns.studentBooks} each)</span>
+                  <span className="font-semibold">Student Hard-Copy Books (${tier.addOns.studentBooks} each + GST)</span>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -155,7 +164,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   </div>
                 </div>
                 <div className="text-white/80 text-sm">
-                  ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()} total
+                  ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()} + GST = ${((addOns.studentBooks * tier.addOns.studentBooks) * 1.1).toLocaleString()} total
                 </div>
               </div>
             </div>
@@ -177,7 +186,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                 </div>
                 <div className="border-t border-white/30 pt-2">
                   <div className="flex justify-between text-2xl font-bold">
-                    <span>Total:</span>
+                    <span>Total (inc. GST):</span>
                     <span>${pricing.total.toLocaleString()}</span>
                   </div>
                 </div>
