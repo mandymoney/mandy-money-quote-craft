@@ -60,7 +60,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
       <Card
         className={cn(
           'relative cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl',
-          'bg-gradient-to-r from-yellow-400 via-lime-300 to-green-400 border-0 text-gray-800 overflow-hidden',
+          'bg-gradient-to-r from-yellow-300 via-lime-300 to-green-400 border-0 text-gray-800 overflow-hidden',
           isSelected ? 'ring-4 ring-yellow-300 ring-opacity-70 shadow-2xl scale-[1.02]' : 'shadow-lg',
           'animate-pulse hover:animate-none'
         )}
@@ -112,7 +112,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
               <div className="space-y-4">
                 <div className="flex items-center space-x-2 mb-3">
                   <Plus className="h-5 w-5 text-gray-700" />
-                  <h4 className="text-xl font-semibold">Optional Hard-Copy Add-ons</h4>
+                  <h4 className="text-xl font-semibold">+ Optional Hard-Copy Add-ons</h4>
                 </div>
                 
                 {/* Teacher Books */}
@@ -234,7 +234,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
       {/* Bottom Banner */}
       <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 rotate-1">
         <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-2 rounded-full shadow-lg transform skew-x-12">
-          <span className="font-bold text-sm">Perfect for schools with 50+ students seeking maximum value</span>
+          <span className="font-bold text-sm">Perfect for schools looking to prioritise financial empowerment as a core learning pillar</span>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -11,7 +12,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, AlertTriangle, ArrowDown, Star } from 'lucide-react';
+import { X, ArrowDown, Star, Sparkles, Zap } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -303,7 +304,7 @@ export const QuoteBuilder = () => {
               </div>
               
               <div className="mb-6 flex justify-center">
-                <div className="w-full max-w-md">
+                <div className="w-full max-w-lg">
                   <VolumeSelector
                     label="Number of Teachers"
                     value={teacherCount}
@@ -355,7 +356,7 @@ export const QuoteBuilder = () => {
               </div>
               
               <div className="mb-6 flex justify-center">
-                <div className="w-full max-w-md">
+                <div className="w-full max-w-lg">
                   <VolumeSelector
                     label="Number of Students"
                     value={studentCount}
@@ -411,13 +412,21 @@ export const QuoteBuilder = () => {
 
             {/* Unlimited School Access Suggestion */}
             {showUnlimitedSuggestion && (
-              <Card className="mb-8 p-6 bg-orange-50 border-orange-200 animate-pulse">
-                <div className="flex items-center space-x-3">
-                  <AlertTriangle className="h-6 w-6 text-orange-600" />
-                  <div>
-                    <h3 className="font-semibold text-orange-800">💡 Consider Unlimited School Access</h3>
-                    <p className="text-orange-700">
-                      Your current quote is ${regularPricing.total.toLocaleString()}. The Unlimited School Access option might offer better value at ${unlimitedPricing.total.toLocaleString()}.
+              <Card className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-green-50 border-2 border-blue-200 shadow-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-gradient-to-r from-blue-500 to-green-500 rounded-full">
+                    <Sparkles className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-blue-800 text-lg flex items-center">
+                      <Zap className="h-5 w-5 mr-2" />
+                      💰 Unlock Even Greater Value!
+                    </h3>
+                    <p className="text-blue-700 mt-1">
+                      Your current selection totals <strong>${regularPricing.total.toLocaleString()}</strong>. 
+                      Consider our Unlimited School Access for just <strong>${unlimitedPricing.total.toLocaleString()}</strong> 
+                      - it might offer better value for your entire school! 
+                      <span className="font-semibold">Check it out below ⬇️</span>
                     </p>
                   </div>
                 </div>
@@ -497,8 +506,8 @@ export const QuoteBuilder = () => {
                     
                     {/* Show per-student savings if applicable */}
                     {selectedStudentData && studentCount >= 12 && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-2">
-                        <div className="text-green-800 text-xs text-center">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <div className="text-green-800 text-sm text-center">
                           💰 Saving ${getStudentSavings(selectedStudentData)} per student with volume pricing!
                         </div>
                       </div>
@@ -591,7 +600,7 @@ export const QuoteBuilder = () => {
               <div className="border-t-2 border-gray-200 mb-8"></div>
               
               <div className="text-center mb-8">
-                <div className="p-6 bg-white border border-green-200 rounded-lg">
+                <div className="p-6 border border-green-200 rounded-lg">
                   <h3 className="text-2xl font-semibold text-green-800 mb-2 flex items-center justify-center">
                     📚 Explore Program Materials
                   </h3>

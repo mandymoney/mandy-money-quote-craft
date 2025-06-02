@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { FileText, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -49,9 +48,9 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   if (!selectedTier) return null;
 
   return (
-    <Card className="bg-gradient-to-r from-orange-500 via-orange-400 to-orange-600 border-0 shadow-2xl animate-scale-in">
-      <div className="p-8 text-center">
-        <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
+    <div className="mt-8">
+      <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-orange-600 rounded-lg p-8 text-center text-white shadow-xl">
+        <h2 className="text-2xl font-bold mb-2">Ready to Get Started?</h2>
         <p className="text-white/90 mb-6">
           Your quote for {selectedTier.name} is ready at ${totalPrice.toLocaleString()} (inc. GST)
         </p>
@@ -70,7 +69,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           <Button
             onClick={handlePlaceOrder}
             size="lg"
-            className="flex-1 bg-white/90 hover:bg-white text-orange-900 font-semibold transition-all duration-200 hover:scale-105 shadow-lg"
+            className="flex-1 bg-white text-orange-900 hover:bg-white/90 font-bold transition-all duration-200 hover:scale-105 shadow-lg border-2 border-white"
           >
             <Plus className="h-5 w-5 mr-2" />
             Place Order Now
@@ -81,6 +80,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           Questions? Contact our team at hello@mandymoney.com.au
         </p>
       </div>
-    </Card>
+    </div>
   );
 };

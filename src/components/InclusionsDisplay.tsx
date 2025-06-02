@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Check, ChevronDown, ChevronUp, Book } from 'lucide-react';
+import { CalendarIcon, Check, ChevronDown, ChevronUp, Book, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 import { PricingTier, UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
@@ -171,54 +172,61 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Price Breakdown */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Investment Breakdown */}
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Investment Breakdown</h3>
+            <div className="flex items-center space-x-3 mb-6">
+              <DollarSign className="h-6 w-6 text-green-600" />
+              <h3 className="text-2xl font-semibold text-gray-800">Investment Breakdown</h3>
+            </div>
+            
             <div className="space-y-3">
               {getPriceBreakdown().map((item, index) => (
                 <div key={index}>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700 text-sm">{item.label}</span>
+                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border">
+                    <span className="text-gray-700 font-medium">{item.label}</span>
                     <div className="text-right">
                       {item.originalAmount && (
-                        <div className="text-xs text-gray-500 line-through">
+                        <div className="text-sm text-gray-500 line-through">
                           ${item.originalAmount.toLocaleString()}
                         </div>
                       )}
-                      <span className="font-semibold text-gray-900">${item.amount.toLocaleString()}</span>
+                      <span className="font-bold text-gray-900 text-lg">${item.amount.toLocaleString()}</span>
                     </div>
                   </div>
                   {item.savings && item.savingsPerStudent && (
-                    <div className="text-center mt-1">
-                      <Badge className="bg-green-100 text-green-800 text-xs">
-                        You save ${item.savingsPerStudent}/student = ${item.savings.toLocaleString()} total!
+                    <div className="text-center mt-2">
+                      <Badge className="bg-green-100 text-green-800 text-sm px-3 py-1">
+                        💰 You save ${item.savingsPerStudent}/student = ${item.savings.toLocaleString()} total!
                       </Badge>
                     </div>
                   )}
                 </div>
               ))}
               
-              <div className="border-t pt-3 mt-3">
-                <div className="flex justify-between items-center text-xl font-bold">
+              <div className="border-t-2 pt-4 mt-4">
+                <div className="flex justify-between items-center text-2xl font-bold">
                   <span>Total Investment</span>
-                  <span className="text-2xl">${pricing.total.toLocaleString()}</span>
+                  <span className="text-3xl text-green-600">${pricing.total.toLocaleString()}</span>
                 </div>
                 <div className="text-sm text-gray-600 text-right mt-1">
-                  (Price includes 10% GST)
+                  (Includes 10% GST)
                 </div>
               </div>
             </div>
 
-            {/* Program Start Date */}
-            <div className="mt-6">
-              <h4 className="font-semibold text-gray-800 mb-3">Program Timeline</h4>
+            {/* Program Timeline */}
+            <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
+                <CalendarIcon className="h-5 w-5 mr-2" />
+                Program Timeline
+              </h4>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal mb-3",
                       !programStartDate && "text-muted-foreground"
                     )}
                   >
@@ -237,59 +245,76 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                 </PopoverContent>
               </Popover>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
-                <div className="text-blue-800 text-sm">
-                  <p className="font-semibold mb-1">12 Month Access Period</p>
-                  <p>Starts: <span className="font-medium">{format(programStartDate, 'PPP')}</span></p>
-                  <p>Ends: <span className="font-medium">{format(programEndDate, 'PPP')}</span></p>
-                </div>
+              <div className="text-blue-800 text-sm space-y-1">
+                <p><span className="font-semibold">12 Month Access Period</span></p>
+                <p>Starts: <span className="font-medium">{format(programStartDate, 'PPP')}</span></p>
+                <p>Ends: <span className="font-medium">{format(programEndDate, 'PPP')}</span></p>
               </div>
             </div>
           </div>
 
-          {/* Teacher Features */}
-          {(teacherTier || isUnlimited) && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-teal-800 mb-4 flex items-center">
-                <div className="w-4 h-4 bg-teal-500 rounded mr-2"></div>
-                Teacher Inclusions
-              </h3>
-              <div className="space-y-3">
-                {(isUnlimited ? unlimitedTier?.inclusions.slice(0, 5) : 
-                  [...(teacherTier?.inclusions.teacher || []), ...(teacherTier?.inclusions.classroom || [])]
-                )?.map((inclusion, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-teal-50 to-teal-100 rounded-lg">
-                    <Check className="h-5 w-5 text-teal-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-teal-700">{inclusion}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Inclusions */}
+          <div className="space-y-6">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+              <Check className="h-6 w-6 text-green-600 mr-2" />
+              What's Included
+            </h3>
 
-          {/* Student Features */}
-          {(studentTier || isUnlimited) && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-yellow-800 mb-4 flex items-center">
-                <div className="w-4 h-4 bg-yellow-500 rounded mr-2"></div>
-                Student Inclusions
-              </h3>
+            {/* Teacher Inclusions */}
+            {(teacherTier || isUnlimited) && (
               <div className="space-y-3">
-                {(isUnlimited ? unlimitedTier?.inclusions.slice(5) : 
-                  studentTier?.inclusions.student
-                )?.map((inclusion, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg">
-                    <Check className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-yellow-700">{inclusion}</span>
-                  </div>
-                ))}
+                <h4 className="text-lg font-semibold text-teal-800 flex items-center">
+                  <div className="w-4 h-4 bg-gradient-to-r from-teal-800 to-teal-400 rounded mr-2"></div>
+                  Teacher Resources
+                </h4>
+                <div className="space-y-2">
+                  {(isUnlimited ? unlimitedTier?.inclusions.slice(0, 5) : 
+                    [...(teacherTier?.inclusions.teacher || []), ...(teacherTier?.inclusions.classroom || [])]
+                  )?.map((inclusion, index) => (
+                    <div key={index} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-teal-50 to-teal-100 rounded-lg border border-teal-200">
+                      <Check className="h-4 w-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-teal-700 text-sm">{inclusion}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Student Inclusions */}
+            {(studentTier || isUnlimited) && (
+              <div className="space-y-3">
+                <h4 className="text-lg font-semibold text-yellow-800 flex items-center">
+                  <div className="w-4 h-4 bg-gradient-to-r from-yellow-500 to-yellow-300 rounded mr-2"></div>
+                  Student Resources
+                </h4>
+                <div className="space-y-2">
+                  {(isUnlimited ? unlimitedTier?.inclusions.slice(5) : 
+                    studentTier?.inclusions.student
+                  )?.map((inclusion, index) => (
+                    <div key={index} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
+                      <Check className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-yellow-700 text-sm">{inclusion}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Digital Pass Benefits */}
+            {((teacherTier && teacherTier.id.includes('digital')) || 
+              (studentTier && studentTier.id.includes('digital')) || 
+              isUnlimited) && (
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="text-green-800 font-medium text-center">
+                  ✨ Includes free intro lesson + pre & post-program testing
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 42 Lessons Showcase */}
-        <div className="mt-12 border-t pt-8">
+        <div className="mt-12 border-t-2 pt-8">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-semibold text-gray-800 flex items-center">
               <Book className="h-6 w-6 mr-2 text-green-600" />
@@ -318,8 +343,8 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                       <span className="font-semibold text-green-800">{lessons.length} Lessons</span>
                     </div>
                     {expandedMicroCredential === microCredential ? 
-                      <ChevronDown className="h-5 w-5 text-green-600" /> : 
-                      <ChevronUp className="h-5 w-5 text-green-600" />
+                      <ChevronUp className="h-5 w-5 text-green-600" /> : 
+                      <ChevronDown className="h-5 w-5 text-green-600" />
                     }
                   </div>
                 </div>
