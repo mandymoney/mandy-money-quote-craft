@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Check, ChevronDown, ChevronUp, Book } from 'lucide-react';
 import { format } from 'date-fns';
 import { PricingTier, UnlimitedTier } from './QuoteBuilder';
+import { ProgramStartDate } from './ProgramStartDate';
 import { cn } from '@/lib/utils';
 
 interface InclusionsDisplayProps {
@@ -127,8 +129,9 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
         <div>
           <h4 className="text-lg font-semibold text-green-800 mb-4">Select Program Start Date</h4>
           <ProgramStartDate
-            programStartDate={programStartDate}
+            startDate={programStartDate}
             onStartDateChange={onStartDateChange}
+            endDate={programEndDate}
           />
         </div>
       </div>
