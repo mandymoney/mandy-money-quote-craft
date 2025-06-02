@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, AlertTriangle, ArrowDown, Check } from 'lucide-react';
+import { X, AlertTriangle, ArrowDown, Check, TrendingUp } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -276,7 +276,7 @@ export const QuoteBuilder = () => {
             />
           </div>
           <h1 className="text-6xl font-extrabold mb-4 bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
-            ✨ Quote Builder ✨
+            Quote Builder
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
             Build your custom quote for Australia's leading financial literacy program
@@ -594,6 +594,13 @@ export const QuoteBuilder = () => {
               programEndDate={addMonths(programStartDate, 12)}
               volumeSavings={volumeSavings}
             />
+
+            {/* Quote validity notice */}
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600 italic">
+                Quote valid until end of current calendar year
+              </p>
+            </div>
 
             {/* Action Buttons with orange gradient */}
             <div className="mt-6">

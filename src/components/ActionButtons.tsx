@@ -59,7 +59,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           onClick={handleExportPDF}
           variant="secondary"
           size="lg"
-          className="flex-1 bg-white/90 hover:bg-white text-orange-900 font-semibold transition-all duration-200 hover:scale-105"
+          className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border border-gray-200"
         >
           <FileText className="h-5 w-5 mr-2" />
           Export Quote as PDF
@@ -68,10 +68,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <Button
           onClick={handlePlaceOrder}
           size="lg"
-          className="flex-1 bg-white text-orange-600 hover:bg-gray-100 font-bold transition-all duration-200 hover:scale-110 shadow-lg border-2 border-white text-lg"
+          className="flex-1 bg-white hover:bg-gray-50 text-orange-600 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-2 border-white text-lg hover:text-orange-700"
         >
           <Plus className="h-5 w-5 mr-2" />
-          + PLACE ORDER NOW
+          Place Order Now
         </Button>
       </div>
       

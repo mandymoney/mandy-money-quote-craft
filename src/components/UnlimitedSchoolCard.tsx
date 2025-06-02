@@ -59,22 +59,21 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
 
   return (
     <div className="relative">
-      {/* Main card without white background box */}
+      {/* Main card without flashing animation */}
       <div
         className={cn(
-          'relative cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl',
+          'relative cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl',
           'text-white overflow-hidden rounded-lg',
-          isSelected ? 'ring-4 ring-green-300 ring-opacity-70 shadow-2xl animate-pulse' : 'shadow-lg hover:animate-pulse'
+          isSelected ? 'ring-4 ring-green-300 ring-opacity-70 shadow-xl' : 'shadow-lg'
         )}
         style={{ 
-          background: 'linear-gradient(135deg, #ebff00, #8ace00)',
-          animation: isSelected ? 'pulse 2s infinite' : ''
+          background: 'linear-gradient(135deg, #ebff00, #8ace00)'
         }}
         onClick={onSelect}
       >
         {/* Animated Value Comparison */}
         {savings > 0 && (
-          <div className="absolute -top-4 -right-4 bg-red-500 text-white px-6 py-3 rounded-full text-sm font-bold animate-bounce shadow-lg">
+          <div className="absolute -top-4 -right-4 bg-red-500 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg">
             <div className="flex items-center">
               <TrendingUp className="h-4 w-4 mr-1" />
               Save ${savings.toLocaleString()}!
@@ -83,7 +82,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
           </div>
         )}
 
-        <div className="p-8">
+        <div className="p-8 pb-16"> {/* Added bottom padding for banner */}
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Main Content */}
             <div>
@@ -209,7 +208,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
 
               {/* Selection Indicator */}
               {isSelected && (
-                <div className="mt-6 p-3 bg-orange-400 text-white rounded-lg shadow-lg animate-pulse">
+                <div className="mt-6 p-3 bg-orange-400 text-white rounded-lg shadow-lg">
                   <div className="flex items-center justify-center font-bold">
                     <Check className="h-5 w-5 mr-2" />
                     Selected Option
@@ -229,9 +228,9 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
           </div>
         </div>
         
-        {/* Exciting banner across the bottom */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 px-4 transform -skew-y-1 origin-bottom-left">
-          <div className="text-center font-bold text-sm transform skew-y-1">
+        {/* Improved banner that doesn't cover content */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4">
+          <div className="text-center font-bold text-sm">
             {tier.bestFor}
           </div>
         </div>
