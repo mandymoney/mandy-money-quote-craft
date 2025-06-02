@@ -16,9 +16,9 @@ interface PricingCardProps {
   animationDelay: number;
   showImages?: boolean;
   studentPrice?: number;
-  studentSavings?: number;
   includeGST?: boolean;
   colorScheme?: 'teal' | 'yellow';
+  customGradient?: string;
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
@@ -31,21 +31,20 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   animationDelay,
   showImages = false,
   studentPrice,
-  studentSavings = 0,
   includeGST = false,
-  colorScheme = 'teal'
+  colorScheme = 'teal',
+  customGradient
 }) => {
   const getGradientClass = () => {
+    if (customGradient) return '';
     if (colorScheme === 'yellow') {
-      // Student gradient: #ffb512 #ffde5a #fea100
-      if (tier.id.includes('digital')) return 'from-yellow-400 via-yellow-300 to-yellow-500';
-      if (tier.id.includes('physical')) return 'from-yellow-500 via-yellow-400 to-yellow-600';
-      return 'from-yellow-600 via-yellow-500 to-yellow-700';
+      if (tier.id.includes('digital')) return 'from-yellow-400 to-yellow-500';
+      if (tier.id.includes('physical')) return 'from-yellow-500 to-yellow-600';
+      return 'from-yellow-600 to-yellow-700';
     } else {
-      // Teacher gradient: #005653 #45c0a9 #80dec4
-      if (tier.id.includes('digital')) return 'from-teal-800 via-teal-500 to-teal-300';
-      if (tier.id.includes('physical')) return 'from-teal-700 via-teal-500 to-teal-400';
-      return 'from-teal-900 via-teal-600 to-teal-400';
+      if (tier.id.includes('digital')) return 'from-teal-400 to-teal-500';
+      if (tier.id.includes('physical')) return 'from-teal-500 to-teal-600';
+      return 'from-teal-600 to-teal-700';
     }
   };
 
@@ -54,6 +53,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       return isSelected ? 'border-yellow-400' : 'border-gray-200';
     }
     return isSelected ? 'border-teal-400' : 'border-gray-200';
+  };
+
+  const getAccentColor = () => {
+    return colorScheme === 'yellow' ? 'yellow' : 'teal';
   };
 
   const allInclusions = [
@@ -98,7 +101,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         )}
 
         {/* Header */}
-        <div className={cn('h-20 rounded-lg mb-4 bg-gradient-to-r', getGradientClass())}>
+        <div 
+          className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-r ' + getGradientClass())}
+          style={customGradient ? { background: customGradient } : {}}
+        >
           <div className="flex items-center justify-center h-full">
             <h3 className="text-white font-bold text-lg text-center">{tier.name}</h3>
           </div>
@@ -116,19 +122,11 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Pricing with Savings */}
+        {/* Simple Pricing */}
         <div className={cn(
           "mb-6 rounded-lg p-4 text-center",
           colorScheme === 'yellow' ? 'bg-yellow-50' : 'bg-teal-50'
         )}>
-          {studentSavings > 0 && studentCount >= 12 && (
-            <div className="mb-2">
-              <div className="text-sm text-gray-500 line-through">${tier.basePrice.student}</div>
-              <Badge className="bg-green-100 text-green-800 text-xs">
-                Save ${studentSavings}/student
-              </Badge>
-            </div>
-          )}
           <div className={cn(
             "text-2xl font-bold",
             colorScheme === 'yellow' ? 'text-yellow-900' : 'text-teal-900'
@@ -143,12 +141,12 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         </div>
 
-        {/* All Features */}
+        {/* All Inclusions */}
         <div className="space-y-2 mb-4">
           <h4 className={cn(
             "font-semibold text-sm",
             colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
-          )}>Features Included:</h4>
+          )}>Inclusions:</h4>
           {allInclusions.map((inclusion, index) => (
             <div key={index} className="flex items-center text-sm text-gray-700">
               <Check className={cn(

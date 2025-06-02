@@ -3,8 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Check, Image, Star, Plus, Zap, TrendingUp } from 'lucide-react';
+import { Check, Image, Star, TrendingUp, DollarSign, Plus } from 'lucide-react';
 import { UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +24,9 @@ interface UnlimitedSchoolCardProps {
   };
   teacherCount: number;
   studentCount: number;
+  regularPricing: {
+    total: number;
+  };
 }
 
 export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
@@ -35,7 +37,8 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
   onAddOnsChange,
   pricing,
   teacherCount,
-  studentCount
+  studentCount,
+  regularPricing
 }) => {
   const handleTeacherBooksChange = (value: string) => {
     const newCount = Math.max(0, parseInt(value) || 0);
@@ -52,191 +55,175 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
     onAddOnsChange({ ...addOns, posterA0: newCount });
   };
 
-  const regularPrice = studentCount * 55 + teacherCount * 189; // Approximate comparison
-  const savings = regularPrice > tier.basePrice ? regularPrice - tier.basePrice : 0;
+  const savings = regularPricing.total - pricing.total;
+  const percentSavings = Math.round((savings / regularPricing.total) * 100);
 
   return (
-    <div className="mb-8 relative">
-      <Card
-        className={cn(
-          'relative cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl',
-          'bg-gradient-to-r from-yellow-300 via-lime-300 to-green-400 border-0 text-gray-800 overflow-hidden',
-          isSelected ? 'ring-4 ring-yellow-300 ring-opacity-70 shadow-2xl scale-[1.02]' : 'shadow-lg',
-          'animate-pulse hover:animate-none'
-        )}
-        onClick={onSelect}
-      >
-        {/* Exciting Banner */}
-        <div className="absolute top-4 right-4 transform rotate-12 z-10">
-          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 text-sm font-bold shadow-lg">
-            🔥 BEST VALUE
-          </Badge>
+    <Card
+      className={cn(
+        'relative cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl',
+        'border-0 text-white overflow-hidden',
+        isSelected ? 'ring-4 ring-green-300 ring-opacity-70 shadow-2xl animate-pulse' : 'shadow-lg hover:animate-pulse'
+      )}
+      style={{ 
+        background: 'linear-gradient(135deg, #ebff00, #8ace00)',
+        animation: isSelected ? 'pulse 2s infinite' : ''
+      }}
+      onClick={onSelect}
+    >
+      {/* Animated Value Comparison */}
+      {savings > 0 && (
+        <div className="absolute -top-4 -right-4 bg-red-500 text-white px-6 py-3 rounded-full text-sm font-bold animate-bounce shadow-lg">
+          <div className="flex items-center">
+            <TrendingUp className="h-4 w-4 mr-1" />
+            Save ${savings.toLocaleString()}!
+          </div>
+          <div className="text-xs">{percentSavings}% savings</div>
         </div>
+      )}
 
-        <div className="p-8">
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Main Content */}
-            <div>
-              <div className="flex items-center space-x-3 mb-3">
-                <Zap className="h-8 w-8 text-yellow-600 animate-bounce" />
-                <h3 className="text-3xl font-bold">{tier.name}</h3>
-              </div>
-              <p className="text-gray-700 text-lg mb-6">{tier.description}</p>
+      <div className="p-8">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Main Content */}
+          <div>
+            <h3 className="text-3xl font-bold mb-2 text-gray-800">{tier.name}</h3>
+            <p className="text-gray-700 text-lg mb-6">{tier.description}</p>
 
-              {/* Value Comparison */}
-              {savings > 0 && (
-                <div className="bg-white/80 rounded-lg p-4 mb-6 border-2 border-green-500">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                    <span className="font-bold text-green-800">MASSIVE SAVINGS!</span>
-                  </div>
-                  <div className="text-sm text-gray-700">
-                    Save over ${savings.toLocaleString()} vs individual pricing!
-                  </div>
+            {/* Base Price - Clean and Simple */}
+            <div className="bg-white/90 rounded-lg p-6 mb-6 shadow-inner">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-gray-800">${tier.basePrice.toLocaleString()}</div>
+                  <div className="text-gray-600">Base unlimited access</div>
                 </div>
-              )}
-
-              {/* Base Price */}
-              <div className="bg-white/90 rounded-lg p-6 mb-6 border-l-4 border-green-500">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm text-gray-600 mb-1">Base Package</div>
-                    <div className="text-3xl font-bold text-gray-800">${tier.basePrice.toLocaleString()}</div>
-                    <div className="text-sm text-gray-600">Unlimited digital access for all</div>
-                  </div>
-                  <Check className="h-8 w-8 text-green-500" />
-                </div>
-              </div>
-
-              {/* Add-on Options */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 mb-3">
-                  <Plus className="h-5 w-5 text-gray-700" />
-                  <h4 className="text-xl font-semibold">+ Optional Hard-Copy Add-ons</h4>
-                </div>
-                
-                {/* Teacher Books */}
-                <div className="bg-white/70 rounded-lg p-4 hover:bg-white/90 transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-teal-500 rounded flex items-center justify-center">
-                        <Image className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <span className="font-semibold">+ Teacher Books</span>
-                        <div className="text-sm text-gray-600">${tier.addOns.teacherBooks} each</div>
-                      </div>
-                    </div>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={addOns.teacherBooks}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        handleTeacherBooksChange(e.target.value);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-20 bg-white border-gray-300"
-                    />
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Total: ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()}
-                  </div>
-                </div>
-
-                {/* Student Books */}
-                <div className="bg-white/70 rounded-lg p-4 hover:bg-white/90 transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-yellow-500 rounded flex items-center justify-center">
-                        <Image className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <span className="font-semibold">+ Student Books</span>
-                        <div className="text-sm text-gray-600">${tier.addOns.studentBooks} each</div>
-                      </div>
-                    </div>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={addOns.studentBooks}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        handleStudentBooksChange(e.target.value);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-20 bg-white border-gray-300"
-                    />
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Total: ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()}
-                  </div>
-                </div>
-
-                {/* A0 Poster */}
-                <div className="bg-white/70 rounded-lg p-4 hover:bg-white/90 transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-500 rounded flex items-center justify-center">
-                        <Image className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <span className="font-semibold">+ A0 Poster</span>
-                        <div className="text-sm text-gray-600">${tier.addOns.posterA0} each</div>
-                      </div>
-                    </div>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={addOns.posterA0}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        handlePosterA0Change(e.target.value);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-20 bg-white border-gray-300"
-                    />
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Total: ${(addOns.posterA0 * tier.addOns.posterA0).toLocaleString()}
-                  </div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-500">Includes all teachers</div>
+                  <div className="text-sm text-gray-500">& all students</div>
                 </div>
               </div>
             </div>
 
-            {/* Inclusions */}
-            <div>
-              {/* Key Inclusions */}
-              <div className="space-y-3 mb-6">
-                <h4 className="text-xl font-semibold">What's Included</h4>
-                {tier.inclusions.map((inclusion, index) => (
-                  <div key={index} className="flex items-center text-gray-700">
-                    <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
-                    <span>{inclusion}</span>
+            {/* Add-on Options - Simplified */}
+            <div className="space-y-4">
+              <h4 className="text-xl font-semibold text-gray-800 flex items-center">
+                <Plus className="h-5 w-5 mr-2" />
+                Optional Hard-Copy Add-ons
+              </h4>
+              
+              {/* Teacher Books */}
+              <div className="bg-white/80 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-3">
+                    <Image className="h-5 w-5 text-gray-600" />
+                    <span className="font-medium text-gray-800">Teacher Books</span>
+                    <span className="text-sm text-gray-600">(${tier.addOns.teacherBooks} each)</span>
                   </div>
-                ))}
+                  <Input
+                    type="number"
+                    min="0"
+                    value={addOns.teacherBooks}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleTeacherBooksChange(e.target.value);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-20 bg-white text-gray-800 border-gray-300"
+                    placeholder="0"
+                  />
+                </div>
+                <div className="text-gray-600 text-sm">
+                  Total: ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()}
+                </div>
               </div>
 
-              {/* Call to Action */}
-              {isSelected && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-lg">
-                  <div className="flex items-center justify-center font-bold text-lg">
-                    <Check className="h-6 w-6 mr-2" />
-                    Selected Option ✨
+              {/* Student Books */}
+              <div className="bg-white/80 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-3">
+                    <Image className="h-5 w-5 text-gray-600" />
+                    <span className="font-medium text-gray-800">Student Books</span>
+                    <span className="text-sm text-gray-600">(${tier.addOns.studentBooks} each)</span>
                   </div>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={addOns.studentBooks}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleStudentBooksChange(e.target.value);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-20 bg-white text-gray-800 border-gray-300"
+                    placeholder="0"
+                  />
                 </div>
-              )}
+                <div className="text-gray-600 text-sm">
+                  Total: ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()}
+                </div>
+              </div>
+
+              {/* A0 Poster */}
+              <div className="bg-white/80 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-3">
+                    <Image className="h-5 w-5 text-gray-600" />
+                    <span className="font-medium text-gray-800">A0 Poster</span>
+                    <span className="text-sm text-gray-600">(${tier.addOns.posterA0} each)</span>
+                  </div>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={addOns.posterA0}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handlePosterA0Change(e.target.value);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-20 bg-white text-gray-800 border-gray-300"
+                    placeholder="0"
+                  />
+                </div>
+                <div className="text-gray-600 text-sm">
+                  Total: ${(addOns.posterA0 * tier.addOns.posterA0).toLocaleString()}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
 
-      {/* Bottom Banner */}
-      <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 rotate-1">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-2 rounded-full shadow-lg transform skew-x-12">
-          <span className="font-bold text-sm">Perfect for schools looking to prioritise financial empowerment as a core learning pillar</span>
+          {/* Inclusions */}
+          <div>
+            {/* Key Inclusions */}
+            <div className="space-y-3">
+              <h4 className="text-xl font-semibold text-gray-800">What's Included</h4>
+              {tier.inclusions.map((inclusion, index) => (
+                <div key={index} className="flex items-center text-gray-700">
+                  <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
+                  <span>{inclusion}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Selection Indicator */}
+            {isSelected && (
+              <div className="mt-6 p-3 bg-orange-400 text-white rounded-lg shadow-lg animate-pulse">
+                <div className="flex items-center justify-center font-bold">
+                  <Check className="h-5 w-5 mr-2" />
+                  Selected Option
+                </div>
+              </div>
+            )}
+
+            {savings > 0 && (
+              <div className="mt-4 p-4 bg-white/90 rounded-lg shadow-inner text-center">
+                <div className="text-green-600 font-bold text-lg">
+                  ${savings.toLocaleString()} cheaper than individual options!
+                </div>
+                <div className="text-green-500 text-sm">{percentSavings}% total savings</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

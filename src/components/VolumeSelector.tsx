@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, X } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface VolumeSelectorProps {
@@ -12,7 +11,7 @@ interface VolumeSelectorProps {
   onChange: (value: number) => void;
   min: number;
   max: number;
-  color: 'purple' | 'pink' | 'blue' | 'green' | 'yellow' | 'teal';
+  color: 'teal' | 'yellow' | 'green';
 }
 
 export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
@@ -25,109 +24,87 @@ export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
 }) => {
   const getColorClasses = () => {
     switch (color) {
-      case 'purple':
+      case 'teal':
         return {
-          gradient: 'from-purple-500 to-indigo-600',
-          button: 'hover:bg-purple-100 text-purple-600',
-          focus: 'focus:ring-purple-500'
-        };
-      case 'pink':
-        return {
-          gradient: 'from-pink-500 to-rose-600',
-          button: 'hover:bg-pink-100 text-pink-600',
-          focus: 'focus:ring-pink-500'
-        };
-      case 'blue':
-        return {
-          gradient: 'from-blue-500 to-cyan-600',
-          button: 'hover:bg-blue-100 text-blue-600',
-          focus: 'focus:ring-blue-500'
+          button: 'bg-teal-500 hover:bg-teal-600 text-white',
+          input: 'border-teal-300 focus:border-teal-500',
+          label: 'text-teal-700'
         };
       case 'yellow':
         return {
-          gradient: 'from-yellow-400 via-yellow-300 to-yellow-500',
-          button: 'hover:bg-yellow-100 text-yellow-600',
-          focus: 'focus:ring-yellow-500'
+          button: 'bg-yellow-500 hover:bg-yellow-600 text-white',
+          input: 'border-yellow-300 focus:border-yellow-500',
+          label: 'text-yellow-700'
         };
-      case 'teal':
+      case 'green':
         return {
-          gradient: 'from-teal-800 via-teal-500 to-teal-300',
-          button: 'hover:bg-teal-100 text-teal-600',
-          focus: 'focus:ring-teal-500'
+          button: 'bg-green-500 hover:bg-green-600 text-white',
+          input: 'border-green-300 focus:border-green-500',
+          label: 'text-green-700'
         };
       default:
         return {
-          gradient: 'from-green-500 to-teal-600',
-          button: 'hover:bg-green-100 text-green-600',
-          focus: 'focus:ring-green-500'
+          button: 'bg-gray-500 hover:bg-gray-600 text-white',
+          input: 'border-gray-300 focus:border-gray-500',
+          label: 'text-gray-700'
         };
     }
   };
 
-  const colorClasses = getColorClasses();
+  const colors = getColorClasses();
 
-  const handleIncrement = () => {
-    if (value < max) {
-      onChange(value + 1);
-    }
-  };
-
-  const handleDecrement = () => {
+  const handleDecrease = () => {
     if (value > min) {
       onChange(value - 1);
     }
   };
 
+  const handleIncrease = () => {
+    if (value < max) {
+      onChange(value + 1);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value) || min;
-    const clampedValue = Math.max(min, Math.min(max, newValue));
+    const clampedValue = Math.min(Math.max(newValue, min), max);
     onChange(clampedValue);
   };
 
   return (
-    <div className="space-y-4 w-full">
-      <div className={cn('h-16 rounded-lg bg-gradient-to-r', colorClasses.gradient)}>
-        <div className="flex items-center justify-center h-full">
-          <h3 className="text-white font-semibold text-lg">{label}</h3>
-        </div>
-      </div>
-      
-      <div className="flex items-center justify-center space-x-4">
+    <div className="space-y-2">
+      <label className={cn("block text-sm font-medium", colors.label)}>
+        {label}
+      </label>
+      <div className="flex items-center space-x-2">
         <Button
+          type="button"
           variant="outline"
           size="icon"
-          onClick={handleDecrement}
+          onClick={handleDecrease}
           disabled={value <= min}
-          className={cn('rounded-full transition-all duration-200', colorClasses.button)}
+          className={cn(colors.button)}
         >
-          <X className="h-4 w-4" />
+          <Minus className="h-4 w-4" />
         </Button>
-        
         <Input
           type="number"
           value={value}
           onChange={handleInputChange}
           min={min}
           max={max}
-          className={cn(
-            'w-20 text-center text-xl font-bold border-2 transition-all duration-200',
-            colorClasses.focus
-          )}
+          className={cn("w-20 text-center", colors.input)}
         />
-        
         <Button
+          type="button"
           variant="outline"
           size="icon"
-          onClick={handleIncrement}
+          onClick={handleIncrease}
           disabled={value >= max}
-          className={cn('rounded-full transition-all duration-200', colorClasses.button)}
+          className={cn(colors.button)}
         >
           <Plus className="h-4 w-4" />
         </Button>
-      </div>
-      
-      <div className="text-center text-sm text-gray-500">
-        Range: {min} - {max}
       </div>
     </div>
   );
