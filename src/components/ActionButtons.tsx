@@ -49,7 +49,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   if (!selectedTier) return null;
 
   return (
-    <Card className="bg-gradient-to-r from-teal-500 to-teal-600 border-0 shadow-2xl animate-scale-in">
+    <Card className="border-0 shadow-2xl animate-scale-in" style={{ background: 'linear-gradient(135deg, #fe5510, #fea700, #fe8303)' }}>
       <div className="p-8 text-center">
         <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
         <p className="text-white/90 mb-6">
@@ -61,7 +61,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             onClick={handleExportPDF}
             variant="secondary"
             size="lg"
-            className="flex-1 bg-white/90 hover:bg-white text-teal-900 font-semibold transition-all duration-200 hover:scale-105"
+            className="flex-1 bg-white/90 hover:bg-white text-orange-900 font-semibold transition-all duration-200 hover:scale-105"
           >
             <FileText className="h-5 w-5 mr-2" />
             Export Quote as PDF
@@ -70,7 +70,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           <Button
             onClick={handlePlaceOrder}
             size="lg"
-            className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold transition-all duration-200 hover:scale-105 shadow-lg"
+            className="flex-1 bg-white/20 hover:bg-white/30 text-white font-semibold transition-all duration-200 hover:scale-105 shadow-lg border border-white/20"
           >
             <Plus className="h-5 w-5 mr-2" />
             Place Order Now

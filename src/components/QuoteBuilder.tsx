@@ -154,8 +154,8 @@ const unlimitedTier: UnlimitedTier = {
   description: 'Complete digital access for entire school',
   basePrice: 3199, // GST inclusive
   addOns: {
-    teacherBooks: 89, // GST inclusive
-    studentBooks: 49, // GST inclusive
+    teacherBooks: 79, // GST inclusive - updated price
+    studentBooks: 42, // GST inclusive - updated price
     posterA0: 89 // GST inclusive
   },
   inclusions: [
@@ -275,11 +275,9 @@ export const QuoteBuilder = () => {
             />
           </div>
           <div className="relative">
-            <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-extrabold mb-4" style={{ background: 'linear-gradient(45deg, #fe5510, #fea700, #fe8303)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               ✨ Quote Builder ✨
             </h1>
-            <div className="absolute -top-2 -right-4 text-2xl animate-bounce">💫</div>
-            <div className="absolute -bottom-2 -left-4 text-2xl animate-pulse">🌟</div>
           </div>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
             Build your custom quote for Australia's leading financial literacy program
@@ -300,15 +298,17 @@ export const QuoteBuilder = () => {
                 <p style={{ color: '#45c0a9' }}>Choose the teaching resources that work best for your classroom</p>
               </div>
               
-              <div className="mb-6">
-                <VolumeSelector
-                  label="Number of Teachers"
-                  value={teacherCount}
-                  onChange={setTeacherCount}
-                  min={1}
-                  max={20}
-                  color="teal"
-                />
+              <div className="mb-6 flex justify-center">
+                <div className="w-full max-w-md">
+                  <VolumeSelector
+                    label="Number of Teachers"
+                    value={teacherCount}
+                    onChange={setTeacherCount}
+                    min={1}
+                    max={20}
+                    color="teal"
+                  />
+                </div>
               </div>
 
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
@@ -353,15 +353,17 @@ export const QuoteBuilder = () => {
                 <p style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
               </div>
               
-              <div className="mb-6">
-                <VolumeSelector
-                  label="Number of Students"
-                  value={studentCount}
-                  onChange={setStudentCount}
-                  min={1}
-                  max={200}
-                  color="yellow"
-                />
+              <div className="mb-6 flex justify-center">
+                <div className="w-full max-w-md">
+                  <VolumeSelector
+                    label="Number of Students"
+                    value={studentCount}
+                    onChange={setStudentCount}
+                    min={1}
+                    max={200}
+                    color="yellow"
+                  />
+                </div>
               </div>
 
               {nextDiscount && (
