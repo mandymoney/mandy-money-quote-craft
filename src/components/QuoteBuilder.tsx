@@ -977,12 +977,12 @@ export const QuoteBuilder = () => {
                 })}
                 </div>
                 
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-semibold text-blue-800 mb-2">Access Period Summary</h4>
-                  <div className="text-sm text-blue-700 space-y-1">
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-2">Access Period Summary</h4>
+                  <div className="text-sm text-green-700 space-y-1">
                     <div><strong>Program starts:</strong> {format(programStartDate, 'MMMM d, yyyy')}</div>
                     <div><strong>Access ends:</strong> {format(addMonths(programStartDate, 12), 'MMMM d, yyyy')}</div>
-                    <div className="text-xs mt-2 text-blue-600">Full 12-month access to all digital content and resources</div>
+                    <div className="text-xs mt-2 text-green-600">Full 12-month access to all digital content and resources</div>
                   </div>
                 </div>
               </div>
