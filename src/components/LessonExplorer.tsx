@@ -146,11 +146,11 @@ const allLessons: LessonData[] = [
     lesson: 11,
     title: 'Intermediate Budgeting',
     chapters: [
-      'If I Earn Enough, Surely I Don't Need To Budget?',
+      'If I Earn Enough, Surely I Don\'t Need To Budget?',
       'How Do I Build a Monthly Budget?',
       'How Do I Use Excel To Budget Plan?',
       'How Do I Build a Long Term Budget?',
-      'How Do I Budget When Things Don't Go To Plan?',
+      'How Do I Budget When Things Don\'t Go To Plan?',
       'How Do I Interpret Banking Data?',
       'How Do I Review My Budget?'
     ]
@@ -303,7 +303,7 @@ const allLessons: LessonData[] = [
     lesson: 24,
     title: 'Compound Interest',
     chapters: [
-      'What's The Difference Between Compound & Simple Interest?',
+      'What\'s The Difference Between Compound & Simple Interest?',
       'Calculating Compound Interest?',
       'How Is Interest Both "Good" and "Bad"?',
       'How Do I Choose Whether To Invest Or Pay Off Debt?'
@@ -318,7 +318,7 @@ const allLessons: LessonData[] = [
       'What Are Financial Products?',
       'What Financial Products Help Me Grow My Money?',
       'What Financial Products Help Me Borrow Money?',
-      'What's a Neutral Product That Lets Me Store Money?'
+      'What\'s a Neutral Product That Lets Me Store Money?'
     ]
   },
   {
@@ -340,7 +340,7 @@ const allLessons: LessonData[] = [
     chapters: [
       'How Does Money Contribute To An Unequal World?',
       'How Does Economic Policy Play A Role In Creating Equity?',
-      'Why Can't We Fix Social Inequalities Overnight?',
+      'Why Can\'t We Fix Social Inequalities Overnight?',
       'How Do We Solve Social Inequalities Using The IEEJ Scale?'
     ]
   },
@@ -466,7 +466,7 @@ const allLessons: LessonData[] = [
     lesson: 38,
     title: 'Investing Performance',
     chapters: [
-      'How Do I Measure an Investment's Performance?',
+      'How Do I Measure an Investment\'s Performance?',
       'How Do I Make Sense Of Investing Numbers?',
       'How Do I Interpret Investing News?'
     ]
@@ -590,14 +590,33 @@ export const LessonExplorer: React.FC = () => {
           </div>
         </div>
 
-        {/* Textbook Preview */}
+        {/* Your Four Micro-Credentials */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-teal-700 mb-4">Your Four Micro-Credentials</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((level) => (
+              <div key={level} className="cursor-pointer group">
+                <div className="aspect-square bg-teal-50 rounded-lg flex items-center justify-center border-2 border-dashed border-teal-300 hover:border-teal-400 transition-colors">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-teal-200 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                      <span className="text-teal-700 font-bold">L{level}</span>
+                    </div>
+                    <p className="text-sm text-teal-600">Level {level}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* How Do Micro-Credentials Work */}
         <div className="border-t border-teal-200 pt-6">
-          <h3 className="text-lg font-semibold text-teal-700 mb-4">Interactive Textbook Preview</h3>
+          <h3 className="text-lg font-semibold text-teal-700 mb-4">How Do Micro-Credentials Work</h3>
           <div className="aspect-video bg-teal-50 rounded-lg flex items-center justify-center border-2 border-dashed border-teal-300">
             <div className="text-center">
               <Book className="h-12 w-12 text-teal-400 mx-auto mb-4" />
-              <p className="text-teal-600 font-medium">FlipHTML5 Textbook Embed</p>
-              <p className="text-sm text-teal-500">Interactive textbook preview will appear here</p>
+              <p className="text-teal-600 font-medium">Canva Public View Link</p>
+              <p className="text-sm text-teal-500">How micro-credentials work content will appear here</p>
             </div>
           </div>
         </div>
@@ -606,9 +625,8 @@ export const LessonExplorer: React.FC = () => {
       {/* Lesson Explorer */}
       <Card className="p-6 bg-white border border-teal-200">
         <div className="flex items-center space-x-2 mb-6">
-          <Book className="h-6 w-6 text-teal-600" />
           <h2 className="text-2xl font-semibold text-teal-800">
-            Explore All 42 Lessons
+            Explore All 42 Financial Literacy Lessons
           </h2>
         </div>
 
@@ -716,7 +734,7 @@ export const LessonExplorer: React.FC = () => {
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t border-teal-200">
-                    <p className="text-sm text-teal-600 mb-2">FlipHTML5 textbook embed for this lesson:</p>
+                    <p className="text-sm text-teal-600 mb-2">FlipHTML5 embed section for this lesson:</p>
                     <div className="bg-white border border-teal-200 rounded p-3 text-center">
                       <p className="text-teal-500 text-sm">FlipHTML5 embed section for Lesson {lesson.lesson}</p>
                     </div>
