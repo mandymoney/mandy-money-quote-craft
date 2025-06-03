@@ -599,7 +599,7 @@ export const QuoteBuilder = () => {
                 {/* Volume Notification */}
                 {volumeNotification && <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-green-700 font-medium text-center text-sm">
-                      🎯 {volumeNotification}
+                      🎉 {volumeNotification}
                     </p>
                   </div>}
               </div>
@@ -612,9 +612,16 @@ export const QuoteBuilder = () => {
                 const originalPrice = tier.basePrice.student;
                 const savings = originalPrice - currentPrice;
                 const hasVolumeDiscount = totalStudents >= 12;
-                return <PricingCard key={tier.id} tier={tier} price={currentPrice} isSelected={selectedStudentTiers[tier.id] > 0} onSelect={() => {}} teacherCount={0} studentCount={selectedStudentTiers[tier.id] || 0} animationDelay={index * 100} showImages={true} studentPrice={currentPrice} includeGST={true} colorScheme="yellow" customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)" showSavings={savings > 0 && hasVolumeDiscount} savings={savings} volumeSelector={<VolumeSelector label="Students" value={selectedStudentTiers[tier.id] || 0} onChange={count => handleStudentSelection(tier.id, count)} min={0} max={200} color="yellow" />} />;
+                return <PricingCard key={tier.id} tier={tier} price={currentPrice} isSelected={selectedStudentTiers[tier.id] > 0} onSelect={() => {}} teacherCount={0} studentCount={selectedStudentTiers[tier.id] || 0} animationDelay={index * 100} showImages={true} studentPrice={currentPrice} includeGST={true} colorScheme="yellow" customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)" showSavings={false} volumeSelector={<VolumeSelector label="Students" value={selectedStudentTiers[tier.id] || 0} onChange={count => handleStudentSelection(tier.id, count)} min={0} max={200} color="yellow" />} />;
               })}
               </div>
+
+              {/* Volume discount celebration notification */}
+              {totalSavings > 0 && <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-700 font-medium text-center text-sm">
+                    🎉 Volume discount applied: Save ${totalSavings.toFixed(0)} total!
+                  </p>
+                </div>}
             </Card>
 
             {/* Unlimited School Access Suggestion */}
@@ -782,7 +789,7 @@ export const QuoteBuilder = () => {
                 schoolABN: e.target.value
               }))} />
                 <div className="md:col-span-2">
-                  <Input placeholder="School Address (Start typing for suggestions)" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
+                  <Input placeholder="School Address" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
                   ...prev,
                   schoolAddress: e.target.value
                 }))} className="w-full" />
@@ -821,7 +828,7 @@ export const QuoteBuilder = () => {
                     }))} />
                         <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
                       </div>
-                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address (Start typing for suggestions)" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
+                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
                     ...prev,
                     deliveryAddress: e.target.value
                   }))} className="w-full" />}
@@ -836,7 +843,7 @@ export const QuoteBuilder = () => {
                   }))} />
                     <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
                   </div>
-                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address (Start typing for suggestions)" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
+                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
                   ...prev,
                   billingAddress: e.target.value
                 }))} className="w-full" />}
@@ -1013,7 +1020,7 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
-        {/* Lesson Explorer - Previous Version */}
+        {/* Lesson Explorer - Old Version */}
         <div className="mt-12">
           <LessonExplorer />
         </div>
