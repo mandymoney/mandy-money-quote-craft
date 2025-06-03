@@ -6,6 +6,7 @@ import { ActionButtons } from './ActionButtons';
 import { UnlimitedSchoolCard } from './UnlimitedSchoolCard';
 import { VideoEmbed } from './VideoEmbed';
 import { LessonExplorer } from './LessonExplorer';
+import { AddressInput } from './AddressInput';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -56,14 +57,22 @@ export interface UnlimitedTier {
 interface TierSelection {
   [tierId: string]: number;
 }
+interface AddressComponents {
+  streetNumber: string;
+  streetName: string;
+  suburb: string;
+  state: string;
+  postcode: string;
+  country: string;
+}
 interface SchoolInfo {
   schoolName: string;
-  schoolAddress: string;
+  schoolAddress: AddressComponents;
   schoolABN: string;
   contactPhone: string;
-  deliveryAddress: string;
+  deliveryAddress: AddressComponents;
   deliveryIsSameAsSchool: boolean;
-  billingAddress: string;
+  billingAddress: AddressComponents;
   billingIsSameAsSchool: boolean;
   accountsEmail: string;
   coordinatorEmail: string;
@@ -229,12 +238,33 @@ export const QuoteBuilder = () => {
   const [programStartDate, setProgramStartDate] = useState<Date>(new Date());
   const [schoolInfo, setSchoolInfo] = useState<SchoolInfo>({
     schoolName: '',
-    schoolAddress: '',
+    schoolAddress: {
+      streetNumber: '',
+      streetName: '',
+      suburb: '',
+      state: '',
+      postcode: '',
+      country: 'Australia'
+    },
     schoolABN: '',
     contactPhone: '',
-    deliveryAddress: '',
+    deliveryAddress: {
+      streetNumber: '',
+      streetName: '',
+      suburb: '',
+      state: '',
+      postcode: '',
+      country: 'Australia'
+    },
     deliveryIsSameAsSchool: true,
-    billingAddress: '',
+    billingAddress: {
+      streetNumber: '',
+      streetName: '',
+      suburb: '',
+      state: '',
+      postcode: '',
+      country: 'Australia'
+    },
     billingIsSameAsSchool: true,
     accountsEmail: '',
     coordinatorEmail: '',
@@ -608,7 +638,7 @@ export const QuoteBuilder = () => {
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {teacherTiers.map((tier, index) => <PricingCard key={tier.id} tier={{
                   ...tier,
-                  bestFor: tier.bestFor ? `Best for: ${tier.bestFor}` : undefined
+                  bestFor: tier.bestFor ? tier.bestFor : undefined
                 }} price={tier.basePrice.teacher} isSelected={selectedTeacherTiers[tier.id] > 0} onSelect={() => {}} teacherCount={selectedTeacherTiers[tier.id] || 0} studentCount={0} animationDelay={index * 100} showImages={true} includeGST={true} colorScheme="teal" customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)" volumeSelector={<VolumeSelector label="Teachers" value={selectedTeacherTiers[tier.id] || 0} onChange={count => handleTeacherSelection(tier.id, count)} min={0} max={20} color="teal" />} />)}
               </div>
             </Card>
@@ -650,7 +680,7 @@ export const QuoteBuilder = () => {
                 const hasVolumeDiscount = totalStudents >= 12;
                 return <PricingCard key={tier.id} tier={{
                   ...tier,
-                  bestFor: tier.bestFor ? `Best for: ${tier.bestFor}` : undefined
+                  bestFor: tier.bestFor ? tier.bestFor : undefined
                 }} price={currentPrice} isSelected={selectedStudentTiers[tier.id] > 0} onSelect={() => {}} teacherCount={0} studentCount={selectedStudentTiers[tier.id] || 0} animationDelay={index * 100} showImages={true} studentPrice={currentPrice} includeGST={true} colorScheme="yellow" customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)" showSavings={false} volumeSelector={<VolumeSelector label="Students" value={selectedStudentTiers[tier.id] || 0} onChange={count => handleStudentSelection(tier.id, count)} min={0} max={200} color="yellow" />} />;
               })}
               </div>
@@ -807,7 +837,7 @@ export const QuoteBuilder = () => {
         </div>
 
         {/* Official Quote Section with Light Green Background */}
-        <div className="bg-gradient-to-b from-green-50 to-emerald-50 rounded-lg shadow-lg overflow-hidden border border-green-100">
+        <div className="bg-gradient-to-b from-green-50 to-emerald-50 rounded-lg shadow-lg overflow-hidden border border-green-100 pb-8 md:pb-0">
           {/* Navy Header Banner */}
           <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white p-6">
             <div className="text-center">
@@ -947,7 +977,7 @@ export const QuoteBuilder = () => {
               </div>
             </div>
 
-            {/* School Information Form - Moved Below */}
+            {/* School Information Form - Updated with address components */}
             <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border border-green-200/50">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">School Information</h3>
               <p className="text-sm text-gray-600 mb-4">Information not required unless placing an order</p>
@@ -973,7 +1003,7 @@ export const QuoteBuilder = () => {
                 </div>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <Input placeholder="School Name *" value={schoolInfo.schoolName} onChange={e => setSchoolInfo(prev => ({
                 ...prev,
                 schoolName: e.target.value
@@ -982,12 +1012,22 @@ export const QuoteBuilder = () => {
                 ...prev,
                 schoolABN: e.target.value
               }))} />
-                <div className="md:col-span-2">
-                  <Input placeholder="School Address (include unit/building number, street name, suburb, state, postcode for pin-point accuracy)" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
-                  ...prev,
-                  schoolAddress: e.target.value
-                }))} className="w-full" />
-                </div>
+              </div>
+
+              {/* School Address */}
+              <div className="mb-6">
+                <AddressInput
+                  label="School Address *"
+                  value={schoolInfo.schoolAddress}
+                  onChange={(address) => setSchoolInfo(prev => ({
+                    ...prev,
+                    schoolAddress: address
+                  }))}
+                  placeholder="Search for your school address..."
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <Input placeholder="Contact Phone" value={schoolInfo.contactPhone} onChange={e => setSchoolInfo(prev => ({
                 ...prev,
                 contactPhone: e.target.value
@@ -1012,37 +1052,53 @@ export const QuoteBuilder = () => {
                 ...prev,
                 purchaseOrderNumber: e.target.value
               }))} />
+              </div>
                 
-                {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && <>
-                    <div className="md:col-span-2">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
-                      ...prev,
-                      deliveryIsSameAsSchool: checked as boolean
-                    }))} />
-                        <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
-                      </div>
-                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address (include unit/building number, street name, suburb, state, postcode for pin-point accuracy)" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
+              {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && (
+                <div className="mb-6">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
                     ...prev,
-                    deliveryAddress: e.target.value
-                  }))} className="w-full" />}
-                    </div>
-                  </>}
-                
-                <div className="md:col-span-2">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Checkbox id="billingIsSame" checked={schoolInfo.billingIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
-                    ...prev,
-                    billingIsSameAsSchool: checked as boolean
+                    deliveryIsSameAsSchool: checked as boolean
                   }))} />
-                    <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
+                    <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
                   </div>
-                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address (include unit/building number, street name, suburb, state, postcode for pin-point accuracy)" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
-                  ...prev,
-                  billingAddress: e.target.value
-                }))} className="w-full" />}
+                  {!schoolInfo.deliveryIsSameAsSchool && (
+                    <AddressInput
+                      label="Delivery Address"
+                      value={schoolInfo.deliveryAddress}
+                      onChange={(address) => setSchoolInfo(prev => ({
+                        ...prev,
+                        deliveryAddress: address
+                      }))}
+                      placeholder="Search for your delivery address..."
+                    />
+                  )}
                 </div>
-                
+              )}
+              
+              <div className="mb-6">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Checkbox id="billingIsSame" checked={schoolInfo.billingIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
+                  ...prev,
+                  billingIsSameAsSchool: checked as boolean
+                }))} />
+                  <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
+                </div>
+                {!schoolInfo.billingIsSameAsSchool && (
+                  <AddressInput
+                    label="Billing Address"
+                    value={schoolInfo.billingAddress}
+                    onChange={(address) => setSchoolInfo(prev => ({
+                      ...prev,
+                      billingAddress: address
+                    }))}
+                    placeholder="Search for your billing address..."
+                  />
+                )}
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <Select value={schoolInfo.paymentPreference} onValueChange={value => setSchoolInfo(prev => ({
                 ...prev,
                 paymentPreference: value
@@ -1069,15 +1125,15 @@ export const QuoteBuilder = () => {
                     <SelectItem value="not-sure">Not Sure</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
 
-                {/* Questions/Comments Section */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Any Questions or Comments?</label>
-                  <Textarea placeholder="Please share any questions, special requirements, or additional information..." value={schoolInfo.questionsComments} onChange={e => setSchoolInfo(prev => ({
-                  ...prev,
-                  questionsComments: e.target.value
-                }))} className="min-h-20" />
-                </div>
+              {/* Questions/Comments Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Any Questions or Comments?</label>
+                <Textarea placeholder="Please share any questions, special requirements, or additional information..." value={schoolInfo.questionsComments} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                questionsComments: e.target.value
+              }))} className="min-h-20" />
               </div>
             </Card>
 
@@ -1111,6 +1167,8 @@ export const QuoteBuilder = () => {
           <LessonExplorer />
         </div>
 
+        {/* Add padding at bottom for mobile to prevent overlap with sticky notification */}
+        <div className="md:hidden h-24"></div>
       </div>
     </div>;
 };

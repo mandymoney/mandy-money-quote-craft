@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Image, Star, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Image, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { PricingTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +42,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   volumeSelector
 }) => {
   const [isInclusionsExpanded, setIsInclusionsExpanded] = useState(false);
+  const [isNotIncludedExpanded, setIsNotIncludedExpanded] = useState(false);
 
   const getGradientClass = () => {
     if (customGradient) return '';
@@ -123,12 +124,11 @@ export const PricingCard: React.FC<PricingCardProps> = ({
 
         <p className="text-gray-600 text-sm mb-4 min-h-[40px]">{tier.description}</p>
 
-        {/* Best For */}
+        {/* Best For - Hidden on mobile */}
         {tier.bestFor && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg hidden md:block">
             <div className="flex items-center text-amber-800">
-              <Star className="h-4 w-4 mr-2 text-amber-600" />
-              <span className="text-sm font-medium">{tier.bestFor}</span>
+              <span className="text-sm font-medium">Best for: {tier.bestFor}</span>
             </div>
           </div>
         )}
@@ -211,16 +211,48 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           ))}
         </div>
 
-        {/* What's Not Included */}
+        {/* What's Not Included - Mobile: Expandable, Desktop: Always shown */}
         {tier.notIncluded && tier.notIncluded.length > 0 && (
           <div className="space-y-2 mb-4">
-            <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
-            {tier.notIncluded.map((notIncluded, index) => (
-              <div key={index} className="flex items-center text-sm text-gray-500">
-                <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
-                <span>{notIncluded}</span>
-              </div>
-            ))}
+            {/* Mobile: Expandable */}
+            <div className="md:hidden">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsNotIncludedExpanded(!isNotIncludedExpanded);
+                }}
+                className="w-full flex items-center justify-between p-3 rounded-lg text-sm font-semibold bg-gray-50 text-gray-700"
+              >
+                <span>What's Not Included ({tier.notIncluded.length})</span>
+                {isNotIncludedExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+              
+              {isNotIncludedExpanded && (
+                <div className="mt-2 space-y-2">
+                  {tier.notIncluded.map((notIncluded, index) => (
+                    <div key={index} className="flex items-center text-sm text-gray-500 px-3">
+                      <X className="h-3 w-3 text-red-400 mr-2 flex-shrink-0" />
+                      <span>{notIncluded}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop: Always shown */}
+            <div className="hidden md:block">
+              <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
+              {tier.notIncluded.map((notIncluded, index) => (
+                <div key={index} className="flex items-center text-sm text-gray-500">
+                  <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
+                  <span>{notIncluded}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
