@@ -1,7 +1,8 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Image, Star, X } from 'lucide-react';
+import { Check, Image, Star, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { PricingTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -40,6 +41,8 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   savings = 0,
   volumeSelector
 }) => {
+  const [isInclusionsExpanded, setIsInclusionsExpanded] = useState(false);
+
   const getGradientClass = () => {
     if (customGradient) return '';
     if (colorScheme === 'yellow') {
@@ -125,7 +128,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <div className="flex items-center text-amber-800">
               <Star className="h-4 w-4 mr-2 text-amber-600" />
-              <span className="text-sm font-medium">Best for: {tier.bestFor}</span>
+              <span className="text-sm font-medium">{tier.bestFor}</span>
             </div>
           </div>
         )}
@@ -156,8 +159,43 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           )}
         </div>
 
-        {/* All Inclusions - displayed without expandable */}
-        <div className="space-y-2 mb-4">
+        {/* Mobile: Expandable Inclusions */}
+        <div className="md:hidden mb-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsInclusionsExpanded(!isInclusionsExpanded);
+            }}
+            className={cn(
+              "w-full flex items-center justify-between p-3 rounded-lg text-sm font-semibold",
+              colorScheme === 'yellow' ? 'bg-yellow-50 text-yellow-700' : 'bg-teal-50 text-teal-700'
+            )}
+          >
+            <span>Inclusions ({allInclusions.length})</span>
+            {isInclusionsExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
+          
+          {isInclusionsExpanded && (
+            <div className="mt-2 space-y-2">
+              {allInclusions.map((inclusion, index) => (
+                <div key={index} className="flex items-center text-sm text-gray-700 px-3">
+                  <Check className={cn(
+                    "h-3 w-3 mr-2 flex-shrink-0",
+                    colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
+                  )} />
+                  <span>{inclusion}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: All Inclusions - displayed without expandable */}
+        <div className="hidden md:block space-y-2 mb-4">
           <h4 className={cn(
             "font-semibold text-sm",
             colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'

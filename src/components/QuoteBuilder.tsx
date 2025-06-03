@@ -608,7 +608,7 @@ export const QuoteBuilder = () => {
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {teacherTiers.map((tier, index) => <PricingCard key={tier.id} tier={{
                   ...tier,
-                  bestFor: tier.bestFor ? `⭐ Best for: ${tier.bestFor}` : undefined
+                  bestFor: tier.bestFor ? `Best for: ${tier.bestFor}` : undefined
                 }} price={tier.basePrice.teacher} isSelected={selectedTeacherTiers[tier.id] > 0} onSelect={() => {}} teacherCount={selectedTeacherTiers[tier.id] || 0} studentCount={0} animationDelay={index * 100} showImages={true} includeGST={true} colorScheme="teal" customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)" volumeSelector={<VolumeSelector label="Teachers" value={selectedTeacherTiers[tier.id] || 0} onChange={count => handleTeacherSelection(tier.id, count)} min={0} max={20} color="teal" />} />)}
               </div>
             </Card>
@@ -650,7 +650,7 @@ export const QuoteBuilder = () => {
                 const hasVolumeDiscount = totalStudents >= 12;
                 return <PricingCard key={tier.id} tier={{
                   ...tier,
-                  bestFor: tier.bestFor ? `⭐ Best for: ${tier.bestFor}` : undefined
+                  bestFor: tier.bestFor ? `Best for: ${tier.bestFor}` : undefined
                 }} price={currentPrice} isSelected={selectedStudentTiers[tier.id] > 0} onSelect={() => {}} teacherCount={0} studentCount={selectedStudentTiers[tier.id] || 0} animationDelay={index * 100} showImages={true} studentPrice={currentPrice} includeGST={true} colorScheme="yellow" customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)" showSavings={false} volumeSelector={<VolumeSelector label="Students" value={selectedStudentTiers[tier.id] || 0} onChange={count => handleStudentSelection(tier.id, count)} min={0} max={200} color="yellow" />} />;
               })}
               </div>
@@ -705,8 +705,8 @@ export const QuoteBuilder = () => {
               </div>}
           </div>
 
-          {/* Running Total Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Running Total Sidebar - Hidden on mobile */}
+          <div className="lg:col-span-1 hidden lg:block">
             <div className="sticky top-6">
               <Card className="p-6 bg-white shadow-sm border-2 border-gray-200">
                 <h3 className="text-xl font-bold mb-4 text-gray-800">Complete Package Cost</h3>
