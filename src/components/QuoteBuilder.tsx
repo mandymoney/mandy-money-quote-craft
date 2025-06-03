@@ -18,7 +18,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon, BarChart3 } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 import { cn } from '@/lib/utils';
-
 export interface PricingTier {
   id: string;
   name: string;
@@ -41,7 +40,6 @@ export interface PricingTier {
   type: 'teacher' | 'student' | 'combined';
   bestFor?: string;
 }
-
 export interface UnlimitedTier {
   id: string;
   name: string;
@@ -55,11 +53,9 @@ export interface UnlimitedTier {
   inclusions: string[];
   bestFor: string;
 }
-
 interface TierSelection {
   [tierId: string]: number;
 }
-
 interface SchoolInfo {
   schoolName: string;
   schoolAddress: string;
@@ -78,157 +74,136 @@ interface SchoolInfo {
   supplierSetupForms: string;
   questionsComments: string;
 }
-
 interface VideoLinks {
   teacherPassVideo: string;
   studentPassVideo: string;
   microCredentialsVideo: string;
-  lessonEmbeds: { [key: number]: string };
+  lessonEmbeds: {
+    [key: number]: string;
+  };
 }
-
-const teacherTiers: PricingTier[] = [
-  {
-    id: 'teacher-digital',
-    name: 'Digital Pass Only',
-    description: 'Complete digital access for teachers',
-    basePrice: { teacher: 119, student: 0 },
-    volumeDiscounts: { students12Plus: 0, students50Plus: 0 },
-    inclusions: {
-      teacher: [
-        '42 x Click & Play Powerpoint Lessons',
-        '168 x Theory Videos',
-        '168 x Printable Worksheets',
-        'Classroom Lesson Quizzes',
-        'Lesson Plans',
-        'Curriculum Alignment Guides',
-        'Digital Textbook',
-        'Classroom Space (requires student passes)'
-      ],
-      student: [],
-      classroom: []
-    },
-    notIncluded: ['Print Textbook', 'Offline Access'],
-    type: 'teacher',
-    bestFor: 'Tech-savvy teachers with digital classrooms'
+const teacherTiers: PricingTier[] = [{
+  id: 'teacher-digital',
+  name: 'Digital Pass Only',
+  description: 'Complete digital access for teachers',
+  basePrice: {
+    teacher: 119,
+    student: 0
   },
-  {
-    id: 'teacher-physical',
-    name: 'Textbook Only',
-    description: 'Physical textbook for teachers',
-    basePrice: { teacher: 89, student: 0 },
-    volumeDiscounts: { students12Plus: 0, students50Plus: 0 },
-    inclusions: {
-      teacher: [
-        '42 x Complete Lesson Resources',
-        '168 x Illustrated Theory Pages',
-        '168 x Worksheets',
-        'Lesson Plans',
-        'Curriculum Alignment Guides'
-      ],
-      student: [],
-      classroom: []
-    },
-    notIncluded: ['Click & Play Digital Lessons', 'Digital Textbook', 'Classroom Lesson Quizzes', 'Classroom Space'],
-    type: 'teacher',
-    bestFor: 'Traditional classroom teachers who prefer print materials'
+  volumeDiscounts: {
+    students12Plus: 0,
+    students50Plus: 0
   },
-  {
-    id: 'teacher-both',
-    name: 'Digital Pass + Textbook Bundle',
-    description: 'Complete teacher package',
-    basePrice: { teacher: 189, student: 0 },
-    volumeDiscounts: { students12Plus: 0, students50Plus: 0 },
-    inclusions: {
-      teacher: [
-        '1 x Print & Digital Textbook',
-        '1 x Digital Teacher Pass',
-        '42 x Click & Play Powerpoint Lessons',
-        '168 x Theory Videos + Illustrated Theory Pages',
-        '168 x Printable Worksheets',
-        'Classroom Lesson Quizzes',
-        'Lesson Plans',
-        'Curriculum Alignment Guides',
-        'Classroom Space (requires student passes)'
-      ],
-      student: [],
-      classroom: []
-    },
-    isPopular: true,
-    type: 'teacher',
-    bestFor: 'Teachers who want maximum flexibility and resources'
-  }
-];
-
-const studentTiers: PricingTier[] = [
-  {
-    id: 'student-digital',
-    name: 'Digital Pass Only',
-    description: 'Digital access for students',
-    basePrice: { teacher: 0, student: 21 },
-    volumeDiscounts: { students12Plus: 18, students50Plus: 15 },
-    inclusions: {
-      teacher: [],
-      student: [
-        'Personal Student Account',
-        '42 x Digital Lessons',
-        '168 x Theory Videos',
-        '168 x Gamified Activities',
-        'Lesson Quizzes',
-        'Lesson Certificates',
-        'Micro-Credential Pre & Post Testing'
-      ],
-      classroom: []
-    },
-    notIncluded: ['Print Student Textbook', 'Offline Access'],
-    type: 'student',
-    bestFor: '1:1 device schools and tech-comfortable students'
+  inclusions: {
+    teacher: ['42 x Click & Play Powerpoint Lessons', '168 x Theory Videos', '168 x Printable Worksheets', 'Classroom Lesson Quizzes', 'Lesson Plans', 'Curriculum Alignment Guides', 'Digital Textbook', 'Classroom Space (requires student passes)'],
+    student: [],
+    classroom: []
   },
-  {
-    id: 'student-physical',
-    name: 'Textbook Only',
-    description: 'Physical textbook for students',
-    basePrice: { teacher: 0, student: 49 },
-    volumeDiscounts: { students12Plus: 42, students50Plus: 40 },
-    inclusions: {
-      teacher: [],
-      student: [
-        '42 x Complete Lesson Resources',
-        '168 x Illustrated Theory Pages',
-        '168 x Worksheets',
-        'Worksheet Answers'
-      ],
-      classroom: []
-    },
-    notIncluded: ['Digital Lesson Access', 'Digital Textbook', 'Micro-Credential Pre & Post Testing'],
-    type: 'student',
-    bestFor: 'Students who learn better with physical materials'
+  notIncluded: ['Print Textbook', 'Offline Access'],
+  type: 'teacher',
+  bestFor: 'Tech-savvy teachers with digital classrooms'
+}, {
+  id: 'teacher-physical',
+  name: 'Textbook Only',
+  description: 'Physical textbook for teachers',
+  basePrice: {
+    teacher: 89,
+    student: 0
   },
-  {
-    id: 'student-both',
-    name: 'Digital Pass + Textbook Bundle',
-    description: 'Complete student package',
-    basePrice: { teacher: 0, student: 55 },
-    volumeDiscounts: { students12Plus: 49, students50Plus: 46 },
-    inclusions: {
-      teacher: [],
-      student: [
-        '1 x Student Digital Pass',
-        '1 x Print Student Textbook',
-        '42 x Lessons',
-        '168 x Theory Videos + Illustrated Theory Pages',
-        '168 x Worksheets + Gamified Activities',
-        'Micro-Credential Pre & Post Testing',
-        'Lesson Quizzes',
-        'Lesson Certificates'
-      ],
-      classroom: []
-    },
-    isPopular: true,
-    type: 'student',
-    bestFor: 'Schools wanting comprehensive learning resources'
-  }
-];
-
+  volumeDiscounts: {
+    students12Plus: 0,
+    students50Plus: 0
+  },
+  inclusions: {
+    teacher: ['42 x Complete Lesson Resources', '168 x Illustrated Theory Pages', '168 x Worksheets', 'Lesson Plans', 'Curriculum Alignment Guides'],
+    student: [],
+    classroom: []
+  },
+  notIncluded: ['Click & Play Digital Lessons', 'Digital Textbook', 'Classroom Lesson Quizzes', 'Classroom Space'],
+  type: 'teacher',
+  bestFor: 'Traditional classroom teachers who prefer print materials'
+}, {
+  id: 'teacher-both',
+  name: 'Digital Pass + Textbook Bundle',
+  description: 'Complete teacher package',
+  basePrice: {
+    teacher: 189,
+    student: 0
+  },
+  volumeDiscounts: {
+    students12Plus: 0,
+    students50Plus: 0
+  },
+  inclusions: {
+    teacher: ['1 x Print & Digital Textbook', '1 x Digital Teacher Pass', '42 x Click & Play Powerpoint Lessons', '168 x Theory Videos + Illustrated Theory Pages', '168 x Printable Worksheets', 'Classroom Lesson Quizzes', 'Lesson Plans', 'Curriculum Alignment Guides', 'Classroom Space (requires student passes)'],
+    student: [],
+    classroom: []
+  },
+  isPopular: true,
+  type: 'teacher',
+  bestFor: 'Teachers who want maximum flexibility and resources'
+}];
+const studentTiers: PricingTier[] = [{
+  id: 'student-digital',
+  name: 'Digital Pass Only',
+  description: 'Digital access for students',
+  basePrice: {
+    teacher: 0,
+    student: 21
+  },
+  volumeDiscounts: {
+    students12Plus: 18,
+    students50Plus: 15
+  },
+  inclusions: {
+    teacher: [],
+    student: ['Personal Student Account', '42 x Digital Lessons', '168 x Theory Videos', '168 x Gamified Activities', 'Lesson Quizzes', 'Lesson Certificates', 'Micro-Credential Pre & Post Testing'],
+    classroom: []
+  },
+  notIncluded: ['Print Student Textbook', 'Offline Access'],
+  type: 'student',
+  bestFor: '1:1 device schools and tech-comfortable students'
+}, {
+  id: 'student-physical',
+  name: 'Textbook Only',
+  description: 'Physical textbook for students',
+  basePrice: {
+    teacher: 0,
+    student: 49
+  },
+  volumeDiscounts: {
+    students12Plus: 42,
+    students50Plus: 40
+  },
+  inclusions: {
+    teacher: [],
+    student: ['42 x Complete Lesson Resources', '168 x Illustrated Theory Pages', '168 x Worksheets', 'Worksheet Answers'],
+    classroom: []
+  },
+  notIncluded: ['Digital Lesson Access', 'Digital Textbook', 'Micro-Credential Pre & Post Testing'],
+  type: 'student',
+  bestFor: 'Students who learn better with physical materials'
+}, {
+  id: 'student-both',
+  name: 'Digital Pass + Textbook Bundle',
+  description: 'Complete student package',
+  basePrice: {
+    teacher: 0,
+    student: 55
+  },
+  volumeDiscounts: {
+    students12Plus: 49,
+    students50Plus: 46
+  },
+  inclusions: {
+    teacher: [],
+    student: ['1 x Student Digital Pass', '1 x Print Student Textbook', '42 x Lessons', '168 x Theory Videos + Illustrated Theory Pages', '168 x Worksheets + Gamified Activities', 'Micro-Credential Pre & Post Testing', 'Lesson Quizzes', 'Lesson Certificates'],
+    classroom: []
+  },
+  isPopular: true,
+  type: 'student',
+  bestFor: 'Schools wanting comprehensive learning resources'
+}];
 const unlimitedTier: UnlimitedTier = {
   id: 'unlimited',
   name: 'Unlimited School Access',
@@ -239,14 +214,9 @@ const unlimitedTier: UnlimitedTier = {
     studentBooks: 42,
     posterA0: 89
   },
-  inclusions: [
-    'Unlimited Teacher Digital Passes',
-    'Unlimited Student Digital Passes',
-    'Unlimited Classroom Spaces'
-  ],
+  inclusions: ['Unlimited Teacher Digital Passes', 'Unlimited Student Digital Passes', 'Unlimited Classroom Spaces'],
   bestFor: 'Perfect for schools prioritising financial empowerment as a core student outcome'
 };
-
 export const QuoteBuilder = () => {
   const [selectedTeacherTiers, setSelectedTeacherTiers] = useState<TierSelection>({});
   const [selectedStudentTiers, setSelectedStudentTiers] = useState<TierSelection>({});
@@ -281,58 +251,51 @@ export const QuoteBuilder = () => {
     microCredentialsVideo: '',
     lessonEmbeds: {}
   });
-
   const GST_RATE = 0.1;
   const SHIPPING_THRESHOLD = 90;
   const SHIPPING_COST = 14;
-
   const getTotalTeacherCount = (): number => {
     return Object.values(selectedTeacherTiers).reduce((sum, count) => sum + count, 0);
   };
-
   const getTotalStudentCount = (): number => {
     return Object.values(selectedStudentTiers).reduce((sum, count) => sum + count, 0);
   };
-
   const hasPhysicalItems = (): boolean => {
     if (useUnlimited) {
       return unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0;
     }
-    return (selectedTeacherTiers['teacher-physical'] > 0 || 
-            selectedTeacherTiers['teacher-both'] > 0 || 
-            selectedStudentTiers['student-physical'] > 0 || 
-            selectedStudentTiers['student-both'] > 0);
+    return selectedTeacherTiers['teacher-physical'] > 0 || selectedTeacherTiers['teacher-both'] > 0 || selectedStudentTiers['student-physical'] > 0 || selectedStudentTiers['student-both'] > 0;
   };
-
   const calculateStudentPrice = (tier: PricingTier, currentStudentCount: number): number => {
     let studentPrice = tier.basePrice.student;
-    
     if (currentStudentCount >= 50) {
       studentPrice = tier.volumeDiscounts.students50Plus;
     } else if (currentStudentCount >= 12) {
       studentPrice = tier.volumeDiscounts.students12Plus;
     }
-
     return studentPrice;
   };
-
-  const calculateRegularTotal = (): { subtotal: number; gst: number; total: number; shipping: number } => {
+  const calculateRegularTotal = (): {
+    subtotal: number;
+    gst: number;
+    total: number;
+    shipping: number;
+  } => {
     let teacherCost = 0;
     let studentCost = 0;
-    
+
     // Calculate teacher costs
     teacherTiers.forEach(tier => {
       const count = selectedTeacherTiers[tier.id] || 0;
       teacherCost += tier.basePrice.teacher * count;
     });
-    
+
     // Calculate student costs
     const totalStudents = getTotalStudentCount();
     studentTiers.forEach(tier => {
       const count = selectedStudentTiers[tier.id] || 0;
       studentCost += calculateStudentPrice(tier, totalStudents) * count;
     });
-    
     let shipping = 0;
     if (hasPhysicalItems()) {
       const subtotalBeforeShipping = (teacherCost + studentCost) / (1 + GST_RATE);
@@ -340,14 +303,16 @@ export const QuoteBuilder = () => {
         shipping = SHIPPING_COST;
       }
     }
-    
     const total = teacherCost + studentCost + shipping;
     const subtotal = (teacherCost + studentCost) / (1 + GST_RATE);
     const gst = total - subtotal - shipping;
-    
-    return { subtotal, gst, total, shipping };
+    return {
+      subtotal,
+      gst,
+      total,
+      shipping
+    };
   };
-
   const getVolumeNotification = (): string | null => {
     const totalStudents = getTotalStudentCount();
     if (totalStudents > 0 && totalStudents < 12) {
@@ -357,10 +322,8 @@ export const QuoteBuilder = () => {
     }
     return null;
   };
-
   const getIncludedItems = () => {
     const items = [];
-    
     if (useUnlimited) {
       items.push(`Unlimited Teacher Digital Passes`);
       items.push(`Unlimited Student Digital Passes`);
@@ -381,13 +344,11 @@ export const QuoteBuilder = () => {
       const studentDigital = selectedStudentTiers['student-digital'] || 0;
       const studentPhysical = selectedStudentTiers['student-physical'] || 0;
       const studentBoth = selectedStudentTiers['student-both'] || 0;
-
       const totalTeacherDigital = teacherDigital + teacherBoth;
       const totalTeacherPhysical = teacherPhysical + teacherBoth;
       const totalStudentDigital = studentDigital + studentBoth;
       const totalStudentPhysical = studentPhysical + studentBoth;
       const totalClassrooms = totalTeacherDigital;
-
       if (totalTeacherDigital > 0) {
         items.push({
           text: `${totalTeacherDigital} Teacher Digital Pass${totalTeacherDigital > 1 ? 'es' : ''}`,
@@ -419,13 +380,10 @@ export const QuoteBuilder = () => {
         });
       }
     }
-    
     return items;
   };
-
   const getDetailedBreakdown = () => {
     const breakdown = [];
-    
     if (useUnlimited) {
       breakdown.push({
         item: 'Unlimited School Access',
@@ -435,7 +393,6 @@ export const QuoteBuilder = () => {
         type: 'base',
         description: 'Unlimited Teacher Digital Passes, Student Digital Passes & Classroom Spaces'
       });
-      
       if (unlimitedAddOns.teacherBooks > 0) {
         breakdown.push({
           item: 'Teacher Print Textbooks',
@@ -446,7 +403,6 @@ export const QuoteBuilder = () => {
           description: 'Physical teacher textbooks'
         });
       }
-      
       if (unlimitedAddOns.studentBooks > 0) {
         breakdown.push({
           item: 'Student Print Textbooks',
@@ -457,7 +413,6 @@ export const QuoteBuilder = () => {
           description: 'Physical student textbooks'
         });
       }
-      
       if (unlimitedAddOns.posterA0 > 0) {
         breakdown.push({
           item: 'A0 Posters',
@@ -470,7 +425,6 @@ export const QuoteBuilder = () => {
       }
     } else {
       const totalStudents = getTotalStudentCount();
-      
       teacherTiers.forEach(tier => {
         const count = selectedTeacherTiers[tier.id] || 0;
         if (count > 0) {
@@ -484,14 +438,12 @@ export const QuoteBuilder = () => {
           });
         }
       });
-      
       studentTiers.forEach(tier => {
         const count = selectedStudentTiers[tier.id] || 0;
         if (count > 0) {
           const unitPrice = calculateStudentPrice(tier, totalStudents);
           const originalPrice = tier.basePrice.student;
           const savings = originalPrice - unitPrice;
-          
           breakdown.push({
             item: tier.name,
             count,
@@ -505,14 +457,11 @@ export const QuoteBuilder = () => {
         }
       });
     }
-    
     return breakdown;
   };
-
   const getTotalSavings = (): number => {
     const totalStudents = getTotalStudentCount();
     let totalSavings = 0;
-    
     studentTiers.forEach(tier => {
       const count = selectedStudentTiers[tier.id] || 0;
       if (count > 0) {
@@ -524,18 +473,14 @@ export const QuoteBuilder = () => {
         }
       }
     });
-    
     return totalSavings;
   };
-
   const getVolumeDiscountDetails = () => {
     const totalStudents = getTotalStudentCount();
     if (totalStudents < 12) return null;
-
     let originalTotal = 0;
     let discountedTotal = 0;
     let totalStudentsWithDiscount = 0;
-
     studentTiers.forEach(tier => {
       const count = selectedStudentTiers[tier.id] || 0;
       if (count > 0) {
@@ -544,13 +489,10 @@ export const QuoteBuilder = () => {
         totalStudentsWithDiscount += count;
       }
     });
-
     if (totalStudentsWithDiscount === 0) return null;
-
     const originalPerStudent = originalTotal / totalStudentsWithDiscount;
     const discountedPerStudent = discountedTotal / totalStudentsWithDiscount;
     const savingsPerStudent = originalPerStudent - discountedPerStudent;
-
     return {
       originalPerStudent,
       discountedPerStudent,
@@ -558,11 +500,9 @@ export const QuoteBuilder = () => {
       totalSavings: originalTotal - discountedTotal
     };
   };
-
   const handleCredentialFlip = (id: string) => {
     // This function was used for micro-credentials flip cards, now removed
   };
-
   const handleTeacherSelection = (tierId: string, count: number) => {
     if (useUnlimited) setUseUnlimited(false);
     setSelectedTeacherTiers(prev => ({
@@ -570,7 +510,6 @@ export const QuoteBuilder = () => {
       [tierId]: count
     }));
   };
-
   const handleStudentSelection = (tierId: string, count: number) => {
     if (useUnlimited) setUseUnlimited(false);
     setSelectedStudentTiers(prev => ({
@@ -578,7 +517,6 @@ export const QuoteBuilder = () => {
       [tierId]: count
     }));
   };
-
   const handleUnlimitedSelection = () => {
     if (!useUnlimited) {
       setSelectedTeacherTiers({});
@@ -586,23 +524,16 @@ export const QuoteBuilder = () => {
     }
     setUseUnlimited(!useUnlimited);
   };
-
   const regularPricing = calculateRegularTotal();
   const volumeNotification = getVolumeNotification();
   const totalSavings = getTotalSavings();
   const volumeDiscountDetails = getVolumeDiscountDetails();
-
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
+  return <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <img 
-              src="/lovable-uploads/25655841-ce46-4847-b1b0-63cf9fc9699e.png" 
-              alt="Mandy Money High School Program Logo" 
-              className="h-24 object-contain"
-            />
+            <img src="/lovable-uploads/25655841-ce46-4847-b1b0-63cf9fc9699e.png" alt="Mandy Money High School Program Logo" className="h-24 object-contain" />
           </div>
           <div className="flex items-center justify-center gap-8 mb-4">
             <div className="text-6xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">✨</div>
@@ -622,117 +553,72 @@ export const QuoteBuilder = () => {
         <div className="grid lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3">
             {/* Step 1: Teacher Section */}
-            <Card className="mb-8 p-6 bg-white shadow-sm border-2" style={{ borderImage: 'linear-gradient(135deg, #005653, #45c0a9, #80dec4) 1' }}>
+            <Card className="mb-8 p-6 bg-white shadow-sm border-2" style={{
+            borderImage: 'linear-gradient(135deg, #005653, #45c0a9, #80dec4) 1'
+          }}>
               <div className="mb-6">
                 <div className="text-center mb-4">
                   <div className="inline-block bg-gradient-to-r from-[#005653] to-[#45c0a9] text-white px-6 py-2 rounded-full text-lg font-bold">
                     Teacher Options
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold mb-2 text-center" style={{ color: '#005653' }}>
+                <h2 className="text-2xl font-bold mb-2 text-center" style={{
+                color: '#005653'
+              }}>
                   Step 1: Select your Teacher Program Elements
                 </h2>
-                <p className="text-center" style={{ color: '#45c0a9' }}>Choose the teaching resources that work best for your classroom</p>
+                <p className="text-center" style={{
+                color: '#45c0a9'
+              }}>Choose the teaching resources that work best for your classroom</p>
               </div>
 
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
-                {teacherTiers.map((tier, index) => (
-                  <PricingCard
-                    key={tier.id}
-                    tier={tier}
-                    price={tier.basePrice.teacher}
-                    isSelected={selectedTeacherTiers[tier.id] > 0}
-                    onSelect={() => {}}
-                    teacherCount={selectedTeacherTiers[tier.id] || 0}
-                    studentCount={0}
-                    animationDelay={index * 100}
-                    showImages={true}
-                    includeGST={true}
-                    colorScheme="teal"
-                    customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)"
-                    volumeSelector={
-                      <VolumeSelector
-                        label="Teachers"
-                        value={selectedTeacherTiers[tier.id] || 0}
-                        onChange={(count) => handleTeacherSelection(tier.id, count)}
-                        min={0}
-                        max={20}
-                        color="teal"
-                      />
-                    }
-                  />
-                ))}
+                {teacherTiers.map((tier, index) => <PricingCard key={tier.id} tier={tier} price={tier.basePrice.teacher} isSelected={selectedTeacherTiers[tier.id] > 0} onSelect={() => {}} teacherCount={selectedTeacherTiers[tier.id] || 0} studentCount={0} animationDelay={index * 100} showImages={true} includeGST={true} colorScheme="teal" customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)" volumeSelector={<VolumeSelector label="Teachers" value={selectedTeacherTiers[tier.id] || 0} onChange={count => handleTeacherSelection(tier.id, count)} min={0} max={20} color="teal" />} />)}
               </div>
             </Card>
 
             {/* Step 2: Student Section */}
-            <Card className="mb-8 p-6 bg-white shadow-sm border-2" style={{ borderImage: 'linear-gradient(135deg, #ffb512, #ffde5a, #fea100) 1' }}>
+            <Card className="mb-8 p-6 bg-white shadow-sm border-2" style={{
+            borderImage: 'linear-gradient(135deg, #ffb512, #ffde5a, #fea100) 1'
+          }}>
               <div className="mb-6">
                 <div className="text-center mb-4">
                   <div className="inline-block bg-gradient-to-r from-[#ffb512] to-[#fea100] text-white px-6 py-2 rounded-full text-lg font-bold">
                     Student Options
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold mb-2 text-center" style={{ color: '#fea100' }}>
+                <h2 className="text-2xl font-bold mb-2 text-center" style={{
+                color: '#fea100'
+              }}>
                   Step 2: Select your Student Program Elements
                 </h2>
-                <p className="text-center" style={{ color: '#ffb512' }}>Choose personalised access to the program for your students</p>
+                <p className="text-center" style={{
+                color: '#ffb512'
+              }}>Choose personalised access to the program for your students</p>
                 
                 {/* Volume Notification */}
-                {volumeNotification && (
-                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                {volumeNotification && <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-green-700 font-medium text-center text-sm">
                       🎯 {volumeNotification}
                     </p>
-                  </div>
-                )}
+                  </div>}
               </div>
 
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {studentTiers.map((tier, index) => {
-                  const currentStudentCount = selectedStudentTiers[tier.id] || 0;
-                  const totalStudents = getTotalStudentCount();
-                  const currentPrice = calculateStudentPrice(tier, totalStudents);
-                  const originalPrice = tier.basePrice.student;
-                  const savings = originalPrice - currentPrice;
-                  const hasVolumeDiscount = totalStudents >= 12;
-                  
-                  return (
-                    <PricingCard
-                      key={tier.id}
-                      tier={tier}
-                      price={currentPrice}
-                      isSelected={selectedStudentTiers[tier.id] > 0}
-                      onSelect={() => {}}
-                      teacherCount={0}
-                      studentCount={selectedStudentTiers[tier.id] || 0}
-                      animationDelay={index * 100}
-                      showImages={true}
-                      studentPrice={currentPrice}
-                      includeGST={true}
-                      colorScheme="yellow"
-                      customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)"
-                      showSavings={savings > 0 && hasVolumeDiscount}
-                      savings={savings}
-                      volumeSelector={
-                        <VolumeSelector
-                          label="Students"
-                          value={selectedStudentTiers[tier.id] || 0}
-                          onChange={(count) => handleStudentSelection(tier.id, count)}
-                          min={0}
-                          max={200}
-                          color="yellow"
-                        />
-                      }
-                    />
-                  );
-                })}
+                const currentStudentCount = selectedStudentTiers[tier.id] || 0;
+                const totalStudents = getTotalStudentCount();
+                const currentPrice = calculateStudentPrice(tier, totalStudents);
+                const originalPrice = tier.basePrice.student;
+                const savings = originalPrice - currentPrice;
+                const hasVolumeDiscount = totalStudents >= 12;
+                return <PricingCard key={tier.id} tier={tier} price={currentPrice} isSelected={selectedStudentTiers[tier.id] > 0} onSelect={() => {}} teacherCount={0} studentCount={selectedStudentTiers[tier.id] || 0} animationDelay={index * 100} showImages={true} studentPrice={currentPrice} includeGST={true} colorScheme="yellow" customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)" showSavings={savings > 0 && hasVolumeDiscount} savings={savings} volumeSelector={<VolumeSelector label="Students" value={selectedStudentTiers[tier.id] || 0} onChange={count => handleStudentSelection(tier.id, count)} min={0} max={200} color="yellow" />} />;
+              })}
               </div>
             </Card>
 
             {/* Unlimited School Access Suggestion */}
-            {regularPricing.total > 2000 && !useUnlimited && (
-              <Card className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
+            {regularPricing.total > 2000 && !useUnlimited && <Card className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
                 <div className="flex items-center space-x-3">
                   <div className="text-4xl">👇</div>
                   <div>
@@ -746,8 +632,7 @@ export const QuoteBuilder = () => {
                     </p>
                   </div>
                 </div>
-              </Card>
-            )}
+              </Card>}
 
             {/* OR Divider */}
             <div className="mb-8 text-center">
@@ -763,31 +648,15 @@ export const QuoteBuilder = () => {
 
             {/* Unlimited School Access */}
             <div className="mb-8">
-              <UnlimitedSchoolCard
-                tier={unlimitedTier}
-                isSelected={useUnlimited}
-                onSelect={handleUnlimitedSelection}
-                addOns={unlimitedAddOns}
-                onAddOnsChange={setUnlimitedAddOns}
-                pricing={regularPricing}
-                teacherCount={getTotalTeacherCount()}
-                studentCount={getTotalStudentCount()}
-                regularPricing={regularPricing}
-              />
+              <UnlimitedSchoolCard tier={unlimitedTier} isSelected={useUnlimited} onSelect={handleUnlimitedSelection} addOns={unlimitedAddOns} onAddOnsChange={setUnlimitedAddOns} pricing={regularPricing} teacherCount={getTotalTeacherCount()} studentCount={getTotalStudentCount()} regularPricing={regularPricing} />
             </div>
 
-            {useUnlimited && (
-              <div className="text-center mt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setUseUnlimited(false)}
-                  className="text-red-600 border-red-200 hover:bg-red-50"
-                >
+            {useUnlimited && <div className="text-center mt-4">
+                <Button variant="outline" onClick={() => setUseUnlimited(false)} className="text-red-600 border-red-200 hover:bg-red-50">
                   <X className="h-4 w-4 mr-2" />
                   Unselect Unlimited Option
                 </Button>
-              </div>
-            )}
+              </div>}
           </div>
 
           {/* Running Total Sidebar */}
@@ -806,22 +675,16 @@ export const QuoteBuilder = () => {
                   <div className="text-xs text-gray-500">Includes 12 month access</div>
                   
                   {/* Simplified Volume Discount and Shipping Display */}
-                  {(regularPricing.shipping > 0 || (regularPricing.shipping === 0 && hasPhysicalItems()) || totalSavings > 0) && (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 mt-4">
+                  {(regularPricing.shipping > 0 || regularPricing.shipping === 0 && hasPhysicalItems() || totalSavings > 0) && <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 mt-4">
                       <div className="space-y-2">
-                        {regularPricing.shipping === 0 && hasPhysicalItems() && (
-                          <div className="flex justify-between items-center text-sm">
+                        {regularPricing.shipping === 0 && hasPhysicalItems() && <div className="flex justify-between items-center text-sm">
                             <span className="text-green-700">🎉 Free shipping included</span>
-                          </div>
-                        )}
-                        {totalSavings > 0 && (
-                          <div className="flex justify-between items-center text-sm">
+                          </div>}
+                        {totalSavings > 0 && <div className="flex justify-between items-center text-sm">
                             <span className="text-green-700">🎉 Volume discount: Save ${totalSavings.toFixed(0)}</span>
-                          </div>
-                        )}
+                          </div>}
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
                 {/* Program Inclusions */}
@@ -829,29 +692,14 @@ export const QuoteBuilder = () => {
                   <h4 className="text-sm font-semibold text-gray-700 mb-3">What's Included:</h4>
                   <div className="space-y-2">
                     {getIncludedItems().map((item, index) => {
-                      const isUnlimitedItem = useUnlimited;
-                      const itemType = isUnlimitedItem ? 'both' : (typeof item === 'object' ? item.type : 'both');
-                      const itemText = typeof item === 'object' ? item.text : item;
-                      
-                      return (
-                        <div key={index} className={`text-xs p-2 rounded-lg flex items-center ${
-                          itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' :
-                          itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' :
-                          'bg-gradient-to-r from-blue-50 to-blue-100'
-                        }`}>
-                          <Check className={`h-3 w-3 mr-2 flex-shrink-0 ${
-                            itemType === 'teacher' ? 'text-teal-600' :
-                            itemType === 'student' ? 'text-yellow-600' :
-                            'text-blue-600'
-                          }`} />
-                          <span className={
-                            itemType === 'teacher' ? 'text-teal-700' :
-                            itemType === 'student' ? 'text-yellow-700' :
-                            'text-blue-700'
-                          }>{itemText}</span>
-                        </div>
-                      );
-                    })}
+                    const isUnlimitedItem = useUnlimited;
+                    const itemType = isUnlimitedItem ? 'both' : typeof item === 'object' ? item.type : 'both';
+                    const itemText = typeof item === 'object' ? item.text : item;
+                    return <div key={index} className={`text-xs p-2 rounded-lg flex items-center ${itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' : itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gradient-to-r from-blue-50 to-blue-100'}`}>
+                          <Check className={`h-3 w-3 mr-2 flex-shrink-0 ${itemType === 'teacher' ? 'text-teal-600' : itemType === 'student' ? 'text-yellow-600' : 'text-blue-600'}`} />
+                          <span className={itemType === 'teacher' ? 'text-teal-700' : itemType === 'student' ? 'text-yellow-700' : 'text-blue-700'}>{itemText}</span>
+                        </div>;
+                  })}
                   </div>
                 </div>
               </Card>
@@ -864,7 +712,7 @@ export const QuoteBuilder = () => {
           <div className="border-t-2 border-gray-300"></div>
         </div>
 
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-8 text-center text-white mb-8">
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-8 text-center text-white mb-8 bg-green-100">
           <div className="flex items-center justify-center gap-4 mb-3">
             <div className="text-4xl">✨</div>
             <h2 className="text-4xl font-bold">Your Official Program Quote</h2>
@@ -888,9 +736,7 @@ export const QuoteBuilder = () => {
               </div>
               
               {/* School Name and Quote Validity */}
-              {schoolInfo.schoolName && (
-                <div className="text-xl font-semibold mb-2">{schoolInfo.schoolName}</div>
-              )}
+              {schoolInfo.schoolName && <div className="text-xl font-semibold mb-2">{schoolInfo.schoolName}</div>}
               <div className="text-sm opacity-90">
                 Quote valid until 31st December, {new Date().getFullYear()}
               </div>
@@ -909,25 +755,13 @@ export const QuoteBuilder = () => {
                 <div className="flex items-center gap-4 mb-3">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-64 justify-start text-left font-normal",
-                          !programStartDate && "text-muted-foreground"
-                        )}
-                      >
+                      <Button variant="outline" className={cn("w-64 justify-start text-left font-normal", !programStartDate && "text-muted-foreground")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={programStartDate}
-                        onSelect={(date) => date && setProgramStartDate(date)}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
+                      <Calendar mode="single" selected={programStartDate} onSelect={date => date && setProgramStartDate(date)} initialFocus className="p-3 pointer-events-auto" />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -937,99 +771,79 @@ export const QuoteBuilder = () => {
               </div>
               
               <div className="grid md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="School Name *"
-                  value={schoolInfo.schoolName}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, schoolName: e.target.value }))}
-                  className="font-medium"
-                />
-                <Input
-                  placeholder="School ABN"
-                  value={schoolInfo.schoolABN}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, schoolABN: e.target.value }))}
-                />
+                <Input placeholder="School Name *" value={schoolInfo.schoolName} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                schoolName: e.target.value
+              }))} className="font-medium" />
+                <Input placeholder="School ABN" value={schoolInfo.schoolABN} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                schoolABN: e.target.value
+              }))} />
                 <div className="md:col-span-2">
-                  <Input
-                    placeholder="School Address (Start typing for suggestions)"
-                    value={schoolInfo.schoolAddress}
-                    onChange={(e) => setSchoolInfo(prev => ({ ...prev, schoolAddress: e.target.value }))}
-                    className="w-full"
-                  />
+                  <Input placeholder="School Address (Start typing for suggestions)" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
+                  ...prev,
+                  schoolAddress: e.target.value
+                }))} className="w-full" />
                 </div>
-                <Input
-                  placeholder="Contact Phone"
-                  value={schoolInfo.contactPhone}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, contactPhone: e.target.value }))}
-                />
-                <Input
-                  placeholder="Coordinator Name"
-                  value={schoolInfo.coordinatorName}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, coordinatorName: e.target.value }))}
-                />
-                <Input
-                  placeholder="Coordinator Position"
-                  value={schoolInfo.coordinatorPosition}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, coordinatorPosition: e.target.value }))}
-                />
-                <Input
-                  placeholder="Coordinator Email"
-                  value={schoolInfo.coordinatorEmail}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, coordinatorEmail: e.target.value }))}
-                />
-                <Input
-                  placeholder="Accounts Email"
-                  value={schoolInfo.accountsEmail}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, accountsEmail: e.target.value }))}
-                />
-                <Input
-                  placeholder="Purchase Order Number"
-                  value={schoolInfo.purchaseOrderNumber}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, purchaseOrderNumber: e.target.value }))}
-                />
+                <Input placeholder="Contact Phone" value={schoolInfo.contactPhone} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                contactPhone: e.target.value
+              }))} />
+                <Input placeholder="Coordinator Name" value={schoolInfo.coordinatorName} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                coordinatorName: e.target.value
+              }))} />
+                <Input placeholder="Coordinator Position" value={schoolInfo.coordinatorPosition} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                coordinatorPosition: e.target.value
+              }))} />
+                <Input placeholder="Coordinator Email" value={schoolInfo.coordinatorEmail} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                coordinatorEmail: e.target.value
+              }))} />
+                <Input placeholder="Accounts Email" value={schoolInfo.accountsEmail} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                accountsEmail: e.target.value
+              }))} />
+                <Input placeholder="Purchase Order Number" value={schoolInfo.purchaseOrderNumber} onChange={e => setSchoolInfo(prev => ({
+                ...prev,
+                purchaseOrderNumber: e.target.value
+              }))} />
                 
-                {hasPhysicalItems() && (
-                  <>
+                {hasPhysicalItems() && <>
                     <div className="md:col-span-2">
                       <div className="flex items-center space-x-2 mb-2">
-                        <Checkbox
-                          id="deliveryIsSame"
-                          checked={schoolInfo.deliveryIsSameAsSchool}
-                          onCheckedChange={(checked) => setSchoolInfo(prev => ({ ...prev, deliveryIsSameAsSchool: checked as boolean }))}
-                        />
+                        <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
+                      ...prev,
+                      deliveryIsSameAsSchool: checked as boolean
+                    }))} />
                         <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
                       </div>
-                      {!schoolInfo.deliveryIsSameAsSchool && (
-                        <Input
-                          placeholder="Delivery Address (Start typing for suggestions)"
-                          value={schoolInfo.deliveryAddress}
-                          onChange={(e) => setSchoolInfo(prev => ({ ...prev, deliveryAddress: e.target.value }))}
-                          className="w-full"
-                        />
-                      )}
+                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address (Start typing for suggestions)" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
+                    ...prev,
+                    deliveryAddress: e.target.value
+                  }))} className="w-full" />}
                     </div>
-                  </>
-                )}
+                  </>}
                 
                 <div className="md:col-span-2">
                   <div className="flex items-center space-x-2 mb-2">
-                    <Checkbox
-                      id="billingIsSame"
-                      checked={schoolInfo.billingIsSameAsSchool}
-                      onCheckedChange={(checked) => setSchoolInfo(prev => ({ ...prev, billingIsSameAsSchool: checked as boolean }))}
-                    />
+                    <Checkbox id="billingIsSame" checked={schoolInfo.billingIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
+                    ...prev,
+                    billingIsSameAsSchool: checked as boolean
+                  }))} />
                     <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
                   </div>
-                  {!schoolInfo.billingIsSameAsSchool && (
-                    <Input
-                      placeholder="Billing Address (Start typing for suggestions)"
-                      value={schoolInfo.billingAddress}
-                      onChange={(e) => setSchoolInfo(prev => ({ ...prev, billingAddress: e.target.value }))}
-                      className="w-full"
-                    />
-                  )}
+                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address (Start typing for suggestions)" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
+                  ...prev,
+                  billingAddress: e.target.value
+                }))} className="w-full" />}
                 </div>
                 
-                <Select value={schoolInfo.paymentPreference} onValueChange={(value) => setSchoolInfo(prev => ({ ...prev, paymentPreference: value }))}>
+                <Select value={schoolInfo.paymentPreference} onValueChange={value => setSchoolInfo(prev => ({
+                ...prev,
+                paymentPreference: value
+              }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Payment Preference" />
                   </SelectTrigger>
@@ -1039,7 +853,10 @@ export const QuoteBuilder = () => {
                   </SelectContent>
                 </Select>
                 
-                <Select value={schoolInfo.supplierSetupForms} onValueChange={(value) => setSchoolInfo(prev => ({ ...prev, supplierSetupForms: value }))}>
+                <Select value={schoolInfo.supplierSetupForms} onValueChange={value => setSchoolInfo(prev => ({
+                ...prev,
+                supplierSetupForms: value
+              }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Supplier Setup Forms Required?" />
                   </SelectTrigger>
@@ -1053,12 +870,10 @@ export const QuoteBuilder = () => {
                 {/* Questions/Comments Section */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Any Questions or Comments?</label>
-                  <Textarea
-                    placeholder="Please share any questions, special requirements, or additional information..."
-                    value={schoolInfo.questionsComments}
-                    onChange={(e) => setSchoolInfo(prev => ({ ...prev, questionsComments: e.target.value }))}
-                    className="min-h-20"
-                  />
+                  <Textarea placeholder="Please share any questions, special requirements, or additional information..." value={schoolInfo.questionsComments} onChange={e => setSchoolInfo(prev => ({
+                  ...prev,
+                  questionsComments: e.target.value
+                }))} className="min-h-20" />
                 </div>
               </div>
             </Card>
@@ -1073,52 +888,35 @@ export const QuoteBuilder = () => {
                 </h3>
                 
                 <div className="space-y-4">
-                  {getDetailedBreakdown().map((item, index) => (
-                    <div key={index} className="border-b border-slate-200 pb-4 last:border-b-0">
+                  {getDetailedBreakdown().map((item, index) => <div key={index} className="border-b border-slate-200 pb-4 last:border-b-0">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
-                            <div className={`w-3 h-3 rounded-full ${
-                              item.type === 'teacher' ? 'bg-teal-500' :
-                              item.type === 'student' ? 'bg-yellow-500' :
-                              'bg-blue-500'
-                            }`}></div>
+                            <div className={`w-3 h-3 rounded-full ${item.type === 'teacher' ? 'bg-teal-500' : item.type === 'student' ? 'bg-yellow-500' : 'bg-blue-500'}`}></div>
                             <div className="font-semibold text-slate-800">{item.item}</div>
-                            <Badge variant="outline" className={`text-xs ${
-                              item.type === 'teacher' ? 'border-teal-300 text-teal-700' :
-                              item.type === 'student' ? 'border-yellow-300 text-yellow-700' :
-                              'border-blue-300 text-blue-700'
-                            }`}>
-                              {item.type === 'teacher' ? 'Teacher' : 
-                               item.type === 'student' ? 'Student' : 
-                               'Add-on'}
+                            <Badge variant="outline" className={`text-xs ${item.type === 'teacher' ? 'border-teal-300 text-teal-700' : item.type === 'student' ? 'border-yellow-300 text-yellow-700' : 'border-blue-300 text-blue-700'}`}>
+                              {item.type === 'teacher' ? 'Teacher' : item.type === 'student' ? 'Student' : 'Add-on'}
                             </Badge>
                           </div>
                           <div className="text-xs text-slate-600 mt-1 ml-5">{item.description}</div>
                           <div className="text-sm text-slate-700 mt-2 ml-5">
                             <span className="font-medium">{item.count}</span> × <span className="font-medium">${item.unitPrice.toLocaleString()}</span>
-                            {item.savings && item.savings > 0 && (
-                              <span className="text-green-600 ml-2 font-medium">
+                            {item.savings && item.savings > 0 && <span className="text-green-600 ml-2 font-medium">
                                 (Save ${item.savings.toFixed(0)} each!)
-                              </span>
-                            )}
+                              </span>}
                           </div>
                         </div>
                         <div className="text-right ml-4">
                           <div className="font-bold text-lg text-slate-800">${item.totalPrice.toLocaleString()}</div>
-                          {item.originalUnitPrice && item.originalUnitPrice > item.unitPrice && (
-                            <div className="text-xs text-slate-400 line-through">
+                          {item.originalUnitPrice && item.originalUnitPrice > item.unitPrice && <div className="text-xs text-slate-400 line-through">
                               ${(item.originalUnitPrice * item.count).toLocaleString()}
-                            </div>
-                          )}
+                            </div>}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                   
                   {/* Shipping */}
-                  {hasPhysicalItems() && (
-                    <div className="border-b border-slate-200 pb-4">
+                  {hasPhysicalItems() && <div className="border-b border-slate-200 pb-4">
                       <div className="flex justify-between items-center">
                         <div>
                           <div className="font-semibold text-slate-800">Shipping</div>
@@ -1127,15 +925,10 @@ export const QuoteBuilder = () => {
                           </div>
                         </div>
                         <div className="font-bold text-lg text-slate-800">
-                          {regularPricing.shipping === 0 ? (
-                            <span className="text-green-600">FREE</span>
-                          ) : (
-                            `$${regularPricing.shipping}`
-                          )}
+                          {regularPricing.shipping === 0 ? <span className="text-green-600">FREE</span> : `$${regularPricing.shipping}`}
                         </div>
                       </div>
-                    </div>
-                  )}
+                    </div>}
                   
                   {/* Tax breakdown */}
                   <div className="space-y-2 py-4 bg-slate-100 rounded-lg px-4">
@@ -1147,12 +940,10 @@ export const QuoteBuilder = () => {
                       <span>GST (10%)</span>
                       <span>${regularPricing.gst.toFixed(2)}</span>
                     </div>
-                    {regularPricing.shipping > 0 && (
-                      <div className="flex justify-between items-center text-sm text-slate-600">
+                    {regularPricing.shipping > 0 && <div className="flex justify-between items-center text-sm text-slate-600">
                         <span>Shipping</span>
                         <span>${regularPricing.shipping}</span>
-                      </div>
-                    )}
+                      </div>}
                   </div>
                   
                   {/* Total */}
@@ -1174,29 +965,14 @@ export const QuoteBuilder = () => {
                 
                 <div className="space-y-3 mb-6">
                   {getIncludedItems().map((item, index) => {
-                    const isUnlimitedItem = useUnlimited;
-                    const itemType = isUnlimitedItem ? 'both' : (typeof item === 'object' ? item.type : 'both');
-                    const itemText = typeof item === 'object' ? item.text : item;
-                    
-                    return (
-                      <div key={index} className={`p-3 rounded-lg flex items-center ${
-                        itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' :
-                        itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' :
-                        'bg-gradient-to-r from-blue-50 to-blue-100'
-                      }`}>
-                        <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${
-                          itemType === 'teacher' ? 'text-teal-600' :
-                          itemType === 'student' ? 'text-yellow-600' :
-                          'text-blue-600'
-                        }`} />
-                        <span className={`text-sm font-medium ${
-                          itemType === 'teacher' ? 'text-teal-800' :
-                          itemType === 'student' ? 'text-yellow-800' :
-                          'text-blue-800'
-                        }`}>{itemText}</span>
-                      </div>
-                    );
-                  })}
+                  const isUnlimitedItem = useUnlimited;
+                  const itemType = isUnlimitedItem ? 'both' : typeof item === 'object' ? item.type : 'both';
+                  const itemText = typeof item === 'object' ? item.text : item;
+                  return <div key={index} className={`p-3 rounded-lg flex items-center ${itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' : itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gradient-to-r from-blue-50 to-blue-100'}`}>
+                        <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${itemType === 'teacher' ? 'text-teal-600' : itemType === 'student' ? 'text-yellow-600' : 'text-blue-600'}`} />
+                        <span className={`text-sm font-medium ${itemType === 'teacher' ? 'text-teal-800' : itemType === 'student' ? 'text-yellow-800' : 'text-blue-800'}`}>{itemText}</span>
+                      </div>;
+                })}
                 </div>
                 
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -1211,15 +987,10 @@ export const QuoteBuilder = () => {
             </div>
 
             <div className="mt-8">
-              <ActionButtons
-                selectedTier={{ 
-                  name: 'Custom Selection',
-                  id: 'combined'
-                }}
-                totalPrice={regularPricing.total}
-                teacherCount={getTotalTeacherCount()}
-                studentCount={getTotalStudentCount()}
-              />
+              <ActionButtons selectedTier={{
+              name: 'Custom Selection',
+              id: 'combined'
+            }} totalPrice={regularPricing.total} teacherCount={getTotalTeacherCount()} studentCount={getTotalStudentCount()} />
             </div>
           </div>
         </div>
@@ -1246,6 +1017,5 @@ export const QuoteBuilder = () => {
         </div>
 
       </div>
-    </div>
-  );
+    </div>;
 };
