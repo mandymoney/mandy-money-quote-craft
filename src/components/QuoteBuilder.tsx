@@ -434,12 +434,16 @@ export const QuoteBuilder = () => {
     return Object.values(selectedTeacherTiers).reduce((sum, count) => sum + count, 0);
   };
 
-  const calculateStudentPrice = (tier: PricingTier): number => {
+  const getTotalStudentCount = (): number => {
+    return Object.values(selectedStudentTiers).reduce((sum, count) => sum + count, 0);
+  };
+
+  const calculateStudentPrice = (tier: PricingTier, currentStudentCount: number): number => {
     let studentPrice = tier.basePrice.student;
     
-    if (studentCount >= 50) {
+    if (currentStudentCount >= 50) {
       studentPrice = tier.volumeDiscounts.students50Plus;
-    } else if (studentCount >= 12) {
+    } else if (currentStudentCount >= 12) {
       studentPrice = tier.volumeDiscounts.students12Plus;
     }
 
@@ -447,10 +451,11 @@ export const QuoteBuilder = () => {
   };
 
   const getNextDiscountThreshold = (): { threshold: number; studentsToGo: number } | null => {
-    if (studentCount < 12) {
-      return { threshold: 12, studentsToGo: 12 - studentCount };
-    } else if (studentCount < 50) {
-      return { threshold: 50, studentsToGo: 50 - studentCount };
+    const totalStudents = getTotalStudentCount();
+    if (totalStudents < 12) {
+      return { threshold: 12, studentsToGo: 12 - totalStudents };
+    } else if (totalStudents < 50) {
+      return { threshold: 50, studentsToGo: 50 - totalStudents };
     }
     return null;
   };
@@ -466,9 +471,10 @@ export const QuoteBuilder = () => {
     });
     
     // Calculate student costs
+    const totalStudents = getTotalStudentCount();
     studentTiers.forEach(tier => {
       const count = selectedStudentTiers[tier.id] || 0;
-      studentCost += calculateStudentPrice(tier) * count;
+      studentCost += calculateStudentPrice(tier, totalStudents) * count;
     });
     
     const total = teacherCost + studentCost;
@@ -521,7 +527,7 @@ export const QuoteBuilder = () => {
   const hasValidSelection = Object.values(selectedTeacherTiers).some(count => count > 0) || 
                            Object.values(selectedStudentTiers).some(count => count > 0);
   const showUnlimitedSuggestion = regularPricing.total > 2000 && !useUnlimited && hasValidSelection;
-  const hasVolumeDiscount = studentCount >= 12;
+  const hasVolumeDiscount = getTotalStudentCount() >= 12;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -569,6 +575,16 @@ export const QuoteBuilder = () => {
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {teacherTiers.map((tier, index) => (
                   <div key={tier.id} className="space-y-4">
+                    <div className="flex justify-center">
+                      <VolumeSelector
+                        label={`Number of ${tier.name} Teachers`}
+                        value={selectedTeacherTiers[tier.id] || 0}
+                        onChange={(count) => handleTeacherSelection(tier.id, count)}
+                        min={0}
+                        max={20}
+                        color="teal"
+                      />
+                    </div>
                     <PricingCard
                       tier={tier}
                       price={tier.basePrice.teacher}
@@ -582,16 +598,6 @@ export const QuoteBuilder = () => {
                       colorScheme="teal"
                       customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)"
                     />
-                    <div className="flex justify-center">
-                      <VolumeSelector
-                        label={`Number of ${tier.name} Teachers`}
-                        value={selectedTeacherTiers[tier.id] || 0}
-                        onChange={(count) => handleTeacherSelection(tier.id, count)}
-                        min={0}
-                        max={20}
-                        color="teal"
-                      />
-                    </div>
                   </div>
                 ))}
               </div>
@@ -610,19 +616,6 @@ export const QuoteBuilder = () => {
                 </h2>
                 <p className="text-center" style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
               </div>
-              
-              <div className="mb-6 flex justify-center">
-                <div className="w-full max-w-md">
-                  <VolumeSelector
-                    label="Total Number of Students"
-                    value={studentCount}
-                    onChange={setStudentCount}
-                    min={1}
-                    max={200}
-                    color="yellow"
-                  />
-                </div>
-              </div>
 
               {nextDiscount && (
                 <div className="mb-6 text-center">
@@ -634,12 +627,25 @@ export const QuoteBuilder = () => {
 
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {studentTiers.map((tier, index) => {
-                  const currentPrice = calculateStudentPrice(tier);
+                  const currentStudentCount = selectedStudentTiers[tier.id] || 0;
+                  const totalStudents = getTotalStudentCount();
+                  const currentPrice = calculateStudentPrice(tier, totalStudents);
                   const originalPrice = tier.basePrice.student;
                   const savings = originalPrice - currentPrice;
+                  const hasVolumeDiscount = totalStudents >= 12;
                   
                   return (
                     <div key={tier.id} className="space-y-4">
+                      <div className="flex justify-center">
+                        <VolumeSelector
+                          label={`Number of ${tier.name} Students`}
+                          value={selectedStudentTiers[tier.id] || 0}
+                          onChange={(count) => handleStudentSelection(tier.id, count)}
+                          min={0}
+                          max={200}
+                          color="yellow"
+                        />
+                      </div>
                       <PricingCard
                         tier={tier}
                         price={currentPrice}
@@ -656,16 +662,6 @@ export const QuoteBuilder = () => {
                         showSavings={savings > 0 && hasVolumeDiscount}
                         savings={savings}
                       />
-                      <div className="flex justify-center">
-                        <VolumeSelector
-                          label={`Number of ${tier.name} Students`}
-                          value={selectedStudentTiers[tier.id] || 0}
-                          onChange={(count) => handleStudentSelection(tier.id, count)}
-                          min={0}
-                          max={studentCount}
-                          color="yellow"
-                        />
-                      </div>
                     </div>
                   );
                 })}
@@ -713,7 +709,7 @@ export const QuoteBuilder = () => {
                 onAddOnsChange={setUnlimitedAddOns}
                 pricing={unlimitedPricing}
                 teacherCount={getTotalTeacherCount()}
-                studentCount={studentCount}
+                studentCount={getTotalStudentCount()}
                 regularPricing={regularPricing}
               />
             </div>
@@ -785,8 +781,8 @@ export const QuoteBuilder = () => {
                     <div className="text-3xl font-bold text-gray-800">${regularPricing.total.toLocaleString()} <span className="text-sm text-gray-600">(inc. GST)</span></div>
                     <div className="text-gray-600 text-sm">
                       {getTotalTeacherCount() > 0 ? `${getTotalTeacherCount()} Teacher${getTotalTeacherCount() > 1 ? 's' : ''}` : ''}
-                      {getTotalTeacherCount() > 0 && Object.values(selectedStudentTiers).some(count => count > 0) ? ' + ' : ''}
-                      {Object.values(selectedStudentTiers).some(count => count > 0) ? `${Object.values(selectedStudentTiers).reduce((sum, count) => sum + count, 0)} Student${Object.values(selectedStudentTiers).reduce((sum, count) => sum + count, 0) > 1 ? 's' : ''}` : ''}
+                      {getTotalTeacherCount() > 0 && getTotalStudentCount() > 0 ? ' + ' : ''}
+                      {getTotalStudentCount() > 0 ? `${getTotalStudentCount()} Student${getTotalStudentCount() > 1 ? 's' : ''}` : ''}
                     </div>
                     <div className="text-xs text-gray-500">Includes 12 month access</div>
                     
@@ -914,7 +910,7 @@ export const QuoteBuilder = () => {
               studentTier={null}
               pricing={useUnlimited ? unlimitedPricing : regularPricing}
               teacherCount={getTotalTeacherCount()}
-              studentCount={studentCount}
+              studentCount={getTotalStudentCount()}
               studentPrice={0}
               isUnlimited={useUnlimited}
               unlimitedTier={useUnlimited ? unlimitedTier : undefined}
@@ -933,7 +929,7 @@ export const QuoteBuilder = () => {
                 }}
                 totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
                 teacherCount={getTotalTeacherCount()}
-                studentCount={studentCount}
+                studentCount={getTotalStudentCount()}
               />
             </div>
           </div>
