@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -54,44 +55,69 @@ export interface UnlimitedTier {
 const teacherTiers: PricingTier[] = [
   {
     id: 'teacher-digital',
-    name: 'Teacher Digital Pass',
+    name: 'Digital Pass Only',
     description: 'Complete digital access for teachers',
-    basePrice: { teacher: 119, student: 0 }, // GST inclusive
+    basePrice: { teacher: 119, student: 0 },
     volumeDiscounts: { students12Plus: 0, students50Plus: 0 },
     inclusions: {
-      teacher: ['42 Interactive Digital Lessons', 'Teacher Dashboard', 'Lesson Plans & Resources', 'Assessment Tools'],
+      teacher: [
+        '42 x Click & Play Powerpoint Lessons',
+        '168 x Theory Videos',
+        '168 x Printable Worksheets',
+        'Classroom Lesson Quizzes',
+        'Lesson Plans',
+        'Curriculum Alignment Guides',
+        'Digital Textbook',
+        'Classroom Space (requires student passes)'
+      ],
       student: [],
-      classroom: ['1 Classroom Space per Teacher', 'Student Progress Tracking', 'Class Management Tools']
+      classroom: []
     },
-    notIncluded: ['Physical Textbook', 'Print Resources', 'Offline Access'],
+    notIncluded: ['Print Textbook', 'Offline Access'],
     type: 'teacher',
     bestFor: 'Tech-savvy teachers with digital classrooms'
   },
   {
     id: 'teacher-physical',
-    name: 'Teacher Hard-Copy',
+    name: 'Textbook Only',
     description: 'Physical textbook for teachers',
-    basePrice: { teacher: 89, student: 0 }, // GST inclusive
+    basePrice: { teacher: 89, student: 0 },
     volumeDiscounts: { students12Plus: 0, students50Plus: 0 },
     inclusions: {
-      teacher: ['42 Lesson Physical Textbook', 'Teacher Guide', 'Print Resources', 'Durable Materials'],
+      teacher: [
+        '42 x Complete Lesson Resources',
+        '168 x Illustrated Theory Pages',
+        '168 x Worksheets',
+        'Lesson Plans',
+        'Curriculum Alignment Guides'
+      ],
       student: [],
-      classroom: ['1 Classroom Space per Teacher', 'Basic Progress Tracking']
+      classroom: []
     },
-    notIncluded: ['Digital Interactive Lessons', 'Teacher Dashboard', 'Mobile Access'],
+    notIncluded: ['Click & Play Digital Lessons', 'Digital Textbook', 'Classroom Lesson Quizzes'],
     type: 'teacher',
     bestFor: 'Traditional classroom teachers who prefer print materials'
   },
   {
     id: 'teacher-both',
-    name: 'Teacher Digital + Hard Copy',
+    name: 'Digital Pass + Textbook Bundle',
     description: 'Complete teacher package',
-    basePrice: { teacher: 189, student: 0 }, // GST inclusive
+    basePrice: { teacher: 189, student: 0 },
     volumeDiscounts: { students12Plus: 0, students50Plus: 0 },
     inclusions: {
-      teacher: ['42 Interactive Digital Lessons', '42 Lesson Physical Textbook', 'Teacher Dashboard', 'All Print & Digital Resources'],
+      teacher: [
+        '1 x Print & Digital Textbook',
+        '1 x Digital Teacher Pass',
+        '42 x Click & Play Powerpoint Lessons',
+        '168 x Theory Videos + Illustrated Theory Pages',
+        '168 x Printable Worksheets',
+        'Classroom Lesson Quizzes',
+        'Lesson Plans',
+        'Curriculum Alignment Guides',
+        'Classroom Space (requires student passes)'
+      ],
       student: [],
-      classroom: ['1 Classroom Space per Teacher', 'Advanced Progress Tracking', 'Full Class Management']
+      classroom: []
     },
     isPopular: true,
     type: 'teacher',
@@ -102,43 +128,65 @@ const teacherTiers: PricingTier[] = [
 const studentTiers: PricingTier[] = [
   {
     id: 'student-digital',
-    name: 'Student Digital Pass',
+    name: 'Digital Pass Only',
     description: 'Digital access for students',
-    basePrice: { teacher: 0, student: 21 }, // GST inclusive
-    volumeDiscounts: { students12Plus: 18, students50Plus: 15 }, // GST inclusive
+    basePrice: { teacher: 0, student: 21 },
+    volumeDiscounts: { students12Plus: 18, students50Plus: 15 },
     inclusions: {
       teacher: [],
-      student: ['42 Interactive Lessons', 'Mobile & Tablet Access', 'Downloadable Resources', 'Progress Tracking'],
+      student: [
+        'Personal Student Account',
+        '42 x Digital Lessons',
+        '168 x Theory Videos',
+        '168 x Gamified Activities',
+        'Lesson Quizzes',
+        'Lesson Certificates',
+        'Micro-Credential Pre & Post Testing'
+      ],
       classroom: []
     },
-    notIncluded: ['Physical Textbook', 'Workbook Pages', 'Offline Access'],
+    notIncluded: ['Print Student Textbook', 'Offline Access'],
     type: 'student',
     bestFor: '1:1 device schools and tech-comfortable students'
   },
   {
     id: 'student-physical',
-    name: 'Student Hard-Copy',
+    name: 'Textbook Only',
     description: 'Physical textbook for students',
-    basePrice: { teacher: 0, student: 49 }, // GST inclusive
-    volumeDiscounts: { students12Plus: 42, students50Plus: 40 }, // GST inclusive
+    basePrice: { teacher: 0, student: 49 },
+    volumeDiscounts: { students12Plus: 42, students50Plus: 40 },
     inclusions: {
       teacher: [],
-      student: ['42 Lesson Textbook', 'Workbook Pages', 'No Internet Required', 'Durable Print Materials'],
+      student: [
+        '42 x Complete Lesson Resources',
+        '168 x Illustrated Theory Pages',
+        '168 x Worksheets',
+        'Worksheet Answers'
+      ],
       classroom: []
     },
-    notIncluded: ['Digital Interactive Lessons', 'Mobile Access', 'Online Progress Tracking'],
+    notIncluded: ['Digital Lesson Access', 'Digital Textbook', 'Micro-Credential Pre & Post Testing'],
     type: 'student',
     bestFor: 'Students who learn better with physical materials'
   },
   {
     id: 'student-both',
-    name: 'Student Digital + Hard Copy',
+    name: 'Digital Pass + Textbook Bundle',
     description: 'Complete student package',
-    basePrice: { teacher: 0, student: 55 }, // GST inclusive
-    volumeDiscounts: { students12Plus: 49, students50Plus: 46 }, // GST inclusive
+    basePrice: { teacher: 0, student: 55 },
+    volumeDiscounts: { students12Plus: 49, students50Plus: 46 },
     inclusions: {
       teacher: [],
-      student: ['42 Interactive Lessons', '42 Lesson Textbook', 'Mobile Access', 'All Resources', 'Complete Package'],
+      student: [
+        '1 x Student Digital Pass',
+        '1 x Print Student Textbook',
+        '42 x Lessons',
+        '168 x Theory Videos + Illustrated Theory Pages',
+        '168 x Worksheets + Gamified Activities',
+        'Micro-Credential Pre & Post Testing',
+        'Lesson Quizzes',
+        'Lesson Certificates'
+      ],
       classroom: []
     },
     isPopular: true,
@@ -151,11 +199,11 @@ const unlimitedTier: UnlimitedTier = {
   id: 'unlimited',
   name: 'Unlimited School Access',
   description: 'Complete digital access for entire school',
-  basePrice: 3199, // GST inclusive
+  basePrice: 3199,
   addOns: {
-    teacherBooks: 79, // GST inclusive
-    studentBooks: 42, // GST inclusive
-    posterA0: 89 // GST inclusive
+    teacherBooks: 79,
+    studentBooks: 42,
+    posterA0: 89
   },
   inclusions: [
     'Unlimited Digital Access',
@@ -276,11 +324,11 @@ export const QuoteBuilder = () => {
             />
           </div>
           <div className="flex items-center justify-center gap-8 mb-4">
-            <div className="text-6xl">✨</div>
+            <div className="text-6xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">✨</div>
             <h1 className="text-6xl font-extrabold bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
               Quote Builder
             </h1>
-            <div className="text-6xl">✨</div>
+            <div className="text-6xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">✨</div>
           </div>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto font-medium">
             Build your custom quote for Australia's leading financial literacy program
@@ -491,12 +539,28 @@ export const QuoteBuilder = () => {
                     
                     <div className="mt-4 space-y-2">
                       <h4 className="font-semibold text-gray-700 text-sm">Key Inclusions:</h4>
-                      {unlimitedTier.inclusions.map((inclusion, index) => (
-                        <div key={index} className="flex items-center text-xs text-gray-600">
+                      <div className="text-xs text-gray-600">
+                        <div className="flex items-center mb-1">
                           <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>{inclusion}</span>
+                          <span>Unlimited Teacher Digital Passes</span>
                         </div>
-                      ))}
+                        <div className="flex items-center mb-1">
+                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                          <span>{unlimitedAddOns.teacherBooks || 0}x Teacher Print Textbooks</span>
+                        </div>
+                        <div className="flex items-center mb-1">
+                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                          <span>Unlimited Classroom Spaces</span>
+                        </div>
+                        <div className="flex items-center mb-1">
+                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                          <span>Unlimited Student Digital Passes</span>
+                        </div>
+                        <div className="flex items-center mb-1">
+                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                          <span>{unlimitedAddOns.studentBooks || 0}x Student Print Textbooks</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ) : hasValidSelection ? (
@@ -508,6 +572,11 @@ export const QuoteBuilder = () => {
                       {selectedStudentData ? `${studentCount} Student${studentCount > 1 ? 's' : ''}` : ''}
                       {' (inc. GST)'}
                     </div>
+                    {selectedStudentData && (
+                      <div className="text-sm text-gray-600">
+                        ${calculateStudentPrice(selectedStudentData)} per student
+                      </div>
+                    )}
                     <div className="text-xs text-gray-500">Includes 12 month access</div>
                     
                     {hasVolumeDiscount && volumeSavings > 0 && (
@@ -523,28 +592,40 @@ export const QuoteBuilder = () => {
 
                     <div className="mt-4 space-y-2">
                       <h4 className="font-semibold text-gray-700 text-sm">Key Inclusions:</h4>
-                      {selectedTeacherData && (
-                        <div>
-                          <h5 className="text-xs font-medium text-teal-700 mb-1">Teacher:</h5>
-                          {[...selectedTeacherData.inclusions.teacher, ...selectedTeacherData.inclusions.classroom].map((inclusion, index) => (
-                            <div key={index} className="flex items-center text-xs text-gray-600 mb-1">
+                      <div className="text-xs text-gray-600">
+                        {selectedTeacherData && (
+                          <>
+                            <div className="flex items-center mb-1">
                               <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                              <span>{inclusion}</span>
+                              <span>{teacherCount}x Teacher Digital Pass{selectedTeacherData.id.includes('digital') || selectedTeacherData.id.includes('both') ? 'es' : ''}</span>
                             </div>
-                          ))}
-                        </div>
-                      )}
-                      {selectedStudentData && (
-                        <div>
-                          <h5 className="text-xs font-medium text-yellow-700 mb-1">Student:</h5>
-                          {selectedStudentData.inclusions.student.map((inclusion, index) => (
-                            <div key={index} className="flex items-center text-xs text-gray-600 mb-1">
+                            {(selectedTeacherData.id.includes('physical') || selectedTeacherData.id.includes('both')) && (
+                              <div className="flex items-center mb-1">
+                                <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
+                                <span>{teacherCount}x Teacher Print Textbook{teacherCount > 1 ? 's' : ''}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center mb-1">
+                              <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
+                              <span>{teacherCount}x Classroom Space{teacherCount > 1 ? 's' : ''}</span>
+                            </div>
+                          </>
+                        )}
+                        {selectedStudentData && (
+                          <>
+                            <div className="flex items-center mb-1">
                               <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
-                              <span>{inclusion}</span>
+                              <span>{studentCount}x Student Digital Pass{selectedStudentData.id.includes('digital') || selectedStudentData.id.includes('both') ? 'es' : ''}</span>
                             </div>
-                          ))}
-                        </div>
-                      )}
+                            {(selectedStudentData.id.includes('physical') || selectedStudentData.id.includes('both')) && (
+                              <div className="flex items-center mb-1">
+                                <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
+                                <span>{studentCount}x Student Print Textbook{studentCount > 1 ? 's' : ''}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -573,7 +654,11 @@ export const QuoteBuilder = () => {
         {((hasValidSelection && !useUnlimited) || useUnlimited) && (
           <div className="mt-12 border-t-4 border-green-600 pt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-8">
             <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold text-green-800 mb-2">📋 Your Official Program Quote</h2>
+              <div className="flex items-center justify-center gap-8 mb-4">
+                <div className="text-4xl">⭐</div>
+                <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
+                <div className="text-4xl">⭐</div>
+              </div>
               <p className="text-lg text-green-700">
                 Complete summary of your selections • Download PDF or Place Order
               </p>
@@ -582,6 +667,13 @@ export const QuoteBuilder = () => {
                 <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
               </div>
             </div>
+
+            {/* Program Start Date */}
+            <ProgramStartDate
+              startDate={programStartDate}
+              onStartDateChange={setProgramStartDate}
+              endDate={programEndDate}
+            />
 
             <InclusionsDisplay
               teacherTier={selectedTeacherData}

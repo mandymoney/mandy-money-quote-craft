@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Plus } from 'lucide-react';
+import { FileText, Plus, MessageCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface ActionButtonsProps {
@@ -45,6 +45,20 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     }, 1500);
   };
 
+  const handleBooklistingEnquiry = () => {
+    toast({
+      title: "Booklisting Enquiry",
+      description: "Opening enquiry form for booklisting options and bulk pricing.",
+    });
+    
+    setTimeout(() => {
+      toast({
+        title: "Contact Form Ready",
+        description: "You'll be directed to our booklisting enquiry form.",
+      });
+    }, 1500);
+  };
+
   if (!selectedTier) return null;
 
   return (
@@ -54,21 +68,31 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         Your quote for {selectedTier.name} is ready at ${totalPrice.toLocaleString()} (inc. GST)
       </p>
       
-      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
         <Button
           onClick={handleExportPDF}
           variant="secondary"
           size="lg"
-          className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border border-gray-200"
+          className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border border-gray-200 hover:shadow-xl"
         >
           <FileText className="h-5 w-5 mr-2" />
           Export Quote as PDF
         </Button>
         
         <Button
+          onClick={handleBooklistingEnquiry}
+          variant="secondary"
+          size="lg"
+          className="flex-1 bg-white hover:bg-gray-50 text-orange-600 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border border-gray-200 hover:shadow-xl"
+        >
+          <MessageCircle className="h-5 w-5 mr-2" />
+          Enquire about Booklisting
+        </Button>
+        
+        <Button
           onClick={handlePlaceOrder}
           size="lg"
-          className="flex-1 bg-white hover:bg-gray-50 text-orange-600 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-2 border-white text-lg hover:text-orange-700"
+          className="flex-1 bg-white hover:bg-gray-50 text-orange-600 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-2 border-white text-lg hover:text-orange-700 hover:shadow-xl"
         >
           <Plus className="h-5 w-5 mr-2" />
           Place Order Now

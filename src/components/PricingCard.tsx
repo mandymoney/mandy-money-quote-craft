@@ -77,7 +77,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       onClick={onSelect}
     >
       {tier.isPopular && (
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 hidden md:block">
           <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1">
             Most Popular
           </Badge>
