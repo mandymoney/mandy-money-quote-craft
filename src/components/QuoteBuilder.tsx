@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, ArrowDown, ChevronDown, Upload, RotateCw } from 'lucide-react';
+import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -74,16 +74,6 @@ interface SchoolInfo {
   paymentPreference: string;
   supplierSetupForms: string;
 }
-
-interface MicroCredential {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  details: string;
-}
-
-// ... keep existing code (teacherTiers, studentTiers, unlimitedTier arrays)
 
 const teacherTiers: PricingTier[] = [
   {
@@ -386,12 +376,18 @@ export const QuoteBuilder = () => {
     const items = [];
     
     if (useUnlimited) {
-      items.push('Unlimited Teacher Digital Passes');
-      items.push('Unlimited Student Digital Passes');
-      items.push('Unlimited Digital Classroom Spaces');
-      if (unlimitedAddOns.teacherBooks > 0) items.push(`${unlimitedAddOns.teacherBooks} x Teacher Print Textbook(s)`);
-      if (unlimitedAddOns.studentBooks > 0) items.push(`${unlimitedAddOns.studentBooks} x Student Print Textbook(s)`);
-      if (unlimitedAddOns.posterA0 > 0) items.push(`${unlimitedAddOns.posterA0} x A0 Poster(s)`);
+      items.push(`Unlimited Teacher Digital Passes`);
+      items.push(`Unlimited Student Digital Passes`);
+      items.push(`Unlimited Digital Classroom Spaces`);
+      if (unlimitedAddOns.teacherBooks > 0) {
+        items.push(`${unlimitedAddOns.teacherBooks} Teacher Print Textbook${unlimitedAddOns.teacherBooks > 1 ? 's' : ''}`);
+      }
+      if (unlimitedAddOns.studentBooks > 0) {
+        items.push(`${unlimitedAddOns.studentBooks} Student Print Textbook${unlimitedAddOns.studentBooks > 1 ? 's' : ''}`);
+      }
+      if (unlimitedAddOns.posterA0 > 0) {
+        items.push(`${unlimitedAddOns.posterA0} A0 Poster${unlimitedAddOns.posterA0 > 1 ? 's' : ''}`);
+      }
     } else {
       const teacherDigital = selectedTeacherTiers['teacher-digital'] || 0;
       const teacherPhysical = selectedTeacherTiers['teacher-physical'] || 0;
@@ -406,14 +402,125 @@ export const QuoteBuilder = () => {
       const totalStudentPhysical = studentPhysical + studentBoth;
       const totalClassrooms = totalTeacherDigital;
 
-      if (totalTeacherDigital > 0) items.push(`${totalTeacherDigital} x Teacher Digital Pass(es)`);
-      if (totalTeacherPhysical > 0) items.push(`${totalTeacherPhysical} x Teacher Print Textbook(s)`);
-      if (totalClassrooms > 0) items.push(`${totalClassrooms} x Digital Classroom Space(s)`);
-      if (totalStudentDigital > 0) items.push(`${totalStudentDigital} x Student Digital Pass(es)`);
-      if (totalStudentPhysical > 0) items.push(`${totalStudentPhysical} x Student Print Textbook(s)`);
+      if (totalTeacherDigital > 0) {
+        items.push({
+          text: `${totalTeacherDigital} Teacher Digital Pass${totalTeacherDigital > 1 ? 'es' : ''}`,
+          type: 'teacher'
+        });
+      }
+      if (totalTeacherPhysical > 0) {
+        items.push({
+          text: `${totalTeacherPhysical} Teacher Print Textbook${totalTeacherPhysical > 1 ? 's' : ''}`,
+          type: 'teacher'
+        });
+      }
+      if (totalClassrooms > 0) {
+        items.push({
+          text: `${totalClassrooms} Digital Classroom Space${totalClassrooms > 1 ? 's' : ''}`,
+          type: 'teacher'
+        });
+      }
+      if (totalStudentDigital > 0) {
+        items.push({
+          text: `${totalStudentDigital} Student Digital Pass${totalStudentDigital > 1 ? 'es' : ''}`,
+          type: 'student'
+        });
+      }
+      if (totalStudentPhysical > 0) {
+        items.push({
+          text: `${totalStudentPhysical} Student Print Textbook${totalStudentPhysical > 1 ? 's' : ''}`,
+          type: 'student'
+        });
+      }
     }
     
     return items;
+  };
+
+  const getDetailedBreakdown = () => {
+    const breakdown = [];
+    
+    if (useUnlimited) {
+      breakdown.push({
+        item: 'Unlimited School Access',
+        count: 1,
+        unitPrice: unlimitedTier.basePrice,
+        totalPrice: unlimitedTier.basePrice,
+        type: 'base',
+        description: 'Unlimited Teacher Digital Passes, Student Digital Passes & Classroom Spaces'
+      });
+      
+      if (unlimitedAddOns.teacherBooks > 0) {
+        breakdown.push({
+          item: 'Teacher Print Textbooks',
+          count: unlimitedAddOns.teacherBooks,
+          unitPrice: unlimitedTier.addOns.teacherBooks,
+          totalPrice: unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks,
+          type: 'addon',
+          description: 'Physical teacher textbooks'
+        });
+      }
+      
+      if (unlimitedAddOns.studentBooks > 0) {
+        breakdown.push({
+          item: 'Student Print Textbooks',
+          count: unlimitedAddOns.studentBooks,
+          unitPrice: unlimitedTier.addOns.studentBooks,
+          totalPrice: unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks,
+          type: 'addon',
+          description: 'Physical student textbooks'
+        });
+      }
+      
+      if (unlimitedAddOns.posterA0 > 0) {
+        breakdown.push({
+          item: 'A0 Posters',
+          count: unlimitedAddOns.posterA0,
+          unitPrice: unlimitedTier.addOns.posterA0,
+          totalPrice: unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0,
+          type: 'addon',
+          description: 'Large format classroom posters'
+        });
+      }
+    } else {
+      const totalStudents = getTotalStudentCount();
+      
+      teacherTiers.forEach(tier => {
+        const count = selectedTeacherTiers[tier.id] || 0;
+        if (count > 0) {
+          breakdown.push({
+            item: tier.name,
+            count,
+            unitPrice: tier.basePrice.teacher,
+            totalPrice: tier.basePrice.teacher * count,
+            type: 'teacher',
+            description: tier.description
+          });
+        }
+      });
+      
+      studentTiers.forEach(tier => {
+        const count = selectedStudentTiers[tier.id] || 0;
+        if (count > 0) {
+          const unitPrice = calculateStudentPrice(tier, totalStudents);
+          const originalPrice = tier.basePrice.student;
+          const savings = originalPrice - unitPrice;
+          
+          breakdown.push({
+            item: tier.name,
+            count,
+            unitPrice,
+            totalPrice: unitPrice * count,
+            type: 'student',
+            description: tier.description,
+            originalUnitPrice: originalPrice,
+            savings: savings > 0 ? savings : 0
+          });
+        }
+      });
+    }
+    
+    return breakdown;
   };
 
   const handleCredentialFlip = (id: string) => {
@@ -524,7 +631,7 @@ export const QuoteBuilder = () => {
                     customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)"
                     volumeSelector={
                       <VolumeSelector
-                        label="Number of Teachers"
+                        label="Teachers"
                         value={selectedTeacherTiers[tier.id] || 0}
                         onChange={(count) => handleTeacherSelection(tier.id, count)}
                         min={0}
@@ -549,6 +656,15 @@ export const QuoteBuilder = () => {
                   Step 2: Select your Student Program Elements
                 </h2>
                 <p className="text-center" style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
+                
+                {/* Volume Notification */}
+                {volumeNotification && (
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-700 font-medium text-center text-sm">
+                      🎯 {volumeNotification}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
@@ -579,7 +695,7 @@ export const QuoteBuilder = () => {
                       savings={savings}
                       volumeSelector={
                         <VolumeSelector
-                          label="Number of Students"
+                          label="Students"
                           value={selectedStudentTiers[tier.id] || 0}
                           onChange={(count) => handleStudentSelection(tier.id, count)}
                           min={0}
@@ -670,15 +786,39 @@ export const QuoteBuilder = () => {
                   {regularPricing.shipping > 0 && (
                     <div className="text-xs text-gray-500">+ $14 shipping</div>
                   )}
+                  {regularPricing.shipping === 0 && hasPhysicalItems() && (
+                    <div className="text-xs text-green-600">Free shipping included</div>
+                  )}
                 </div>
 
                 {/* Program Inclusions */}
                 <div className="border-t pt-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">What's Included:</h4>
-                  <div className="space-y-1">
-                    {getIncludedItems().map((item, index) => (
-                      <div key={index} className="text-xs text-gray-600">• {item}</div>
-                    ))}
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">What's Included:</h4>
+                  <div className="space-y-2">
+                    {getIncludedItems().map((item, index) => {
+                      const isUnlimitedItem = useUnlimited;
+                      const itemType = isUnlimitedItem ? 'both' : (typeof item === 'object' ? item.type : 'both');
+                      const itemText = typeof item === 'object' ? item.text : item;
+                      
+                      return (
+                        <div key={index} className={`text-xs p-2 rounded-lg flex items-center ${
+                          itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' :
+                          itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' :
+                          'bg-gradient-to-r from-blue-50 to-blue-100'
+                        }`}>
+                          <Check className={`h-3 w-3 mr-2 flex-shrink-0 ${
+                            itemType === 'teacher' ? 'text-teal-600' :
+                            itemType === 'student' ? 'text-yellow-600' :
+                            'text-blue-600'
+                          }`} />
+                          <span className={
+                            itemType === 'teacher' ? 'text-teal-700' :
+                            itemType === 'student' ? 'text-yellow-700' :
+                            'text-blue-700'
+                          }>{itemText}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </Card>
@@ -821,41 +961,123 @@ export const QuoteBuilder = () => {
             </Card>
           </div>
 
-          {/* Program Inclusions */}
-          <div className="mb-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm max-w-4xl mx-auto">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">Program Inclusions</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {getIncludedItems().map((item, index) => (
-                  <div key={index} className="flex items-center text-gray-700">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    {item}
+          {/* Two Column Layout for Official Quote */}
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Left Column - Investment Breakdown */}
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">📊 Investment Breakdown</h3>
+              
+              <div className="space-y-3">
+                {getDetailedBreakdown().map((item, index) => (
+                  <div key={index} className="border-b border-gray-100 pb-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-800">{item.item}</div>
+                        <div className="text-xs text-gray-500 mt-1">{item.description}</div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          {item.count} × ${item.unitPrice.toLocaleString()}
+                          {item.savings && item.savings > 0 && (
+                            <span className="text-green-600 ml-2">
+                              (Save ${item.savings.toFixed(0)} each)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-lg">${item.totalPrice.toLocaleString()}</div>
+                        {item.originalUnitPrice && item.originalUnitPrice > item.unitPrice && (
+                          <div className="text-xs text-gray-400 line-through">
+                            ${(item.originalUnitPrice * item.count).toLocaleString()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
-              </div>
-              {regularPricing.shipping === 0 && hasPhysicalItems() && (
-                <div className="mt-4 p-3 bg-green-50 rounded-lg">
-                  <div className="text-green-700 font-medium">✓ Free shipping included (order over $90)</div>
+                
+                {/* Shipping */}
+                {hasPhysicalItems() && (
+                  <div className="border-b border-gray-100 pb-3">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-gray-800">Shipping</div>
+                        <div className="text-xs text-gray-500">
+                          {regularPricing.shipping === 0 ? 'Free shipping (order over $90)' : 'Standard shipping'}
+                        </div>
+                      </div>
+                      <div className="font-bold text-lg">
+                        {regularPricing.shipping === 0 ? 'FREE' : `$${regularPricing.shipping}`}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* GST */}
+                <div className="border-b border-gray-100 pb-3">
+                  <div className="flex justify-between items-center text-sm text-gray-600">
+                    <span>Subtotal (exc. GST)</span>
+                    <span>${regularPricing.subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm text-gray-600">
+                    <span>GST (10%)</span>
+                    <span>${regularPricing.gst.toFixed(2)}</span>
+                  </div>
                 </div>
-              )}
+                
+                {/* Total */}
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div className="text-xl font-bold text-green-800">Total Investment</div>
+                    <div className="text-2xl font-bold text-green-800">${regularPricing.total.toLocaleString()}</div>
+                  </div>
+                  <div className="text-sm text-green-600 text-right mt-1">
+                    (Price includes 10% GST)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Program Inclusions */}
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">What's Included</h3>
+              
+              <div className="space-y-3">
+                {getIncludedItems().map((item, index) => {
+                  const isUnlimitedItem = useUnlimited;
+                  const itemType = isUnlimitedItem ? 'both' : (typeof item === 'object' ? item.type : 'both');
+                  const itemText = typeof item === 'object' ? item.text : item;
+                  
+                  return (
+                    <div key={index} className={`p-3 rounded-lg flex items-center ${
+                      itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' :
+                      itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' :
+                      'bg-gradient-to-r from-blue-50 to-blue-100'
+                    }`}>
+                      <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${
+                        itemType === 'teacher' ? 'text-teal-600' :
+                        itemType === 'student' ? 'text-yellow-600' :
+                        'text-blue-600'
+                      }`} />
+                      <span className={`text-sm font-medium ${
+                        itemType === 'teacher' ? 'text-teal-800' :
+                        itemType === 'student' ? 'text-yellow-800' :
+                        'text-blue-800'
+                      }`}>{itemText}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-blue-800 mb-2">Program Access Period</h4>
+                <div className="text-sm text-blue-700">
+                  <div><strong>Program starts:</strong> {format(programStartDate, 'MMMM d, yyyy')}</div>
+                  <div><strong>Access ends:</strong> {format(addMonths(programStartDate, 12), 'MMMM d, yyyy')}</div>
+                  <div className="text-xs mt-1 text-blue-600">12 months of full access included</div>
+                </div>
+              </div>
             </div>
           </div>
-
-          <InclusionsDisplay
-            teacherTier={null}
-            studentTier={null}
-            pricing={regularPricing}
-            teacherCount={getTotalTeacherCount()}
-            studentCount={getTotalStudentCount()}
-            studentPrice={0}
-            isUnlimited={useUnlimited}
-            unlimitedTier={useUnlimited ? unlimitedTier : undefined}
-            unlimitedAddOns={unlimitedAddOns}
-            programStartDate={programStartDate}
-            onStartDateChange={setProgramStartDate}
-            programEndDate={addMonths(programStartDate, 12)}
-            volumeSavings={0}
-          />
 
           <div className="mt-6">
             <ActionButtons
@@ -870,94 +1092,20 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="my-12">
+          <div className="border-t-2 border-gray-300"></div>
+        </div>
+
         {/* Explore Materials Section */}
         <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent">
+          <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
             <h2 className="text-4xl font-bold mb-2">✨ Explore your included materials ✨</h2>
           </div>
           <div className="flex justify-center items-center mt-4">
             <ArrowDown className="h-6 w-6 text-gray-600 animate-bounce" />
             <span className="ml-2 text-gray-600">Scroll down to explore</span>
           </div>
-        </div>
-
-        {/* Divider */}
-        <div className="my-12">
-          <div className="border-t-2 border-gray-300"></div>
-        </div>
-
-        {/* Micro-Credentials Section */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              <h2 className="text-4xl font-bold">✨ 🎓 Your Four Micro-Credentials ✨</h2>
-            </div>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {microCredentials.map((credential) => (
-              <Card 
-                key={credential.id} 
-                className="cursor-pointer transition-all duration-300 hover:scale-105 perspective-1000"
-                onClick={() => handleCredentialFlip(credential.id)}
-              >
-                <div className={`relative w-full h-64 transition-transform duration-500 transform-style-preserve-3d ${flippedCredentials.has(credential.id) ? 'rotate-y-180' : ''}`}>
-                  {/* Front */}
-                  <div className="absolute inset-0 backface-hidden">
-                    <div className="h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-t-lg flex items-center justify-center">
-                      <Upload className="h-12 w-12 text-white" />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-bold text-lg mb-2">{credential.title}</h3>
-                      <p className="text-sm text-gray-600">{credential.description}</p>
-                      <div className="mt-3 flex items-center text-blue-600 text-sm">
-                        <RotateCw className="h-4 w-4 mr-1" />
-                        Click to flip
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Back */}
-                  <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <div className="h-full p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg flex flex-col justify-center">
-                      <h3 className="font-bold text-lg mb-3 text-center">{credential.title}</h3>
-                      <p className="text-sm text-gray-700 text-center leading-relaxed">{credential.details}</p>
-                      <div className="mt-3 flex items-center justify-center text-purple-600 text-sm">
-                        <RotateCw className="h-4 w-4 mr-1" />
-                        Click to flip back
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* See Inside Textbook Section */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <div className="bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
-              <h2 className="text-4xl font-bold">✨ See inside the Textbook ✨</h2>
-            </div>
-          </div>
-          
-          <Card className="p-8 bg-gradient-to-br from-gray-100 to-gray-200">
-            <div className="text-center">
-              <div className="bg-white rounded-lg p-8 shadow-lg max-w-4xl mx-auto">
-                <h3 className="text-2xl font-bold mb-4 text-gray-800">Interactive Textbook Preview</h3>
-                <div className="bg-gray-100 rounded-lg p-12 mb-4">
-                  <p className="text-gray-600 mb-4">FlipHTML5 Embed will be placed here</p>
-                  <div className="text-sm text-gray-500">
-                    Browse through sample pages, lessons, and activities from the complete textbook
-                  </div>
-                </div>
-                <p className="text-gray-600">
-                  Explore the comprehensive content that makes up Australia's leading financial literacy curriculum
-                </p>
-              </div>
-            </div>
-          </Card>
         </div>
 
         {/* Lesson Explorer */}
