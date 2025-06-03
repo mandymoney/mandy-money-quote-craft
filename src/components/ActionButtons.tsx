@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { generateQuotePDF, downloadPDF, createEmailSubject, createEmailBody } from '@/utils/pdfGenerator';
+import { generateQuotePDF, generateOrderPDF, downloadPDF, createEmailSubject, createEmailBody } from '@/utils/pdfGenerator';
 
 interface AddressComponents {
   streetNumber: string;
@@ -71,7 +70,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   programStartDate,
   isUnlimited = false
 }) => {
-  const generateAndDownloadPDF = () => {
+  const generateAndDownloadQuote = () => {
     const doc = generateQuotePDF(
       schoolInfo,
       quoteItems,
@@ -88,13 +87,39 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     return doc;
   };
 
+  const generateAndDownloadOrder = () => {
+    const doc = generateOrderPDF(
+      schoolInfo,
+      quoteItems,
+      pricing,
+      teacherCount,
+      studentCount,
+      programStartDate,
+      isUnlimited
+    );
+    
+    const filename = `MandyMoney_Order_${schoolInfo.schoolName || 'School'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    downloadPDF(doc, filename);
+    
+    return doc;
+  };
+
   const openEmailWithPDF = (type: 'enquiry' | 'order') => {
-    const doc = generateAndDownloadPDF();
+    // Generate and download the appropriate PDF
+    if (type === 'order') {
+      generateAndDownloadOrder();
+    } else {
+      generateAndDownloadQuote();
+    }
     
     const subject = createEmailSubject(type, schoolInfo.schoolName);
     const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount);
     
-    const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    // Note: Browsers cannot automatically attach files to mailto links
+    // The PDF will be downloaded separately and user needs to manually attach it
+    const enhancedBody = `${body}\n\nNote: Please attach the downloaded PDF file to this email before sending.`;
+    
+    const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(enhancedBody)}`;
     
     window.open(mailtoUrl, '_blank');
   };
@@ -106,7 +131,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     });
     
     try {
-      generateAndDownloadPDF();
+      generateAndDownloadQuote();
       
       toast({
         title: "Quote Downloaded!",
@@ -124,7 +149,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const handlePlaceOrder = () => {
     toast({
       title: "Preparing Order...",
-      description: "Generating quote and setting up email",
+      description: "Generating order document and setting up email",
     });
     
     try {
@@ -132,7 +157,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       
       toast({
         title: "Email Ready!",
-        description: "Your quote has been downloaded and email opened for order placement.",
+        description: "Your order document has been downloaded and email opened. Please attach the PDF to your email.",
       });
     } catch (error) {
       toast({
@@ -154,7 +179,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       
       toast({
         title: "Email Ready!",
-        description: "Your quote has been downloaded and email opened for booklisting enquiry.",
+        description: "Your quote has been downloaded and email opened. Please attach the PDF to your email.",
       });
     } catch (error) {
       toast({
