@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -594,7 +593,7 @@ export const QuoteBuilder = () => {
 
               {nextDiscount && (
                 <div className="mb-6 text-center">
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs px-3 py-1 font-normal">
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-sm px-3 py-1 font-normal">
                     🎯 Add {nextDiscount.studentsToGo} more student{nextDiscount.studentsToGo > 1 ? 's' : ''} to unlock volume discounts at {nextDiscount.threshold}+ students!
                   </Badge>
                 </div>
@@ -859,9 +858,9 @@ export const QuoteBuilder = () => {
           <div className="mt-12 border-t-4 border-green-600 pt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-8">
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-8 mb-4">
-                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">⭐</div>
+                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
                 <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
-                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">⭐</div>
+                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
               </div>
               <p className="text-lg text-green-700">
                 Use this quote for internal approval purposes or to place your program order
@@ -898,7 +897,6 @@ export const QuoteBuilder = () => {
                 totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
                 teacherCount={teacherCount}
                 studentCount={studentCount}
-                volumeSavings={volumeSavings}
               />
             </div>
           </div>
