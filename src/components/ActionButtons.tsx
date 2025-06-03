@@ -84,8 +84,8 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         student_count: studentCount,
         total_price: pricing.total,
         program_start_date: programStartDate.toISOString().split('T')[0],
-        quote_items: quoteItems,
-        pricing: pricing,
+        quote_items: quoteItems as any, // Cast to any to satisfy Json type
+        pricing: pricing as any, // Cast to any to satisfy Json type
         pdf_url: pdfUrl || null,
         attempt_type: type
       };
