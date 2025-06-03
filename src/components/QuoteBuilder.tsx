@@ -712,15 +712,17 @@ export const QuoteBuilder = () => {
           <div className="border-t-2 border-gray-300"></div>
         </div>
 
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-8 text-center text-white mb-8 bg-green-100">
-          <div className="flex items-center justify-center gap-4 mb-3">
-            <div className="text-4xl">✨</div>
-            <h2 className="text-4xl font-bold">Your Official Program Quote</h2>
-            <div className="text-4xl">✨</div>
+        <div className="rounded-lg p-8 text-center mb-8">
+          <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
+            <div className="flex items-center justify-center gap-4 mb-3">
+              <div className="text-4xl">✨</div>
+              <h2 className="text-4xl font-bold">Your Official Program Quote</h2>
+              <div className="text-4xl">✨</div>
+            </div>
           </div>
-          <p className="text-xl opacity-90">For internal use or to place an order</p>
+          <p className="text-xl text-gray-600">For internal use or to place an order</p>
           <div className="mt-6 animate-bounce">
-            <ArrowDown className="h-8 w-8 mx-auto text-white" />
+            <ArrowDown className="h-8 w-8 mx-auto text-gray-600" />
           </div>
         </div>
 
