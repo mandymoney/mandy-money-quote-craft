@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronDown, ChevronRight, Search, Book, Play } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, Book, Play, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LessonData {
@@ -13,6 +14,7 @@ interface LessonData {
   lesson: number;
   title: string;
   chapters: string[];
+  icon?: string;
 }
 
 const allLessons: LessonData[] = [
@@ -29,7 +31,7 @@ const allLessons: LessonData[] = [
   },
   {
     microCredential: 'Level 1',
-    topic: 'Budgeting Level 1',
+    topic: 'Budgeting',
     lesson: 2,
     title: 'Basic Budgeting',
     chapters: [
@@ -140,15 +142,15 @@ const allLessons: LessonData[] = [
   },
   {
     microCredential: 'Level 2',
-    topic: 'Budgeting Level 2',
+    topic: 'Budgeting',
     lesson: 11,
     title: 'Intermediate Budgeting',
     chapters: [
-      'If I Earn Enough, Surely I Don’t Need To Budget?',
+      'If I Earn Enough, Surely I Don't Need To Budget?',
       'How Do I Build a Monthly Budget?',
       'How Do I Use Excel To Budget Plan?',
       'How Do I Build a Long Term Budget?',
-      'How Do I Budget When Things Don’t Go To Plan?',
+      'How Do I Budget When Things Don't Go To Plan?',
       'How Do I Interpret Banking Data?',
       'How Do I Review My Budget?'
     ]
@@ -270,7 +272,7 @@ const allLessons: LessonData[] = [
   },
   {
     microCredential: 'Level 3',
-    topic: 'Budgeting Level 3',
+    topic: 'Budgeting',
     lesson: 22,
     title: 'Advanced Budgeting',
     chapters: [
@@ -301,9 +303,9 @@ const allLessons: LessonData[] = [
     lesson: 24,
     title: 'Compound Interest',
     chapters: [
-      'What’s The Difference Between Compound & Simple Interest?',
+      'What's The Difference Between Compound & Simple Interest?',
       'Calculating Compound Interest?',
-      'How Is Interest Both “Good” and “Bad”?',
+      'How Is Interest Both "Good" and "Bad"?',
       'How Do I Choose Whether To Invest Or Pay Off Debt?'
     ]
   },
@@ -316,7 +318,7 @@ const allLessons: LessonData[] = [
       'What Are Financial Products?',
       'What Financial Products Help Me Grow My Money?',
       'What Financial Products Help Me Borrow Money?',
-      'What’s a Neutral Product That Lets Me Store Money?'
+      'What's a Neutral Product That Lets Me Store Money?'
     ]
   },
   {
@@ -338,7 +340,7 @@ const allLessons: LessonData[] = [
     chapters: [
       'How Does Money Contribute To An Unequal World?',
       'How Does Economic Policy Play A Role In Creating Equity?',
-      'Why Can’t We Fix Social Inequalities Overnight?',
+      'Why Can't We Fix Social Inequalities Overnight?',
       'How Do We Solve Social Inequalities Using The IEEJ Scale?'
     ]
   },
@@ -464,7 +466,7 @@ const allLessons: LessonData[] = [
     lesson: 38,
     title: 'Investing Performance',
     chapters: [
-      'How Do I Measure an Investment’s Performance?',
+      'How Do I Measure an Investment's Performance?',
       'How Do I Make Sense Of Investing Numbers?',
       'How Do I Interpret Investing News?'
     ]
@@ -524,6 +526,7 @@ export const LessonExplorer: React.FC = () => {
   const [selectedMicroCredential, setSelectedMicroCredential] = useState<string>('all');
   const [selectedTopic, setSelectedTopic] = useState<string>('all');
   const [expandedLesson, setExpandedLesson] = useState<number | null>(null);
+  const [lessonIcons, setLessonIcons] = useState<{ [key: number]: string }>({});
 
   const microCredentials = Array.from(new Set(allLessons.map(l => l.microCredential)));
   const topics = Array.from(new Set(allLessons.map(l => l.topic)));
@@ -536,6 +539,20 @@ export const LessonExplorer: React.FC = () => {
     
     return matchesSearch && matchesMicroCredential && matchesTopic;
   });
+
+  const handleIconUpload = (lessonNumber: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLessonIcons(prev => ({
+          ...prev,
+          [lessonNumber]: e.target?.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -646,6 +663,27 @@ export const LessonExplorer: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                      {lessonIcons[lesson.lesson] ? (
+                        <img 
+                          src={lessonIcons[lesson.lesson]} 
+                          alt={`Lesson ${lesson.lesson} icon`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-center relative">
+                          <Upload className="h-4 w-4 mx-auto mb-1 text-gray-400" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleIconUpload(lesson.lesson, e)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                          <p className="text-xs text-gray-500">Icon</p>
+                        </div>
+                      )}
+                    </div>
                     <div className="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                       {lesson.lesson}
                     </div>
@@ -678,9 +716,9 @@ export const LessonExplorer: React.FC = () => {
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t border-teal-200">
-                    <p className="text-sm text-teal-600 mb-2">Textbook pages for this lesson:</p>
+                    <p className="text-sm text-teal-600 mb-2">FlipHTML5 textbook embed for this lesson:</p>
                     <div className="bg-white border border-teal-200 rounded p-3 text-center">
-                      <p className="text-teal-500 text-sm">Textbook page embed placeholder</p>
+                      <p className="text-teal-500 text-sm">FlipHTML5 embed section for Lesson {lesson.lesson}</p>
                     </div>
                   </div>
                 </div>

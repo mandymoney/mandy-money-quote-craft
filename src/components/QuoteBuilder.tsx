@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -361,7 +362,7 @@ const LessonExplorerWithIcon = () => {
             </div>
           )}
         </div>
-        <h3 className="text-xl font-semibold text-green-800">Explore All 42 Financial Literacy Lessons</h3>
+        <h3 className="text-xl font-semibold text-green-800">📚 Explore All 42 Financial Literacy Lessons</h3>
       </div>
       <LessonExplorer />
     </div>
@@ -568,7 +569,7 @@ export const QuoteBuilder = () => {
             <Card className="mb-8 p-6 bg-white shadow-sm border-2" style={{ borderImage: 'linear-gradient(135deg, #ffb512, #ffde5a, #fea100) 1' }}>
               <div className="mb-6">
                 <div className="text-center mb-4">
-                  <div className="inline-block bg-gradient-to-r from-[#ffb512] to-[#fea100] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  <div className="inline-block bg-gradient-to-r from-[#ffb512] to-[#fea100] text-white px-6 py-2 rounded-full text-lg font-bold">
                     Student Options
                   </div>
                 </div>
@@ -593,7 +594,7 @@ export const QuoteBuilder = () => {
 
               {nextDiscount && (
                 <div className="mb-6 text-center">
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-sm px-3 py-1">
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs px-3 py-1 font-normal">
                     🎯 Add {nextDiscount.studentsToGo} more student{nextDiscount.studentsToGo > 1 ? 's' : ''} to unlock volume discounts at {nextDiscount.threshold}+ students!
                   </Badge>
                 </div>
@@ -782,29 +783,35 @@ export const QuoteBuilder = () => {
                       <div className="text-xs text-gray-600">
                         {selectedTeacherData && (
                           <>
-                            <div className="flex items-center mb-1">
-                              <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                              <span>{teacherCount}x Teacher Digital Pass{(selectedTeacherData.id.includes('digital') || selectedTeacherData.id.includes('both')) ? 'es' : ''}</span>
-                            </div>
-                            {(selectedTeacherData.id.includes('physical') || selectedTeacherData.id.includes('both')) && (
+                            {teacherCount > 0 && (
+                              <div className="flex items-center mb-1">
+                                <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
+                                <span>{teacherCount}x Teacher Digital Pass{(selectedTeacherData.id.includes('digital') || selectedTeacherData.id.includes('both')) ? 'es' : ''}</span>
+                              </div>
+                            )}
+                            {(selectedTeacherData.id.includes('physical') || selectedTeacherData.id.includes('both')) && teacherCount > 0 && (
                               <div className="flex items-center mb-1">
                                 <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
                                 <span>{teacherCount}x Print Teacher Textbook{teacherCount > 1 ? 's' : ''}</span>
                               </div>
                             )}
-                            <div className="flex items-center mb-1">
-                              <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                              <span>{teacherCount}x Classroom Space{teacherCount > 1 ? 's' : ''}</span>
-                            </div>
+                            {teacherCount > 0 && (
+                              <div className="flex items-center mb-1">
+                                <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
+                                <span>{teacherCount}x Classroom Space{teacherCount > 1 ? 's' : ''}</span>
+                              </div>
+                            )}
                           </>
                         )}
                         {selectedStudentData && (
                           <>
-                            <div className="flex items-center mb-1">
-                              <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
-                              <span>{studentCount}x Student Digital Pass{(selectedStudentData.id.includes('digital') || selectedStudentData.id.includes('both')) ? 'es' : ''}</span>
-                            </div>
-                            {(selectedStudentData.id.includes('physical') || selectedStudentData.id.includes('both')) && (
+                            {studentCount > 0 && (
+                              <div className="flex items-center mb-1">
+                                <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
+                                <span>{studentCount}x Student Digital Pass{(selectedStudentData.id.includes('digital') || selectedStudentData.id.includes('both')) ? 'es' : ''}</span>
+                              </div>
+                            )}
+                            {(selectedStudentData.id.includes('physical') || selectedStudentData.id.includes('both')) && studentCount > 0 && (
                               <div className="flex items-center mb-1">
                                 <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
                                 <span>{studentCount}x Print Student Textbook{studentCount > 1 ? 's' : ''}</span>
@@ -852,9 +859,9 @@ export const QuoteBuilder = () => {
           <div className="mt-12 border-t-4 border-green-600 pt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-8">
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-8 mb-4">
-                <div className="text-4xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">⭐</div>
+                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">⭐</div>
                 <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
-                <div className="text-4xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">⭐</div>
+                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">⭐</div>
               </div>
               <p className="text-lg text-green-700">
                 Use this quote for internal approval purposes or to place your program order
@@ -891,6 +898,7 @@ export const QuoteBuilder = () => {
                 totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
                 teacherCount={teacherCount}
                 studentCount={studentCount}
+                volumeSavings={volumeSavings}
               />
             </div>
           </div>
