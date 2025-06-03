@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { generateQuotePDF, generateOrderPDF, downloadPDF, createEmailSubject, createEmailBody } from '@/utils/pdfGenerator';
 import { uploadPDFToStorage, generatePDFBlob } from '@/utils/pdfUpload';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AddressComponents {
   streetNumber: string;
@@ -72,6 +72,54 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   programStartDate,
   isUnlimited = false
 }) => {
+  const storeQuoteAttempt = async (type: 'quote' | 'order' | 'enquiry', pdfUrl?: string) => {
+    try {
+      const quoteData = {
+        school_name: schoolInfo.schoolName || null,
+        school_abn: schoolInfo.schoolABN || null,
+        coordinator_name: schoolInfo.coordinatorName || null,
+        coordinator_email: schoolInfo.coordinatorEmail || null,
+        contact_phone: schoolInfo.contactPhone || null,
+        teacher_count: teacherCount,
+        student_count: studentCount,
+        total_price: pricing.total,
+        program_start_date: programStartDate.toISOString().split('T')[0],
+        quote_items: quoteItems,
+        pricing: pricing,
+        pdf_url: pdfUrl || null,
+        attempt_type: type
+      };
+
+      // Store in database
+      const { error: dbError } = await supabase
+        .from('quote_attempts')
+        .insert([quoteData]);
+
+      if (dbError) {
+        console.error('Error storing quote attempt:', dbError);
+      }
+
+      // Send alert email
+      try {
+        const response = await fetch('/functions/v1/send-quote-alert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ quoteData }),
+        });
+
+        if (!response.ok) {
+          console.error('Error sending alert email:', response.statusText);
+        }
+      } catch (emailError) {
+        console.error('Error sending alert email:', emailError);
+      }
+    } catch (error) {
+      console.error('Error in storeQuoteAttempt:', error);
+    }
+  };
+
   const generateAndUploadQuote = async () => {
     const doc = generateQuotePDF(
       schoolInfo,
@@ -129,16 +177,16 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         // For enquiry, generate and upload quote
         const result = await generateAndUploadQuote();
         pdfUrl = result.pdfUrl;
-        console.log('Generated PDF URL for enquiry:', pdfUrl);
       }
     } catch (error) {
       console.error('Error generating/uploading PDF:', error);
     }
     
+    // Store quote attempt
+    await storeQuoteAttempt(type, pdfUrl || undefined);
+    
     const subject = createEmailSubject(type, schoolInfo.schoolName);
     const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount, pdfUrl || undefined);
-    
-    console.log('Email body for enquiry includes PDF URL:', body.includes('http'));
     
     const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
@@ -152,7 +200,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     });
     
     try {
-      await generateAndUploadQuote();
+      const result = await generateAndUploadQuote();
+      
+      // Store quote attempt
+      await storeQuoteAttempt('quote', result.pdfUrl || undefined);
       
       toast({
         title: "Quote Generated!",

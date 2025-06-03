@@ -506,6 +506,7 @@ export const createEmailBody = (
   
   if (pdfUrl) {
     body += `Please find the detailed ${documentType} document here:\n${pdfUrl}\n\n`;
+    body += `You can view and download the PDF by clicking the link above.\n\n`;
   } else {
     body += `Please find the detailed ${documentType} attached.\n\n`;
   }
