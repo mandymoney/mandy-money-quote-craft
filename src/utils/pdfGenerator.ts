@@ -474,7 +474,8 @@ export const createEmailBody = (
   schoolInfo: SchoolInfo,
   pricing: PricingDetails,
   teacherCount: number,
-  studentCount: number
+  studentCount: number,
+  pdfUrl?: string
 ): string => {
   const isEnquiry = type === 'enquiry';
   
@@ -502,7 +503,13 @@ export const createEmailBody = (
   }
   
   const documentType = isEnquiry ? 'quote' : 'order';
-  body += `Please find the detailed ${documentType} attached.\n\n`;
+  
+  if (pdfUrl) {
+    body += `Please find the detailed ${documentType} document here:\n${pdfUrl}\n\n`;
+  } else {
+    body += `Please find the detailed ${documentType} attached.\n\n`;
+  }
+  
   body += `Best regards,\n${schoolInfo.coordinatorName || 'School Coordinator'}`;
   
   return body;

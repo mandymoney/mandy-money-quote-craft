@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { generateQuotePDF, generateOrderPDF, downloadPDF, createEmailSubject, createEmailBody } from '@/utils/pdfGenerator';
+import { uploadPDFToStorage, generatePDFBlob } from '@/utils/pdfUpload';
 
 interface AddressComponents {
   streetNumber: string;
@@ -70,7 +71,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   programStartDate,
   isUnlimited = false
 }) => {
-  const generateAndDownloadQuote = () => {
+  const generateAndUploadQuote = async () => {
     const doc = generateQuotePDF(
       schoolInfo,
       quoteItems,
@@ -82,12 +83,18 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     );
     
     const filename = `MandyMoney_Quote_${schoolInfo.schoolName || 'School'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    // Generate blob and upload to storage
+    const pdfBlob = generatePDFBlob(doc);
+    const pdfUrl = await uploadPDFToStorage(pdfBlob, filename);
+    
+    // Also download locally
     downloadPDF(doc, filename);
     
-    return doc;
+    return { doc, pdfUrl };
   };
 
-  const generateAndDownloadOrder = () => {
+  const generateAndUploadOrder = async () => {
     const doc = generateOrderPDF(
       schoolInfo,
       quoteItems,
@@ -99,43 +106,52 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     );
     
     const filename = `MandyMoney_Order_${schoolInfo.schoolName || 'School'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    // Generate blob and upload to storage
+    const pdfBlob = generatePDFBlob(doc);
+    const pdfUrl = await uploadPDFToStorage(pdfBlob, filename);
+    
+    // Also download locally
     downloadPDF(doc, filename);
     
-    return doc;
+    return { doc, pdfUrl };
   };
 
-  const openEmailWithPDF = (type: 'enquiry' | 'order') => {
-    // Generate and download the appropriate PDF
-    if (type === 'order') {
-      generateAndDownloadOrder();
-    } else {
-      generateAndDownloadQuote();
+  const openEmailWithPDF = async (type: 'enquiry' | 'order') => {
+    let pdfUrl: string | null = null;
+    
+    try {
+      if (type === 'order') {
+        const result = await generateAndUploadOrder();
+        pdfUrl = result.pdfUrl;
+      } else {
+        const result = await generateAndUploadQuote();
+        pdfUrl = result.pdfUrl;
+      }
+    } catch (error) {
+      console.error('Error generating/uploading PDF:', error);
     }
     
     const subject = createEmailSubject(type, schoolInfo.schoolName);
-    const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount);
+    const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount, pdfUrl || undefined);
     
-    // Note: Browsers cannot automatically attach files to mailto links
-    // The PDF will be downloaded separately and user needs to manually attach it
-    const enhancedBody = `${body}\n\nNote: Please attach the downloaded PDF file to this email before sending.`;
-    
-    const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(enhancedBody)}`;
+    const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     window.open(mailtoUrl, '_blank');
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     toast({
       title: "Generating PDF...",
       description: "Creating your quote document",
     });
     
     try {
-      generateAndDownloadQuote();
+      await generateAndUploadQuote();
       
       toast({
-        title: "Quote Downloaded!",
-        description: "Your PDF quote has been generated and downloaded.",
+        title: "Quote Generated!",
+        description: "Your PDF quote has been generated, downloaded, and saved to our system.",
       });
     } catch (error) {
       toast({
@@ -146,18 +162,18 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     toast({
       title: "Preparing Order...",
       description: "Generating order document and setting up email",
     });
     
     try {
-      openEmailWithPDF('order');
+      await openEmailWithPDF('order');
       
       toast({
         title: "Email Ready!",
-        description: "Your order document has been downloaded and email opened. Please attach the PDF to your email.",
+        description: "Your order document has been generated and email opened with the PDF link included.",
       });
     } catch (error) {
       toast({
@@ -168,18 +184,18 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     }
   };
 
-  const handleBooklistingEnquiry = () => {
+  const handleBooklistingEnquiry = async () => {
     toast({
       title: "Preparing Enquiry...",
       description: "Generating quote and setting up email",
     });
     
     try {
-      openEmailWithPDF('enquiry');
+      await openEmailWithPDF('enquiry');
       
       toast({
         title: "Email Ready!",
-        description: "Your quote has been downloaded and email opened. Please attach the PDF to your email.",
+        description: "Your quote has been generated and email opened with the PDF link included.",
       });
     } catch (error) {
       toast({
