@@ -275,6 +275,35 @@ export const QuoteBuilder = () => {
     }
     return studentPrice;
   };
+  const calculateUnlimitedTotal = (): { subtotal: number; gst: number; total: number; shipping: number } => {
+    const basePrice = unlimitedTier.basePrice;
+    const addOnsCost = 
+      (unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks) +
+      (unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks) +
+      (unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0);
+
+    const hasPhysicalItems = unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0;
+    
+    let shipping = 0;
+    if (hasPhysicalItems) {
+      const subtotalBeforeShipping = (basePrice + addOnsCost) / (1 + GST_RATE);
+      if (subtotalBeforeShipping < SHIPPING_THRESHOLD) {
+        shipping = SHIPPING_COST;
+      }
+    }
+
+    const total = basePrice + addOnsCost + shipping;
+    const subtotal = (basePrice + addOnsCost) / (1 + GST_RATE);
+    const gst = total - subtotal - shipping;
+
+    return {
+      subtotal,
+      gst,
+      total,
+      shipping
+    };
+  };
+
   const calculateRegularTotal = (): {
     subtotal: number;
     gst: number;
@@ -530,6 +559,8 @@ export const QuoteBuilder = () => {
   const volumeNotification = getVolumeNotification();
   const totalSavings = getTotalSavings();
   const volumeDiscountDetails = getVolumeDiscountDetails();
+  const unlimitedPricing = useUnlimited ? calculateUnlimitedTotal() : regularPricing;
+  const finalPricing = useUnlimited ? unlimitedPricing : regularPricing;
   return <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -663,7 +694,7 @@ export const QuoteBuilder = () => {
 
             {/* Unlimited School Access */}
             <div className="mb-8">
-              <UnlimitedSchoolCard tier={unlimitedTier} isSelected={useUnlimited} onSelect={handleUnlimitedSelection} addOns={unlimitedAddOns} onAddOnsChange={setUnlimitedAddOns} pricing={regularPricing} teacherCount={getTotalTeacherCount()} studentCount={getTotalStudentCount()} regularPricing={regularPricing} />
+              <UnlimitedSchoolCard tier={unlimitedTier} isSelected={useUnlimited} onSelect={handleUnlimitedSelection} addOns={unlimitedAddOns} onAddOnsChange={setUnlimitedAddOns} pricing={finalPricing} teacherCount={getTotalTeacherCount()} studentCount={getTotalStudentCount()} regularPricing={regularPricing} />
             </div>
 
             {useUnlimited && <div className="text-center mt-4">
@@ -689,16 +720,16 @@ export const QuoteBuilder = () => {
                       "text-2xl font-bold",
                       useUnlimited ? 'text-green-900' : 'text-teal-900'
                     )}>
-                      ${regularPricing.total.toLocaleString()}
+                      ${finalPricing.total.toLocaleString()}
                     </div>
                     <div className={cn(
                       "text-sm",
                       useUnlimited ? 'text-green-600' : 'text-teal-600'
                     )}>
-                      {hasPhysicalItems() && regularPricing.shipping > 0 
-                        ? `inc. $${regularPricing.shipping} shipping + GST`
-                        : hasPhysicalItems() && regularPricing.shipping === 0
-                        ? 'inc. free shipping + GST'
+                      {hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0)) 
+                        ? finalPricing.shipping > 0 
+                          ? `inc. $${finalPricing.shipping} shipping + GST`
+                          : 'inc. free shipping + GST'
                         : 'inc. GST'
                       }
                     </div>
@@ -833,16 +864,16 @@ export const QuoteBuilder = () => {
                     </div>)}
                   
                   {/* Shipping */}
-                  {hasPhysicalItems() && <div className="border-b border-slate-200 pb-4">
+                  {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && <div className="border-b border-slate-200 pb-4">
                       <div className="flex justify-between items-center">
                         <div>
                           <div className="font-semibold text-slate-800">Shipping</div>
                           <div className="text-xs text-slate-600">
-                            {regularPricing.shipping === 0 ? 'Free shipping (order over $90)' : 'Standard shipping'}
+                            {finalPricing.shipping === 0 ? 'Free shipping (order over $90)' : 'Standard shipping'}
                           </div>
                         </div>
                         <div className="font-bold text-lg text-slate-800">
-                          {regularPricing.shipping === 0 ? <span className="text-green-600">FREE</span> : `$${regularPricing.shipping}`}
+                          {finalPricing.shipping === 0 ? <span className="text-green-600">FREE</span> : `$${finalPricing.shipping}`}
                         </div>
                       </div>
                     </div>}
@@ -851,15 +882,15 @@ export const QuoteBuilder = () => {
                   <div className="space-y-2 py-4 bg-slate-100 rounded-lg px-4">
                     <div className="flex justify-between items-center text-sm text-slate-600">
                       <span>Subtotal (exc. GST)</span>
-                      <span>${regularPricing.subtotal.toFixed(2)}</span>
+                      <span>${finalPricing.subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm text-slate-600">
                       <span>GST (10%)</span>
-                      <span>${regularPricing.gst.toFixed(2)}</span>
+                      <span>${finalPricing.gst.toFixed(2)}</span>
                     </div>
-                    {regularPricing.shipping > 0 && <div className="flex justify-between items-center text-sm text-slate-600">
+                    {finalPricing.shipping > 0 && <div className="flex justify-between items-center text-sm text-slate-600">
                         <span>Shipping</span>
-                        <span>${regularPricing.shipping}</span>
+                        <span>${finalPricing.shipping}</span>
                       </div>}
                   </div>
                   
@@ -867,7 +898,7 @@ export const QuoteBuilder = () => {
                   <div className="bg-green-600 text-white p-4 rounded-lg">
                     <div className="flex justify-between items-center">
                       <div className="text-xl font-bold">Total Investment</div>
-                      <div className="text-2xl font-bold">${regularPricing.total.toLocaleString()}</div>
+                      <div className="text-2xl font-bold">${finalPricing.total.toLocaleString()}</div>
                     </div>
                     <div className="text-sm opacity-90 text-right mt-1">
                       (Price includes 10% GST)
@@ -952,7 +983,7 @@ export const QuoteBuilder = () => {
                 schoolABN: e.target.value
               }))} />
                 <div className="md:col-span-2">
-                  <Input placeholder="School Address (Street, City, State, Postcode)" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
+                  <Input placeholder="School Address (include unit/building number, street name, suburb, state, postcode for pin-point accuracy)" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
                   ...prev,
                   schoolAddress: e.target.value
                 }))} className="w-full" />
@@ -982,7 +1013,7 @@ export const QuoteBuilder = () => {
                 purchaseOrderNumber: e.target.value
               }))} />
                 
-                {hasPhysicalItems() && <>
+                {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && <>
                     <div className="md:col-span-2">
                       <div className="flex items-center space-x-2 mb-2">
                         <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
@@ -991,7 +1022,7 @@ export const QuoteBuilder = () => {
                     }))} />
                         <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
                       </div>
-                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address (Street, City, State, Postcode)" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
+                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address (include unit/building number, street name, suburb, state, postcode for pin-point accuracy)" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
                     ...prev,
                     deliveryAddress: e.target.value
                   }))} className="w-full" />}
@@ -1006,7 +1037,7 @@ export const QuoteBuilder = () => {
                   }))} />
                     <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
                   </div>
-                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address (Street, City, State, Postcode)" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
+                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address (include unit/building number, street name, suburb, state, postcode for pin-point accuracy)" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
                   ...prev,
                   billingAddress: e.target.value
                 }))} className="w-full" />}
@@ -1054,7 +1085,7 @@ export const QuoteBuilder = () => {
               <ActionButtons selectedTier={{
               name: 'Custom Selection',
               id: 'combined'
-            }} totalPrice={regularPricing.total} teacherCount={getTotalTeacherCount()} studentCount={getTotalStudentCount()} />
+            }} totalPrice={finalPricing.total} teacherCount={getTotalTeacherCount()} studentCount={getTotalStudentCount()} />
             </div>
           </div>
         </div>

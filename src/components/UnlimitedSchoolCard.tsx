@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -69,6 +70,23 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
 
   const savings = regularPricing.total - pricing.total;
   const percentSavings = Math.round((savings / regularPricing.total) * 100);
+
+  // Get all inclusions including add-ons
+  const getAllInclusions = () => {
+    const inclusions = [...tier.inclusions];
+    
+    if (addOns.teacherBooks > 0) {
+      inclusions.push(`${addOns.teacherBooks} x Teacher Print Textbook${addOns.teacherBooks > 1 ? 's' : ''}`);
+    }
+    if (addOns.studentBooks > 0) {
+      inclusions.push(`${addOns.studentBooks} x Student Print Textbook${addOns.studentBooks > 1 ? 's' : ''}`);
+    }
+    if (addOns.posterA0 > 0) {
+      inclusions.push(`${addOns.posterA0} x A0 Poster${addOns.posterA0 > 1 ? 's' : ''}`);
+    }
+    
+    return inclusions;
+  };
 
   return (
     <div className="relative">
@@ -246,7 +264,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
               {/* Key Inclusions */}
               <div className="space-y-3">
                 <h4 className="text-xl font-semibold text-gray-800">What's Included</h4>
-                {tier.inclusions.map((inclusion, index) => (
+                {getAllInclusions().map((inclusion, index) => (
                   <div key={index} className="flex items-center text-gray-700">
                     <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
                     <span>{inclusion}</span>
