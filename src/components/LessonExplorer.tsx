@@ -527,6 +527,7 @@ export const LessonExplorer: React.FC = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('all');
   const [expandedLesson, setExpandedLesson] = useState<number | null>(null);
   const [lessonIcons, setLessonIcons] = useState<{ [key: number]: string }>({});
+  const [microCredentialImages, setMicroCredentialImages] = useState<{ [key: number]: string }>({});
 
   const microCredentials = Array.from(new Set(allLessons.map(l => l.microCredential)));
   const topics = Array.from(new Set(allLessons.map(l => l.topic)));
@@ -548,6 +549,20 @@ export const LessonExplorer: React.FC = () => {
         setLessonIcons(prev => ({
           ...prev,
           [lessonNumber]: e.target?.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleMicroCredentialImageUpload = (level: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setMicroCredentialImages(prev => ({
+          ...prev,
+          [level]: e.target?.result as string
         }));
       };
       reader.readAsDataURL(file);
@@ -595,13 +610,47 @@ export const LessonExplorer: React.FC = () => {
           <h3 className="text-lg font-semibold text-teal-700 mb-4">Your Four Micro-Credentials</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((level) => (
-              <div key={level} className="cursor-pointer group">
-                <div className="aspect-square bg-teal-50 rounded-lg flex items-center justify-center border-2 border-dashed border-teal-300 hover:border-teal-400 transition-colors">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-teal-200 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                      <span className="text-teal-700 font-bold">L{level}</span>
+              <div key={level} className="cursor-pointer group perspective-1000">
+                <div className="relative aspect-square transform-style-preserve-3d transition-transform duration-500 hover:rotate-y-180">
+                  {/* Front side */}
+                  <div className="absolute inset-0 w-full h-full backface-hidden">
+                    <div className="aspect-square bg-teal-50 rounded-lg flex items-center justify-center border-2 border-dashed border-teal-300 hover:border-teal-400 transition-colors overflow-hidden">
+                      {microCredentialImages[level] ? (
+                        <img 
+                          src={microCredentialImages[level]} 
+                          alt={`Level ${level} micro-credential`}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="text-center relative w-full h-full flex flex-col items-center justify-center">
+                          <Upload className="h-8 w-8 text-teal-400 mb-2" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleMicroCredentialImageUpload(level, e)}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                          <p className="text-teal-600 font-medium">Upload Image</p>
+                          <p className="text-sm text-teal-500">Level {level}</p>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-teal-600">Level {level}</p>
+                  </div>
+                  
+                  {/* Back side */}
+                  <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
+                    <div className="aspect-square bg-teal-600 text-white rounded-lg flex flex-col items-center justify-center p-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold mb-2">Level {level}</div>
+                        <div className="text-sm opacity-90 mb-3">Micro-Credential</div>
+                        <div className="text-xs opacity-75">
+                          {level === 1 && "Foundation skills in budgeting, spending, super & tax"}
+                          {level === 2 && "Career planning, saving goals & real-world applications"}
+                          {level === 3 && "Advanced concepts, systems & financial safety"}
+                          {level === 4 && "Wealth building, debt management & investing"}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
