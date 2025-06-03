@@ -150,24 +150,27 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                     <span className="text-gray-700">Unlimited School Access</span>
                     <span className="font-bold text-lg">${unlimitedTier?.basePrice.toLocaleString()}</span>
                   </div>
+                  <div className="text-sm text-gray-500 ml-4 mb-2">
+                    Includes: Unlimited Teacher Digital Passes, Unlimited Student Digital Passes, Unlimited Classroom Spaces
+                  </div>
                   
                   {unlimitedAddOns && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0) && (
                     <div className="ml-4 space-y-2">
                       {unlimitedAddOns.teacherBooks > 0 && (
                         <div className="flex justify-between text-sm text-gray-600">
-                          <span>Teacher Books × {unlimitedAddOns.teacherBooks}</span>
+                          <span>Print Teacher Textbooks × {unlimitedAddOns.teacherBooks}</span>
                           <span>${(unlimitedAddOns.teacherBooks * (unlimitedTier?.addOns.teacherBooks || 0)).toLocaleString()}</span>
                         </div>
                       )}
                       {unlimitedAddOns.studentBooks > 0 && (
                         <div className="flex justify-between text-sm text-gray-600">
-                          <span>Student Books × {unlimitedAddOns.studentBooks}</span>
+                          <span>Print Student Textbooks × {unlimitedAddOns.studentBooks}</span>
                           <span>${(unlimitedAddOns.studentBooks * (unlimitedTier?.addOns.studentBooks || 0)).toLocaleString()}</span>
                         </div>
                       )}
                       {unlimitedAddOns.posterA0 > 0 && (
                         <div className="flex justify-between text-sm text-gray-600">
-                          <span>A0 Poster × {unlimitedAddOns.posterA0}</span>
+                          <span>A0 Posters × {unlimitedAddOns.posterA0}</span>
                           <span>${(unlimitedAddOns.posterA0 * (unlimitedTier?.addOns.posterA0 || 0)).toLocaleString()}</span>
                         </div>
                       )}
@@ -183,7 +186,11 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                         <span className="font-bold text-lg">${(teacherTier.basePrice.teacher * teacherCount).toLocaleString()}</span>
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
-                        {teacherTier.name} - Full teaching resources
+                        {teacherTier.name}
+                        {teacherTier.id.includes('digital') && ' - Includes Teacher Digital Passes'}
+                        {teacherTier.id.includes('physical') && ' - Includes Print Teacher Textbooks'}
+                        {teacherTier.id.includes('both') && ' - Includes Teacher Digital Passes + Print Teacher Textbooks'}
+                        , Classroom Spaces
                       </div>
                     </div>
                   )}
@@ -195,7 +202,10 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                         <span className="font-bold text-lg">${(studentPrice * studentCount).toLocaleString()}</span>
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
-                        {studentTier.name} - Individual learning materials
+                        {studentTier.name}
+                        {studentTier.id.includes('digital') && ' - Includes Student Digital Passes'}
+                        {studentTier.id.includes('physical') && ' - Includes Print Student Textbooks'}
+                        {studentTier.id.includes('both') && ' - Includes Student Digital Passes + Print Student Textbooks'}
                       </div>
                       {volumeSavings > 0 && (
                         <div className="text-sm text-green-600 mt-1">
@@ -231,11 +241,11 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
             </div>
 
             {/* Program Timeline with integrated date selector */}
-            <div>
-              <h4 className="text-lg font-semibold text-gray-800 mb-4">Program Timeline</h4>
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-4">
+              <h4 className="text-lg font-semibold text-blue-800 mb-4">Program Timeline</h4>
               
               <div className="space-y-4">
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div>
                   <h5 className="font-semibold text-blue-800 mb-3">Select Program Start Date</h5>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -267,59 +277,86 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                     <div className="text-xs mt-1 text-blue-600">12 months of full access included</div>
                   </div>
                 </div>
-                
-                <div className="text-center text-sm text-gray-500 italic">
-                  Quote valid until end of current calendar year
-                </div>
               </div>
+            </div>
+            
+            <div className="text-center text-sm text-gray-500 italic">
+              Quote valid until end of current calendar year
             </div>
           </div>
 
-          {/* Right Column - Inclusions */}
+          {/* Right Column - Simplified Inclusions */}
           <div>
             <div className="flex items-center mb-6">
               <div className="w-4 h-4 bg-teal-500 rounded-full mr-3"></div>
               <h3 className="text-xl font-semibold text-gray-800">
-                {isUnlimited ? 'Unlimited Access Inclusions' : 
-                 teacherTier ? 'Teacher Inclusions' : 'Student Inclusions'}
+                {isUnlimited ? 'Unlimited Access Inclusions' : 'Program Inclusions'}
               </h3>
             </div>
             
             <div className="space-y-3">
               {isUnlimited ? (
-                unlimitedTier?.inclusions.map((inclusion, index) => (
-                  <div key={index} className="flex items-center p-3 bg-teal-50 rounded-lg">
+                <>
+                  <div className="flex items-center p-3 bg-teal-50 rounded-lg">
                     <Check className="h-5 w-5 text-teal-600 mr-3 flex-shrink-0" />
-                    <span className="text-teal-800">{inclusion}</span>
+                    <span className="text-teal-800">Unlimited Teacher Digital Passes</span>
                   </div>
-                ))
+                  <div className="flex items-center p-3 bg-teal-50 rounded-lg">
+                    <Check className="h-5 w-5 text-teal-600 mr-3 flex-shrink-0" />
+                    <span className="text-teal-800">{unlimitedAddOns?.teacherBooks || 0}x Print Teacher Textbooks</span>
+                  </div>
+                  <div className="flex items-center p-3 bg-teal-50 rounded-lg">
+                    <Check className="h-5 w-5 text-teal-600 mr-3 flex-shrink-0" />
+                    <span className="text-teal-800">Unlimited Classroom Spaces</span>
+                  </div>
+                  <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
+                    <Check className="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" />
+                    <span className="text-yellow-800">Unlimited Student Digital Passes</span>
+                  </div>
+                  <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
+                    <Check className="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" />
+                    <span className="text-yellow-800">{unlimitedAddOns?.studentBooks || 0}x Print Student Textbooks</span>
+                  </div>
+                  {(unlimitedAddOns?.posterA0 || 0) > 0 && (
+                    <div className="flex items-center p-3 bg-blue-50 rounded-lg">
+                      <Check className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0" />
+                      <span className="text-blue-800">{unlimitedAddOns?.posterA0}x A0 Posters</span>
+                    </div>
+                  )}
+                </>
               ) : (
                 <>
                   {teacherTier && (
                     <>
-                      {[...teacherTier.inclusions.teacher, ...teacherTier.inclusions.classroom].map((inclusion, index) => (
-                        <div key={index} className="flex items-center p-3 bg-teal-50 rounded-lg">
+                      <div className="flex items-center p-3 bg-teal-50 rounded-lg">
+                        <Check className="h-5 w-5 text-teal-600 mr-3 flex-shrink-0" />
+                        <span className="text-teal-800">{teacherCount}x Teacher Digital Pass{(teacherTier.id.includes('digital') || teacherTier.id.includes('both')) ? 'es' : ''}</span>
+                      </div>
+                      {(teacherTier.id.includes('physical') || teacherTier.id.includes('both')) && (
+                        <div className="flex items-center p-3 bg-teal-50 rounded-lg">
                           <Check className="h-5 w-5 text-teal-600 mr-3 flex-shrink-0" />
-                          <span className="text-teal-800">{inclusion}</span>
+                          <span className="text-teal-800">{teacherCount}x Print Teacher Textbook{teacherCount > 1 ? 's' : ''}</span>
                         </div>
-                      ))}
+                      )}
+                      <div className="flex items-center p-3 bg-teal-50 rounded-lg">
+                        <Check className="h-5 w-5 text-teal-600 mr-3 flex-shrink-0" />
+                        <span className="text-teal-800">{teacherCount}x Classroom Space{teacherCount > 1 ? 's' : ''}</span>
+                      </div>
                     </>
                   )}
                   
                   {studentTier && (
                     <>
-                      {teacherTier && (
-                        <div className="flex items-center mt-6 mb-4">
-                          <div className="w-4 h-4 bg-yellow-500 rounded-full mr-3"></div>
-                          <h4 className="text-lg font-semibold text-gray-800">Student Inclusions</h4>
+                      <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
+                        <Check className="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" />
+                        <span className="text-yellow-800">{studentCount}x Student Digital Pass{(studentTier.id.includes('digital') || studentTier.id.includes('both')) ? 'es' : ''}</span>
+                      </div>
+                      {(studentTier.id.includes('physical') || studentTier.id.includes('both')) && (
+                        <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
+                          <Check className="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" />
+                          <span className="text-yellow-800">{studentCount}x Print Student Textbook{studentCount > 1 ? 's' : ''}</span>
                         </div>
                       )}
-                      {studentTier.inclusions.student.map((inclusion, index) => (
-                        <div key={index} className="flex items-center p-3 bg-yellow-50 rounded-lg">
-                          <Check className="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" />
-                          <span className="text-yellow-800">{inclusion}</span>
-                        </div>
-                      ))}
                     </>
                   )}
                 </>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Check, Image, TrendingUp, Plus, Upload } from 'lucide-react';
+import { Check, Image, TrendingUp, Upload } from 'lucide-react';
 import { UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -154,8 +154,9 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                     <div className="text-gray-600">Base unlimited access</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-gray-500">Includes all teachers</div>
-                    <div className="text-sm text-gray-500">& all students</div>
+                    <div className="text-sm text-gray-500">Unlimited Teacher Digital Passes</div>
+                    <div className="text-sm text-gray-500">Unlimited Student Digital Passes</div>
+                    <div className="text-sm text-gray-500">Unlimited Classroom Spaces</div>
                   </div>
                 </div>
               </div>
@@ -166,12 +167,12 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   Optional Hard-Copy Add-ons
                 </h4>
                 
-                {/* Teacher Books */}
+                {/* Print Teacher Textbooks */}
                 <div className="bg-white/80 rounded-lg p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-3">
                       <Image className="h-5 w-5 text-gray-600" />
-                      <span className="font-medium text-gray-800">Teacher Books</span>
+                      <span className="font-medium text-gray-800">Print Teacher Textbooks</span>
                       <span className="text-sm text-gray-600">(${tier.addOns.teacherBooks} each)</span>
                     </div>
                     <Input
@@ -192,12 +193,12 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   </div>
                 </div>
 
-                {/* Student Books */}
+                {/* Print Student Textbooks */}
                 <div className="bg-white/80 rounded-lg p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-3">
                       <Image className="h-5 w-5 text-gray-600" />
-                      <span className="font-medium text-gray-800">Student Books</span>
+                      <span className="font-medium text-gray-800">Print Student Textbooks</span>
                       <span className="text-sm text-gray-600">(${tier.addOns.studentBooks} each)</span>
                     </div>
                     <Input
@@ -218,12 +219,12 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   </div>
                 </div>
 
-                {/* A0 Poster */}
+                {/* A0 Posters */}
                 <div className="bg-white/80 rounded-lg p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-3">
                       <Image className="h-5 w-5 text-gray-600" />
-                      <span className="font-medium text-gray-800">A0 Poster</span>
+                      <span className="font-medium text-gray-800">A0 Posters</span>
                       <span className="text-sm text-gray-600">(${tier.addOns.posterA0} each)</span>
                     </div>
                     <Input

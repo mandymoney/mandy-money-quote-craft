@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -11,7 +12,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, AlertTriangle, ArrowDown, Check, TrendingUp } from 'lucide-react';
+import { X, AlertTriangle, ArrowDown, Check, TrendingUp, Upload } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -207,6 +208,7 @@ const unlimitedTier: UnlimitedTier = {
   inclusions: [
     'Unlimited Teacher Digital Passes',
     'Unlimited Student Digital Passes',
+    'Unlimited Classroom Spaces',
     '42 x Click & Play Powerpoint Lessons',
     '168 x Theory Videos',
     '168 x Printable Worksheets',
@@ -214,7 +216,6 @@ const unlimitedTier: UnlimitedTier = {
     'Lesson Plans',
     'Curriculum Alignment Guides',
     'Digital Textbooks',
-    'Unlimited Classroom Spaces',
     'Personal Student Accounts',
     '168 x Gamified Activities',
     'Lesson Certificates',
@@ -225,6 +226,161 @@ const unlimitedTier: UnlimitedTier = {
     'Advanced Analytics'
   ],
   bestFor: 'Perfect for schools prioritising financial empowerment as a core student outcome'
+};
+
+const MicroCredentialsSection = () => {
+  const [selectedCredential, setSelectedCredential] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<{ [key: string]: string }>({});
+
+  const microCredentials = [
+    {
+      id: 'level1',
+      title: 'Level 1 - Foundations',
+      banner: 'Building Strong Financial Foundations',
+      description: 'Introduction to financial literacy basics including budgeting, spending, super, and tax fundamentals. Perfect for students beginning their financial journey.'
+    },
+    {
+      id: 'level2', 
+      title: 'Level 2 - Building Skills',
+      banner: 'Developing Essential Life Skills',
+      description: 'Intermediate concepts covering career planning, employment preparation, and real-world financial decisions like car ownership and phone plans.'
+    },
+    {
+      id: 'level3',
+      title: 'Level 3 - Advanced Topics',
+      banner: 'Understanding Financial Systems',
+      description: 'Advanced budgeting, interest concepts, financial products, banking, and developing a healthy money mindset with safety strategies.'
+    },
+    {
+      id: 'level4',
+      title: 'Level 4 - Mastery',
+      banner: 'Building Wealth & Investment Skills',
+      description: 'Wealth building, income generation, debt management, and comprehensive investment education including shares and property.'
+    }
+  ];
+
+  const handleImageUpload = (credentialId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImages(prev => ({
+          ...prev,
+          [credentialId]: e.target?.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <div className="mt-12 pt-8 border-t border-gray-200">
+      <h3 className="text-xl font-semibold text-green-800 mb-6">🎓 Your Four Micro-Credentials</h3>
+      
+      <div className="grid md:grid-cols-4 gap-4">
+        {microCredentials.map((credential) => (
+          <div key={credential.id} className="relative">
+            <div
+              className={`cursor-pointer transition-all duration-300 hover:scale-105 border-2 rounded-lg p-4 ${
+                selectedCredential === credential.id 
+                  ? 'border-green-500 bg-green-50' 
+                  : 'border-gray-300 bg-white hover:border-gray-400'
+              }`}
+              onClick={() => setSelectedCredential(selectedCredential === credential.id ? null : credential.id)}
+            >
+              <div className="aspect-square mb-3 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                {uploadedImages[credential.id] ? (
+                  <img 
+                    src={uploadedImages[credential.id]} 
+                    alt={credential.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center p-2">
+                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                    <p className="text-xs text-gray-500">Click to upload image</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(credential.id, e)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </div>
+                )}
+              </div>
+              <h4 className="font-semibold text-sm text-gray-800 text-center">{credential.title}</h4>
+            </div>
+            
+            {selectedCredential === credential.id && (
+              <div className="absolute top-full left-0 right-0 z-10 mt-2 p-4 bg-white border border-green-300 rounded-lg shadow-lg">
+                <h5 className="font-bold text-green-800 mb-2">{credential.banner}</h5>
+                <p className="text-sm text-gray-700">{credential.description}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const LessonExplorerWithIcon = () => {
+  const [uploadedIcon, setUploadedIcon] = useState<string | null>(null);
+
+  const handleIconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedIcon(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <div className="mt-12 pt-8 border-t border-gray-200">
+      <div className="flex items-center mb-6">
+        <div className="w-16 h-16 mr-4 bg-gray-100 border-2 border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+          {uploadedIcon ? (
+            <img 
+              src={uploadedIcon} 
+              alt="Lesson icon"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="text-center">
+              <Upload className="h-6 w-6 mx-auto mb-1 text-gray-400" />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleIconUpload}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+              <p className="text-xs text-gray-500">Upload</p>
+            </div>
+          )}
+        </div>
+        <h3 className="text-xl font-semibold text-green-800">📚 Explore All 42 Financial Literacy Lessons</h3>
+      </div>
+      <LessonExplorer />
+    </div>
+  );
+};
+
+const TextbookPreview = () => {
+  return (
+    <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+      <h4 className="text-lg font-semibold text-blue-800 mb-4">📖 Interactive Textbook Preview</h4>
+      <div className="aspect-video bg-white rounded-lg border border-blue-300 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-2">FlipHTML5 Textbook Embed</p>
+          <p className="text-sm text-gray-500">Interactive lesson previews will be embedded here</p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export const QuoteBuilder = () => {
@@ -558,7 +714,7 @@ export const QuoteBuilder = () => {
                         </div>
                         <div className="flex items-center mb-1">
                           <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>{unlimitedAddOns.teacherBooks || 0}x Teacher Print Textbooks</span>
+                          <span>{unlimitedAddOns.teacherBooks || 0}x Print Teacher Textbooks</span>
                         </div>
                         <div className="flex items-center mb-1">
                           <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
@@ -570,8 +726,14 @@ export const QuoteBuilder = () => {
                         </div>
                         <div className="flex items-center mb-1">
                           <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>{unlimitedAddOns.studentBooks || 0}x Student Print Textbooks</span>
+                          <span>{unlimitedAddOns.studentBooks || 0}x Print Student Textbooks</span>
                         </div>
+                        {unlimitedAddOns.posterA0 > 0 && (
+                          <div className="flex items-center mb-1">
+                            <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                            <span>{unlimitedAddOns.posterA0}x A0 Posters</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -597,7 +759,7 @@ export const QuoteBuilder = () => {
                           🎉 Volume Discount Active!
                         </div>
                         <div className="text-green-700 text-xs text-center">
-                          Saving ${volumeSavings.toLocaleString()} total (${((selectedStudentData?.basePrice.student || 0) - calculateStudentPrice(selectedStudentData!)).toFixed(0)} per student)
+                          Saving ${volumeSavings.toLocaleString()} total (${((selectedTeacherData?.basePrice.teacher || 0) - calculateStudentPrice(selectedStudentData!)).toFixed(0)} per student)
                         </div>
                       </div>
                     )}
@@ -609,12 +771,12 @@ export const QuoteBuilder = () => {
                           <>
                             <div className="flex items-center mb-1">
                               <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                              <span>{teacherCount}x Teacher Digital Pass{selectedTeacherData.id.includes('digital') || selectedTeacherData.id.includes('both') ? 'es' : ''}</span>
+                              <span>{teacherCount}x Teacher Digital Pass{(selectedTeacherData.id.includes('digital') || selectedTeacherData.id.includes('both')) ? 'es' : ''}</span>
                             </div>
                             {(selectedTeacherData.id.includes('physical') || selectedTeacherData.id.includes('both')) && (
                               <div className="flex items-center mb-1">
                                 <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                                <span>{teacherCount}x Teacher Print Textbook{teacherCount > 1 ? 's' : ''}</span>
+                                <span>{teacherCount}x Print Teacher Textbook{teacherCount > 1 ? 's' : ''}</span>
                               </div>
                             )}
                             <div className="flex items-center mb-1">
@@ -627,12 +789,12 @@ export const QuoteBuilder = () => {
                           <>
                             <div className="flex items-center mb-1">
                               <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
-                              <span>{studentCount}x Student Digital Pass{selectedStudentData.id.includes('digital') || selectedStudentData.id.includes('both') ? 'es' : ''}</span>
+                              <span>{studentCount}x Student Digital Pass{(selectedStudentData.id.includes('digital') || selectedStudentData.id.includes('both')) ? 'es' : ''}</span>
                             </div>
                             {(selectedStudentData.id.includes('physical') || selectedStudentData.id.includes('both')) && (
                               <div className="flex items-center mb-1">
                                 <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
-                                <span>{studentCount}x Student Print Textbook{studentCount > 1 ? 's' : ''}</span>
+                                <span>{studentCount}x Print Student Textbook{studentCount > 1 ? 's' : ''}</span>
                               </div>
                             )}
                           </>
@@ -657,6 +819,24 @@ export const QuoteBuilder = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Student Bundle Benefits */}
+                {selectedStudentData && selectedStudentData.id === 'student-both' && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <div className="text-blue-800 font-medium text-sm text-center">
+                      ✨ Includes free intro lesson + pre & post-program testing
+                    </div>
+                  </div>
+                )}
+
+                {/* All options include intro lesson */}
+                {hasValidSelection && (
+                  <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
+                    <div className="text-yellow-800 font-medium text-sm text-center">
+                      ✨ Includes free intro lesson
+                    </div>
+                  </div>
+                )}
               </Card>
             </div>
           </div>
@@ -672,7 +852,7 @@ export const QuoteBuilder = () => {
                 <div className="text-4xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">⭐</div>
               </div>
               <p className="text-lg text-green-700">
-                Complete summary of your selections • Download PDF or Place Order
+                Use this quote for internal approval purposes or to place your program order
               </p>
               <div className="flex items-center justify-center mt-2">
                 <ArrowDown className="h-5 w-5 text-green-600 mr-2 animate-bounce" />
@@ -729,8 +909,14 @@ export const QuoteBuilder = () => {
           </div>
         )}
 
-        {/* Lesson Explorer */}
-        <LessonExplorer />
+        {/* Lesson Explorer with Icon */}
+        <LessonExplorerWithIcon />
+
+        {/* Micro-Credentials Section */}
+        <MicroCredentialsSection />
+
+        {/* Textbook Preview */}
+        <TextbookPreview />
       </div>
     </div>
   );

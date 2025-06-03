@@ -61,19 +61,21 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   if (!selectedTier) return null;
 
+  // Calculate potential savings (placeholder logic)
+  const estimatedSavings = Math.floor(totalPrice * 0.1); // 10% example savings
+
   return (
     <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
       <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
       <p className="text-white/90 mb-6">
-        Your quote for {selectedTier.name} is ready at ${totalPrice.toLocaleString()} (inc. GST)
+        Lock in your ${totalPrice.toLocaleString()} price (including ${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.
       </p>
       
-      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-3xl mx-auto">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-4xl mx-auto">
         <Button
           onClick={handleExportPDF}
-          variant="secondary"
           size="lg"
-          className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-2 border-white hover:shadow-xl"
+          className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem]"
         >
           <FileText className="h-5 w-5 mr-2" />
           Export Quote as PDF
@@ -81,9 +83,8 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         
         <Button
           onClick={handleBooklistingEnquiry}
-          variant="secondary"
           size="lg"
-          className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-2 border-white hover:shadow-xl"
+          className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem]"
         >
           <MessageCircle className="h-5 w-5 mr-2" />
           Enquire about Booklisting
@@ -92,7 +93,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <Button
           onClick={handlePlaceOrder}
           size="lg"
-          className="flex-1 bg-white hover:bg-gray-50 text-orange-600 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-2 border-white text-lg hover:text-orange-700 hover:shadow-xl"
+          className="flex-1 bg-white hover:bg-gray-50 text-orange-600 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:text-orange-700 hover:shadow-xl min-h-[3rem]"
         >
           <Plus className="h-5 w-5 mr-2" />
           Place Order Now
