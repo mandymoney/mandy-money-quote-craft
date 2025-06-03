@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -13,8 +14,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 export interface PricingTier {
   id: string;
@@ -73,6 +77,14 @@ interface SchoolInfo {
   purchaseOrderNumber: string;
   paymentPreference: string;
   supplierSetupForms: string;
+}
+
+interface MicroCredential {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  details: string;
 }
 
 const teacherTiers: PricingTier[] = [
@@ -456,7 +468,7 @@ export const QuoteBuilder = () => {
           count: unlimitedAddOns.teacherBooks,
           unitPrice: unlimitedTier.addOns.teacherBooks,
           totalPrice: unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks,
-          type: 'addon',
+          type: 'teacher',
           description: 'Physical teacher textbooks'
         });
       }
@@ -467,7 +479,7 @@ export const QuoteBuilder = () => {
           count: unlimitedAddOns.studentBooks,
           unitPrice: unlimitedTier.addOns.studentBooks,
           totalPrice: unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks,
-          type: 'addon',
+          type: 'student',
           description: 'Physical student textbooks'
         });
       }
@@ -523,6 +535,25 @@ export const QuoteBuilder = () => {
     return breakdown;
   };
 
+  const getTotalSavings = (): number => {
+    const totalStudents = getTotalStudentCount();
+    let totalSavings = 0;
+    
+    studentTiers.forEach(tier => {
+      const count = selectedStudentTiers[tier.id] || 0;
+      if (count > 0) {
+        const currentPrice = calculateStudentPrice(tier, totalStudents);
+        const originalPrice = tier.basePrice.student;
+        const savings = originalPrice - currentPrice;
+        if (savings > 0) {
+          totalSavings += savings * count;
+        }
+      }
+    });
+    
+    return totalSavings;
+  };
+
   const handleCredentialFlip = (id: string) => {
     setFlippedCredentials(prev => {
       const newSet = new Set(prev);
@@ -561,6 +592,7 @@ export const QuoteBuilder = () => {
 
   const regularPricing = calculateRegularTotal();
   const volumeNotification = getVolumeNotification();
+  const totalSavings = getTotalSavings();
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -588,15 +620,6 @@ export const QuoteBuilder = () => {
 
         {/* Video Embed */}
         <VideoEmbed />
-
-        {/* Volume Notification */}
-        {volumeNotification && (
-          <Card className="mb-8 p-4 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
-            <div className="text-center">
-              <p className="text-orange-800 font-semibold">{volumeNotification}</p>
-            </div>
-          </Card>
-        )}
 
         <div className="grid lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3">
@@ -789,6 +812,11 @@ export const QuoteBuilder = () => {
                   {regularPricing.shipping === 0 && hasPhysicalItems() && (
                     <div className="text-xs text-green-600">Free shipping included</div>
                   )}
+                  {totalSavings > 0 && (
+                    <div className="text-sm text-green-600 font-medium">
+                      Volume discount: Save ${totalSavings.toFixed(0)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Program Inclusions */}
@@ -827,24 +855,62 @@ export const QuoteBuilder = () => {
         </div>
 
         {/* Official Quote Section */}
-        <div className="mt-12 border-t-4 border-green-600 pt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-8">
-          <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-8 mb-4">
-              <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
-              <h2 className="text-3xl font-bold text-green-800">📋 Official Program Quote</h2>
-              <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
+        <div className="mt-12 bg-white rounded-lg shadow-lg overflow-hidden">
+          {/* Navy Header Banner */}
+          <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white p-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-4 mb-3">
+                <div className="text-3xl">📋</div>
+                <h2 className="text-3xl font-bold">Official Program Quote</h2>
+                <div className="text-3xl">📋</div>
+              </div>
+              
+              {/* School Name and Quote Validity */}
+              {schoolInfo.schoolName && (
+                <div className="text-xl font-semibold mb-2">{schoolInfo.schoolName}</div>
+              )}
+              <div className="text-sm opacity-90">
+                Quote valid until 31st December, {new Date().getFullYear()}
+              </div>
             </div>
-            
-            {/* School Name and Quote Validity */}
-            {schoolInfo.schoolName && (
-              <div className="text-xl font-semibold text-green-700 mb-2">{schoolInfo.schoolName}</div>
-            )}
-            <div className="text-sm text-gray-600 mb-4">
-              Quote valid until 31st December, {new Date().getFullYear()}
+          </div>
+
+          <div className="p-8">
+            {/* Program Start Date */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Program Access Period</h3>
+              <div className="flex justify-center">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-64 justify-start text-left font-normal",
+                        !programStartDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={programStartDate}
+                      onSelect={(date) => date && setProgramStartDate(date)}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="text-center mt-3 text-sm text-gray-600">
+                Access period: {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
+              </div>
             </div>
             
             {/* School Information Form */}
-            <Card className="max-w-4xl mx-auto mb-6 p-6 bg-white">
+            <Card className="mb-8 p-6 bg-gray-50">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">School Information</h3>
               <p className="text-sm text-gray-600 mb-4">Information not required unless placing an order</p>
               
@@ -959,136 +1025,164 @@ export const QuoteBuilder = () => {
                 </Select>
               </div>
             </Card>
-          </div>
 
-          {/* Two Column Layout for Official Quote */}
-          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Left Column - Investment Breakdown */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">📊 Investment Breakdown</h3>
-              
-              <div className="space-y-3">
-                {getDetailedBreakdown().map((item, index) => (
-                  <div key={index} className="border-b border-gray-100 pb-3">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-800">{item.item}</div>
-                        <div className="text-xs text-gray-500 mt-1">{item.description}</div>
-                        <div className="text-sm text-gray-600 mt-1">
-                          {item.count} × ${item.unitPrice.toLocaleString()}
-                          {item.savings && item.savings > 0 && (
-                            <span className="text-green-600 ml-2">
-                              (Save ${item.savings.toFixed(0)} each)
-                            </span>
+            {/* Two Column Layout for Official Quote */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Left Column - Investment Breakdown */}
+              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                <h3 className="text-lg font-semibold mb-4 text-slate-800 flex items-center">
+                  📊 Investment Breakdown
+                </h3>
+                
+                <div className="space-y-4">
+                  {getDetailedBreakdown().map((item, index) => (
+                    <div key={index} className="border-b border-slate-200 pb-4 last:border-b-0">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-3 h-3 rounded-full ${
+                              item.type === 'teacher' ? 'bg-teal-500' :
+                              item.type === 'student' ? 'bg-yellow-500' :
+                              'bg-blue-500'
+                            }`}></div>
+                            <div className="font-semibold text-slate-800">{item.item}</div>
+                            <Badge variant="outline" className={`text-xs ${
+                              item.type === 'teacher' ? 'border-teal-300 text-teal-700' :
+                              item.type === 'student' ? 'border-yellow-300 text-yellow-700' :
+                              'border-blue-300 text-blue-700'
+                            }`}>
+                              {item.type === 'teacher' ? 'Teacher' : 
+                               item.type === 'student' ? 'Student' : 
+                               'Add-on'}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-slate-600 mt-1 ml-5">{item.description}</div>
+                          <div className="text-sm text-slate-700 mt-2 ml-5">
+                            <span className="font-medium">{item.count}</span> × <span className="font-medium">${item.unitPrice.toLocaleString()}</span>
+                            {item.savings && item.savings > 0 && (
+                              <span className="text-green-600 ml-2 font-medium">
+                                (Save ${item.savings.toFixed(0)} each!)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <div className="font-bold text-lg text-slate-800">${item.totalPrice.toLocaleString()}</div>
+                          {item.originalUnitPrice && item.originalUnitPrice > item.unitPrice && (
+                            <div className="text-xs text-slate-400 line-through">
+                              ${(item.originalUnitPrice * item.count).toLocaleString()}
+                            </div>
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-bold text-lg">${item.totalPrice.toLocaleString()}</div>
-                        {item.originalUnitPrice && item.originalUnitPrice > item.unitPrice && (
-                          <div className="text-xs text-gray-400 line-through">
-                            ${(item.originalUnitPrice * item.count).toLocaleString()}
-                          </div>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                ))}
-                
-                {/* Shipping */}
-                {hasPhysicalItems() && (
-                  <div className="border-b border-gray-100 pb-3">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium text-gray-800">Shipping</div>
-                        <div className="text-xs text-gray-500">
-                          {regularPricing.shipping === 0 ? 'Free shipping (order over $90)' : 'Standard shipping'}
+                  ))}
+                  
+                  {/* Shipping */}
+                  {hasPhysicalItems() && (
+                    <div className="border-b border-slate-200 pb-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-semibold text-slate-800">Shipping</div>
+                          <div className="text-xs text-slate-600">
+                            {regularPricing.shipping === 0 ? 'Free shipping (order over $90)' : 'Standard shipping'}
+                          </div>
+                        </div>
+                        <div className="font-bold text-lg text-slate-800">
+                          {regularPricing.shipping === 0 ? (
+                            <span className="text-green-600">FREE</span>
+                          ) : (
+                            `$${regularPricing.shipping}`
+                          )}
                         </div>
                       </div>
-                      <div className="font-bold text-lg">
-                        {regularPricing.shipping === 0 ? 'FREE' : `$${regularPricing.shipping}`}
-                      </div>
                     </div>
-                  </div>
-                )}
-                
-                {/* GST */}
-                <div className="border-b border-gray-100 pb-3">
-                  <div className="flex justify-between items-center text-sm text-gray-600">
-                    <span>Subtotal (exc. GST)</span>
-                    <span>${regularPricing.subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm text-gray-600">
-                    <span>GST (10%)</span>
-                    <span>${regularPricing.gst.toFixed(2)}</span>
-                  </div>
-                </div>
-                
-                {/* Total */}
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <div className="text-xl font-bold text-green-800">Total Investment</div>
-                    <div className="text-2xl font-bold text-green-800">${regularPricing.total.toLocaleString()}</div>
-                  </div>
-                  <div className="text-sm text-green-600 text-right mt-1">
-                    (Price includes 10% GST)
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Program Inclusions */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">What's Included</h3>
-              
-              <div className="space-y-3">
-                {getIncludedItems().map((item, index) => {
-                  const isUnlimitedItem = useUnlimited;
-                  const itemType = isUnlimitedItem ? 'both' : (typeof item === 'object' ? item.type : 'both');
-                  const itemText = typeof item === 'object' ? item.text : item;
+                  )}
                   
-                  return (
-                    <div key={index} className={`p-3 rounded-lg flex items-center ${
-                      itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' :
-                      itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' :
-                      'bg-gradient-to-r from-blue-50 to-blue-100'
-                    }`}>
-                      <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${
-                        itemType === 'teacher' ? 'text-teal-600' :
-                        itemType === 'student' ? 'text-yellow-600' :
-                        'text-blue-600'
-                      }`} />
-                      <span className={`text-sm font-medium ${
-                        itemType === 'teacher' ? 'text-teal-800' :
-                        itemType === 'student' ? 'text-yellow-800' :
-                        'text-blue-800'
-                      }`}>{itemText}</span>
+                  {/* Tax breakdown */}
+                  <div className="space-y-2 py-4 bg-slate-100 rounded-lg px-4">
+                    <div className="flex justify-between items-center text-sm text-slate-600">
+                      <span>Subtotal (exc. GST)</span>
+                      <span>${regularPricing.subtotal.toFixed(2)}</span>
                     </div>
-                  );
-                })}
+                    <div className="flex justify-between items-center text-sm text-slate-600">
+                      <span>GST (10%)</span>
+                      <span>${regularPricing.gst.toFixed(2)}</span>
+                    </div>
+                    {regularPricing.shipping > 0 && (
+                      <div className="flex justify-between items-center text-sm text-slate-600">
+                        <span>Shipping</span>
+                        <span>${regularPricing.shipping}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Total */}
+                  <div className="bg-green-600 text-white p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <div className="text-xl font-bold">Total Investment</div>
+                      <div className="text-2xl font-bold">${regularPricing.total.toLocaleString()}</div>
+                    </div>
+                    <div className="text-sm opacity-90 text-right mt-1">
+                      (Price includes 10% GST)
+                    </div>
+                  </div>
+                </div>
               </div>
-              
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h4 className="font-semibold text-blue-800 mb-2">Program Access Period</h4>
-                <div className="text-sm text-blue-700">
-                  <div><strong>Program starts:</strong> {format(programStartDate, 'MMMM d, yyyy')}</div>
-                  <div><strong>Access ends:</strong> {format(addMonths(programStartDate, 12), 'MMMM d, yyyy')}</div>
-                  <div className="text-xs mt-1 text-blue-600">12 months of full access included</div>
+
+              {/* Right Column - Program Inclusions */}
+              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                <h3 className="text-lg font-semibold mb-4 text-slate-800">What's Included</h3>
+                
+                <div className="space-y-3 mb-6">
+                  {getIncludedItems().map((item, index) => {
+                    const isUnlimitedItem = useUnlimited;
+                    const itemType = isUnlimitedItem ? 'both' : (typeof item === 'object' ? item.type : 'both');
+                    const itemText = typeof item === 'object' ? item.text : item;
+                    
+                    return (
+                      <div key={index} className={`p-3 rounded-lg flex items-center ${
+                        itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' :
+                        itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' :
+                        'bg-gradient-to-r from-blue-50 to-blue-100'
+                      }`}>
+                        <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${
+                          itemType === 'teacher' ? 'text-teal-600' :
+                          itemType === 'student' ? 'text-yellow-600' :
+                          'text-blue-600'
+                        }`} />
+                        <span className={`text-sm font-medium ${
+                          itemType === 'teacher' ? 'text-teal-800' :
+                          itemType === 'student' ? 'text-yellow-800' :
+                          'text-blue-800'
+                        }`}>{itemText}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">Access Period Summary</h4>
+                  <div className="text-sm text-blue-700 space-y-1">
+                    <div><strong>Program starts:</strong> {format(programStartDate, 'MMMM d, yyyy')}</div>
+                    <div><strong>Access ends:</strong> {format(addMonths(programStartDate, 12), 'MMMM d, yyyy')}</div>
+                    <div className="text-xs mt-2 text-blue-600">Full 12-month access to all digital content and resources</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-6">
-            <ActionButtons
-              selectedTier={{ 
-                name: 'Custom Selection',
-                id: 'combined'
-              }}
-              totalPrice={regularPricing.total}
-              teacherCount={getTotalTeacherCount()}
-              studentCount={getTotalStudentCount()}
-            />
+            <div className="mt-8">
+              <ActionButtons
+                selectedTier={{ 
+                  name: 'Custom Selection',
+                  id: 'combined'
+                }}
+                totalPrice={regularPricing.total}
+                teacherCount={getTotalTeacherCount()}
+                studentCount={getTotalStudentCount()}
+              />
+            </div>
           </div>
         </div>
 
@@ -1102,9 +1196,53 @@ export const QuoteBuilder = () => {
           <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
             <h2 className="text-4xl font-bold mb-2">✨ Explore your included materials ✨</h2>
           </div>
-          <div className="flex justify-center items-center mt-4">
+          <div className="flex justify-center items-center mt-6">
             <ArrowDown className="h-6 w-6 text-gray-600 animate-bounce" />
             <span className="ml-2 text-gray-600">Scroll down to explore</span>
+          </div>
+        </div>
+
+        {/* Micro-Credentials Section */}
+        <div className="mt-16 mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Your Four Micro-Credentials</h2>
+            <p className="text-gray-600">Hover over each credential to learn more</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {microCredentials.map((credential) => (
+              <div
+                key={credential.id}
+                className="perspective-1000 h-64"
+                onMouseEnter={() => handleCredentialFlip(credential.id)}
+                onMouseLeave={() => handleCredentialFlip(credential.id)}
+              >
+                <div className={`relative w-full h-full transform-style-preserve-3d transition-transform duration-700 ${
+                  flippedCredentials.has(credential.id) ? 'rotate-y-180' : ''
+                }`}>
+                  {/* Front */}
+                  <div className="absolute inset-0 backface-hidden rounded-lg overflow-hidden shadow-lg">
+                    <img
+                      src={credential.image}
+                      alt={credential.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                      <div className="absolute bottom-4 left-4 text-white">
+                        <h3 className="font-bold text-lg">{credential.title}</h3>
+                        <p className="text-sm opacity-90">{credential.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Back */}
+                  <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-6 flex flex-col justify-center text-white shadow-lg">
+                    <h3 className="font-bold text-xl mb-4">{credential.title}</h3>
+                    <p className="text-sm leading-relaxed">{credential.details}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
