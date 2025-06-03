@@ -72,11 +72,11 @@ export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 text-center">
       <label className={cn("block text-sm font-medium", colors.label)}>
         {label}
       </label>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-center space-x-2">
         <Button
           type="button"
           variant="outline"

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -350,7 +349,7 @@ const LessonExplorerWithIcon = () => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-center">
+            <div className="text-center relative">
               <Upload className="h-6 w-6 mx-auto mb-1 text-gray-400" />
               <input
                 type="file"
@@ -362,7 +361,7 @@ const LessonExplorerWithIcon = () => {
             </div>
           )}
         </div>
-        <h3 className="text-xl font-semibold text-green-800">📚 Explore All 42 Financial Literacy Lessons</h3>
+        <h3 className="text-xl font-semibold text-green-800">Explore All 42 Financial Literacy Lessons</h3>
       </div>
       <LessonExplorer />
     </div>
@@ -372,11 +371,11 @@ const LessonExplorerWithIcon = () => {
 const TextbookPreview = () => {
   return (
     <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-      <h4 className="text-lg font-semibold text-blue-800 mb-4">📖 Interactive Textbook Preview</h4>
+      <h4 className="text-lg font-semibold text-blue-800 mb-4">How Do Micro-Credentials Work?</h4>
       <div className="aspect-video bg-white rounded-lg border border-blue-300 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-2">FlipHTML5 Textbook Embed</p>
-          <p className="text-sm text-gray-500">Interactive lesson previews will be embedded here</p>
+          <p className="text-gray-600 mb-2">Canva Public View Link</p>
+          <p className="text-sm text-gray-500">Interactive credential explanation will be embedded here</p>
         </div>
       </div>
     </div>
@@ -508,10 +507,15 @@ export const QuoteBuilder = () => {
             {/* Step 1: Teacher Section */}
             <Card className="mb-8 p-6 bg-white shadow-sm border-2" style={{ borderImage: 'linear-gradient(135deg, #005653, #45c0a9, #80dec4) 1' }}>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2" style={{ color: '#005653' }}>
+                <div className="text-center mb-4">
+                  <div className="inline-block bg-gradient-to-r from-[#005653] to-[#45c0a9] text-white px-6 py-2 rounded-full text-lg font-bold">
+                    Teacher Options
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold mb-2 text-center" style={{ color: '#005653' }}>
                   Step 1: Select your Teacher Program Elements
                 </h2>
-                <p style={{ color: '#45c0a9' }}>Choose the teaching resources that work best for your classroom</p>
+                <p className="text-center" style={{ color: '#45c0a9' }}>Choose the teaching resources that work best for your classroom</p>
               </div>
               
               <div className="mb-6 flex justify-center">
@@ -563,10 +567,15 @@ export const QuoteBuilder = () => {
             {/* Step 2: Student Section */}
             <Card className="mb-8 p-6 bg-white shadow-sm border-2" style={{ borderImage: 'linear-gradient(135deg, #ffb512, #ffde5a, #fea100) 1' }}>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2" style={{ color: '#fea100' }}>
+                <div className="text-center mb-4">
+                  <div className="inline-block bg-gradient-to-r from-[#ffb512] to-[#fea100] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Student Options
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold mb-2 text-center" style={{ color: '#fea100' }}>
                   Step 2: Select your Student Program Elements
                 </h2>
-                <p style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
+                <p className="text-center" style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
               </div>
               
               <div className="mb-6 flex justify-center">
@@ -584,7 +593,7 @@ export const QuoteBuilder = () => {
 
               {nextDiscount && (
                 <div className="mb-6 text-center">
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-lg px-4 py-2">
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-sm px-3 py-1">
                     🎯 Add {nextDiscount.studentsToGo} more student{nextDiscount.studentsToGo > 1 ? 's' : ''} to unlock volume discounts at {nextDiscount.threshold}+ students!
                   </Badge>
                 </div>
@@ -637,7 +646,7 @@ export const QuoteBuilder = () => {
             {showUnlimitedSuggestion && (
               <Card className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
                 <div className="flex items-center space-x-3">
-                  <div className="text-4xl">🎓</div>
+                  <div className="text-4xl">👇</div>
                   <div>
                     <h3 className="font-bold text-blue-800 text-lg">Consider Our Unlimited School Access Option!</h3>
                     <p className="text-blue-700">
@@ -714,20 +723,24 @@ export const QuoteBuilder = () => {
                         </div>
                         <div className="flex items-center mb-1">
                           <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>{unlimitedAddOns.teacherBooks || 0}x Print Teacher Textbooks</span>
+                          <span>Unlimited Student Digital Passes</span>
                         </div>
                         <div className="flex items-center mb-1">
                           <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
                           <span>Unlimited Classroom Spaces</span>
                         </div>
-                        <div className="flex items-center mb-1">
-                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>Unlimited Student Digital Passes</span>
-                        </div>
-                        <div className="flex items-center mb-1">
-                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>{unlimitedAddOns.studentBooks || 0}x Print Student Textbooks</span>
-                        </div>
+                        {unlimitedAddOns.teacherBooks > 0 && (
+                          <div className="flex items-center mb-1">
+                            <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                            <span>{unlimitedAddOns.teacherBooks}x Print Teacher Textbooks</span>
+                          </div>
+                        )}
+                        {unlimitedAddOns.studentBooks > 0 && (
+                          <div className="flex items-center mb-1">
+                            <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                            <span>{unlimitedAddOns.studentBooks}x Print Student Textbooks</span>
+                          </div>
+                        )}
                         {unlimitedAddOns.posterA0 > 0 && (
                           <div className="flex items-center mb-1">
                             <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
@@ -809,31 +822,23 @@ export const QuoteBuilder = () => {
                   </div>
                 )}
 
-                {/* Digital Pass Benefits */}
-                {((selectedTeacherData && selectedTeacherData.id.includes('digital')) || 
-                  (selectedStudentData && selectedStudentData.id.includes('digital')) || 
-                  useUnlimited) && (
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                    <div className="text-blue-800 font-medium text-sm text-center">
-                      ✨ Includes free intro lesson + pre & post-program testing
+                {/* Benefits */}
+                {hasValidSelection && (
+                  <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
+                    <div className="text-yellow-800 font-medium text-sm text-center">
+                      ✨ Includes free intro lesson
                     </div>
                   </div>
                 )}
 
                 {/* Student Bundle Benefits */}
-                {selectedStudentData && selectedStudentData.id === 'student-both' && (
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                {(selectedStudentData && selectedStudentData.id === 'student-both') || 
+                 ((selectedTeacherData && selectedTeacherData.id.includes('digital')) || 
+                  (selectedStudentData && selectedStudentData.id.includes('digital')) || 
+                  useUnlimited) && (
+                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                     <div className="text-blue-800 font-medium text-sm text-center">
                       ✨ Includes free intro lesson + pre & post-program testing
-                    </div>
-                  </div>
-                )}
-
-                {/* All options include intro lesson */}
-                {hasValidSelection && (
-                  <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
-                    <div className="text-yellow-800 font-medium text-sm text-center">
-                      ✨ Includes free intro lesson
                     </div>
                   </div>
                 )}
