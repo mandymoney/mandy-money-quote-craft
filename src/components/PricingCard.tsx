@@ -1,10 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Image, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Image } from 'lucide-react';
 import { PricingTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
+import { ExpandableSection } from './ExpandableSection';
+import { PricingDisplay } from './PricingDisplay';
 
 interface PricingCardProps {
   tier: PricingTier;
@@ -41,9 +43,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   savings = 0,
   volumeSelector
 }) => {
-  const [isInclusionsExpanded, setIsInclusionsExpanded] = useState(false);
-  const [isNotIncludedExpanded, setIsNotIncludedExpanded] = useState(false);
-
   const getGradientClass = () => {
     if (customGradient) return '';
     if (colorScheme === 'yellow') {
@@ -124,75 +123,24 @@ export const PricingCard: React.FC<PricingCardProps> = ({
 
         <p className="text-gray-600 text-sm mb-4 min-h-[40px]">{tier.description}</p>
 
-        {/* Best For - Hidden on mobile */}
-        {tier.bestFor && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg hidden md:block">
-            <div className="flex items-center text-amber-800">
-              <span className="text-sm font-medium">Best for: {tier.bestFor}</span>
-            </div>
-          </div>
-        )}
-
         {/* Pricing with savings */}
-        <div className={cn(
-          "mb-6 rounded-lg p-4 text-center",
-          colorScheme === 'yellow' ? 'bg-yellow-50' : 'bg-teal-50'
-        )}>
-          <div className={cn(
-            "text-2xl font-bold",
-            colorScheme === 'yellow' ? 'text-yellow-900' : 'text-teal-900'
-          )}>
-            ${(studentPrice || price).toLocaleString()}
-          </div>
-          <div className={cn(
-            "text-sm",
-            colorScheme === 'yellow' ? 'text-yellow-600' : 'text-teal-600'
-          )}>
-            per {tier.type} (inc. GST)
-          </div>
-          
-          {/* Volume savings display */}
-          {showSavings && savings > 0 && (
-            <div className="mt-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
-              Save ${savings}/student!
-            </div>
-          )}
-        </div>
+        <PricingDisplay
+          price={price}
+          studentPrice={studentPrice}
+          tierType={tier.type}
+          showSavings={showSavings}
+          savings={savings}
+          colorScheme={colorScheme}
+        />
 
         {/* Mobile: Expandable Inclusions */}
-        <div className="md:hidden mb-4">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsInclusionsExpanded(!isInclusionsExpanded);
-            }}
-            className={cn(
-              "w-full flex items-center justify-between p-3 rounded-lg text-sm font-semibold",
-              colorScheme === 'yellow' ? 'bg-yellow-50 text-yellow-700' : 'bg-teal-50 text-teal-700'
-            )}
-          >
-            <span>Inclusions ({allInclusions.length})</span>
-            {isInclusionsExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-          
-          {isInclusionsExpanded && (
-            <div className="mt-2 space-y-2">
-              {allInclusions.map((inclusion, index) => (
-                <div key={index} className="flex items-center text-sm text-gray-700 px-3">
-                  <Check className={cn(
-                    "h-3 w-3 mr-2 flex-shrink-0",
-                    colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
-                  )} />
-                  <span>{inclusion}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ExpandableSection
+          title="Inclusions"
+          items={allInclusions}
+          colorScheme={colorScheme}
+          isPositive={true}
+          className="md:hidden mb-4"
+        />
 
         {/* Desktop: All Inclusions - displayed without expandable */}
         <div className="hidden md:block space-y-2 mb-4">
@@ -213,47 +161,26 @@ export const PricingCard: React.FC<PricingCardProps> = ({
 
         {/* What's Not Included - Mobile: Expandable, Desktop: Always shown */}
         {tier.notIncluded && tier.notIncluded.length > 0 && (
-          <div className="space-y-2 mb-4">
+          <>
             {/* Mobile: Expandable */}
-            <div className="md:hidden">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsNotIncludedExpanded(!isNotIncludedExpanded);
-                }}
-                className="w-full flex items-center justify-between p-3 rounded-lg text-sm font-semibold bg-gray-50 text-gray-700"
-              >
-                <span>What's Not Included ({tier.notIncluded.length})</span>
-                {isNotIncludedExpanded ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </button>
-              
-              {isNotIncludedExpanded && (
-                <div className="mt-2 space-y-2">
-                  {tier.notIncluded.map((notIncluded, index) => (
-                    <div key={index} className="flex items-center text-sm text-gray-500 px-3">
-                      <X className="h-3 w-3 text-red-400 mr-2 flex-shrink-0" />
-                      <span>{notIncluded}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ExpandableSection
+              title="What's Not Included"
+              items={tier.notIncluded}
+              isPositive={false}
+              className="md:hidden mb-4"
+            />
 
             {/* Desktop: Always shown */}
-            <div className="hidden md:block">
+            <div className="hidden md:block space-y-2 mb-4">
               <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
               {tier.notIncluded.map((notIncluded, index) => (
                 <div key={index} className="flex items-center text-sm text-gray-500">
-                  <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
+                  <Check className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
                   <span>{notIncluded}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </>
         )}
 
         {/* Selection Indicator */}
