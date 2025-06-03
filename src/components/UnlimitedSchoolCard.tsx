@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Check, Image, TrendingUp, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, Image, TrendingUp, Plus, Upload } from 'lucide-react';
 import { UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +40,8 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
   studentCount,
   regularPricing
 }) => {
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+
   const handleTeacherBooksChange = (value: string) => {
     const newCount = Math.max(0, parseInt(value) || 0);
     onAddOnsChange({ ...addOns, teacherBooks: newCount });
@@ -54,12 +57,23 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
     onAddOnsChange({ ...addOns, posterA0: newCount });
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const savings = regularPricing.total - pricing.total;
   const percentSavings = Math.round((savings / regularPricing.total) * 100);
 
   return (
     <div className="relative">
-      {/* Main card without flashing animation */}
+      {/* Main card */}
       <div
         className={cn(
           'relative cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl',
@@ -71,7 +85,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
         }}
         onClick={onSelect}
       >
-        {/* Animated Value Comparison */}
+        {/* Savings Badge */}
         {savings > 0 && (
           <div className="absolute -top-4 -right-4 bg-red-500 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg">
             <div className="flex items-center">
@@ -82,7 +96,50 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
           </div>
         )}
 
-        <div className="p-8 pb-16"> {/* Added bottom padding for banner */}
+        <div className="p-8 pb-16">
+          {/* Image Upload Section */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-800 mb-2">
+              Upload Banner Image (Optional)
+            </label>
+            <div className="relative">
+              {uploadedImage ? (
+                <div className="relative">
+                  <img 
+                    src={uploadedImage} 
+                    alt="Uploaded banner" 
+                    className="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+                  />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUploadedImage(null);
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-400 rounded-lg p-4 bg-white/50">
+                  <div className="text-center">
+                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-600" />
+                    <p className="text-sm text-gray-700 mb-2">Click to upload banner image</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Main Content */}
             <div>
@@ -103,18 +160,16 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                 </div>
               </div>
 
-              {/* Add-on Options - Simplified with + signs */}
+              {/* Add-on Options */}
               <div className="space-y-4">
                 <h4 className="text-xl font-semibold text-gray-800 flex items-center">
-                  <Plus className="h-5 w-5 mr-2" />
-                  + Optional Hard-Copy Add-ons
+                  Optional Hard-Copy Add-ons
                 </h4>
                 
                 {/* Teacher Books */}
                 <div className="bg-white/80 rounded-lg p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-3">
-                      <Plus className="h-4 w-4 text-gray-600" />
                       <Image className="h-5 w-5 text-gray-600" />
                       <span className="font-medium text-gray-800">Teacher Books</span>
                       <span className="text-sm text-gray-600">(${tier.addOns.teacherBooks} each)</span>
@@ -141,7 +196,6 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                 <div className="bg-white/80 rounded-lg p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-3">
-                      <Plus className="h-4 w-4 text-gray-600" />
                       <Image className="h-5 w-5 text-gray-600" />
                       <span className="font-medium text-gray-800">Student Books</span>
                       <span className="text-sm text-gray-600">(${tier.addOns.studentBooks} each)</span>
@@ -168,7 +222,6 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                 <div className="bg-white/80 rounded-lg p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-3">
-                      <Plus className="h-4 w-4 text-gray-600" />
                       <Image className="h-5 w-5 text-gray-600" />
                       <span className="font-medium text-gray-800">A0 Poster</span>
                       <span className="text-sm text-gray-600">(${tier.addOns.posterA0} each)</span>
@@ -228,7 +281,7 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
           </div>
         </div>
         
-        {/* Improved banner that doesn't cover content */}
+        {/* Banner that doesn't cover content */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4">
           <div className="text-center font-bold text-sm">
             {tier.bestFor}

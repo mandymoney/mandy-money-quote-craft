@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, Check, Book, Calendar } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check, Book, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { PricingTier, UnlimitedTier } from './QuoteBuilder';
-import { ProgramStartDate } from './ProgramStartDate';
+import { cn } from '@/lib/utils';
 
 interface InclusionsDisplayProps {
   teacherTier?: PricingTier;
@@ -115,13 +117,18 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
 
   return (
     <div className="w-full max-w-6xl mx-auto bg-white rounded-lg border border-gray-300 overflow-hidden">
-      {/* Header - Dark background like in the image */}
+      {/* Header - Dark background */}
       <div className="bg-gray-800 text-white px-8 py-6 flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold">Official Program Quote</h2>
           <p className="text-gray-300 text-lg mt-1">
             {isUnlimited ? unlimitedTier?.name : `${teacherTier?.name || ''}${teacherTier && studentTier ? ' + ' : ''}${studentTier?.name || ''}`}
           </p>
+          {studentTier && !isUnlimited && (
+            <p className="text-gray-400 text-sm mt-1">
+              ${studentPrice} per student
+            </p>
+          )}
         </div>
         <div className="text-right">
           <div className="text-4xl font-bold">${pricing.total.toLocaleString()}</div>
@@ -170,9 +177,14 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
               ) : (
                 <>
                   {teacherTier && (
-                    <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                      <span className="text-gray-700">{teacherCount} Teacher{teacherCount > 1 ? 's' : ''} × ${teacherTier.basePrice.teacher}</span>
-                      <span className="font-bold text-lg">${(teacherTier.basePrice.teacher * teacherCount).toLocaleString()}</span>
+                    <div className="py-3 border-b border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">{teacherCount} Teacher{teacherCount > 1 ? 's' : ''} × ${teacherTier.basePrice.teacher}</span>
+                        <span className="font-bold text-lg">${(teacherTier.basePrice.teacher * teacherCount).toLocaleString()}</span>
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        {teacherTier.name} - Full teaching resources
+                      </div>
                     </div>
                   )}
                   
@@ -181,6 +193,9 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                       <div className="flex justify-between items-center">
                         <span className="text-gray-700">{studentCount} Student{studentCount > 1 ? 's' : ''} × ${studentPrice}</span>
                         <span className="font-bold text-lg">${(studentPrice * studentCount).toLocaleString()}</span>
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        {studentTier.name} - Individual learning materials
                       </div>
                       {volumeSavings > 0 && (
                         <div className="text-sm text-green-600 mt-1">
@@ -191,6 +206,18 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                   )}
                 </>
               )}
+              
+              {/* GST Breakdown */}
+              <div className="py-2 border-b border-gray-200">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Subtotal (exc. GST)</span>
+                  <span>${pricing.subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>GST (10%)</span>
+                  <span>${pricing.gst.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg mb-8">
@@ -203,22 +230,46 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
               </div>
             </div>
 
-            {/* Program Timeline */}
+            {/* Program Timeline with integrated date selector */}
             <div>
               <h4 className="text-lg font-semibold text-gray-800 mb-4">Program Timeline</h4>
               
               <div className="space-y-4">
-                <div className="flex items-center p-3 border border-gray-200 rounded-lg">
-                  <Calendar className="h-5 w-5 text-gray-500 mr-3" />
-                  <span className="text-gray-700">{formatDate(programStartDate)}</span>
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h5 className="font-semibold text-blue-800 mb-3">Select Program Start Date</h5>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !programStartDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {programStartDate ? format(programStartDate, 'PPP') : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={programStartDate}
+                        onSelect={(date) => date && onStartDateChange(date)}
+                        initialFocus
+                        className="p-3"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  
+                  <div className="text-sm text-blue-700 mt-3">
+                    <div><strong>Program starts:</strong> {formatDate(programStartDate)}</div>
+                    <div><strong>Access ends:</strong> {formatDate(programEndDate)}</div>
+                    <div className="text-xs mt-1 text-blue-600">12 months of full access included</div>
+                  </div>
                 </div>
                 
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <h5 className="font-semibold text-blue-800 mb-2">12 Month Access Period</h5>
-                  <div className="text-sm text-blue-700">
-                    <div>Starts: {formatDate(programStartDate)}</div>
-                    <div>Ends: {formatDate(programEndDate)}</div>
-                  </div>
+                <div className="text-center text-sm text-gray-500 italic">
+                  Quote valid until end of current calendar year
                 </div>
               </div>
             </div>

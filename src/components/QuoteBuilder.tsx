@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -12,7 +11,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, AlertTriangle, ArrowDown, Check, TrendingUp } from 'lucide-react';
+import { X, AlertTriangle, ArrowDown, Check, TrendingUp, PointingDown } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -206,13 +205,23 @@ const unlimitedTier: UnlimitedTier = {
     posterA0: 89
   },
   inclusions: [
-    'Unlimited Digital Access',
-    'All Teachers & Students',
-    '42 Interactive Lessons',
+    'Unlimited Teacher Digital Passes',
+    'Unlimited Student Digital Passes',
+    '42 x Click & Play Powerpoint Lessons',
+    '168 x Theory Videos',
+    '168 x Printable Worksheets',
+    'Classroom Lesson Quizzes',
+    'Lesson Plans',
+    'Curriculum Alignment Guides',
+    'Digital Textbooks',
+    'Unlimited Classroom Spaces',
+    'Personal Student Accounts',
+    '168 x Gamified Activities',
+    'Lesson Certificates',
+    'Micro-Credential Pre & Post Testing',
     'School-wide License',
     'Priority Support',
     'Admin Dashboard',
-    'Unlimited Classroom Spaces',
     'Advanced Analytics'
   ],
   bestFor: 'Perfect for schools prioritising financial empowerment as a core student outcome'
@@ -474,11 +483,14 @@ export const QuoteBuilder = () => {
                 <div className="flex items-center space-x-3">
                   <div className="text-4xl">🎓</div>
                   <div>
-                    <h3 className="font-bold text-blue-800 text-lg">💰 Consider Our Unlimited School Access Option!</h3>
+                    <h3 className="font-bold text-blue-800 text-lg">Consider Our Unlimited School Access Option!</h3>
                     <p className="text-blue-700">
                       Your current quote is ${regularPricing.total.toLocaleString()}. Our Unlimited School Access option at ${unlimitedPricing.total.toLocaleString()} might offer exceptional value for your entire school community.
                     </p>
-                    <p className="text-blue-600 text-sm mt-1">✨ See the unlimited option below for complete school-wide access</p>
+                    <p className="text-blue-600 text-sm mt-1 flex items-center">
+                      <PointingDown className="h-4 w-4 mr-1" />
+                      See the unlimited option below for complete school-wide access
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -655,9 +667,9 @@ export const QuoteBuilder = () => {
           <div className="mt-12 border-t-4 border-green-600 pt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-8">
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-8 mb-4">
-                <div className="text-4xl">⭐</div>
+                <div className="text-4xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">⭐</div>
                 <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
-                <div className="text-4xl">⭐</div>
+                <div className="text-4xl bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">⭐</div>
               </div>
               <p className="text-lg text-green-700">
                 Complete summary of your selections • Download PDF or Place Order
@@ -667,13 +679,6 @@ export const QuoteBuilder = () => {
                 <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
               </div>
             </div>
-
-            {/* Program Start Date */}
-            <ProgramStartDate
-              startDate={programStartDate}
-              onStartDateChange={setProgramStartDate}
-              endDate={programEndDate}
-            />
 
             <InclusionsDisplay
               teacherTier={selectedTeacherData}
@@ -690,13 +695,6 @@ export const QuoteBuilder = () => {
               programEndDate={addMonths(programStartDate, 12)}
               volumeSavings={volumeSavings}
             />
-
-            {/* Quote validity notice */}
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600 italic">
-                Quote valid until end of current calendar year
-              </p>
-            </div>
 
             {/* Action Buttons with orange gradient */}
             <div className="mt-6">
