@@ -171,7 +171,11 @@ export const generateQuotePDF = (
     doc.text(`● ${item.item}`, 20, yPosition);
     
     // Add type badge
-    doc.setFillColor(item.type === 'teacher' ? 72, 187, 120 : 245, 158, 11);
+    if (item.type === 'teacher') {
+      doc.setFillColor(72, 187, 120);
+    } else {
+      doc.setFillColor(245, 158, 11);
+    }
     doc.roundedRect(130, yPosition - 4, 25, 8, 2, 2, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(8);
