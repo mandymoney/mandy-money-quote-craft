@@ -811,27 +811,13 @@ export const QuoteBuilder = () => {
                       <div className="space-y-2">
                         {regularPricing.shipping === 0 && hasPhysicalItems() && (
                           <div className="flex justify-between items-center text-sm">
-                            <span className="text-green-700">Free shipping included</span>
+                            <span className="text-green-700">🎉 Free shipping included</span>
                           </div>
                         )}
-                        {totalSavings > 0 && volumeDiscountDetails && (
-                          <>
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-green-700">Volume discount: Save ${totalSavings.toFixed(0)}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-xs text-green-600">
-                              <span>Before discount:</span>
-                              <span className="line-through">${volumeDiscountDetails.originalPerStudent.toFixed(0)}/student</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm font-semibold">
-                              <span className="text-green-700">Your price:</span>
-                              <span className="text-green-800">${volumeDiscountDetails.discountedPerStudent.toFixed(0)}/student</span>
-                            </div>
-                            <div className="flex justify-between items-center text-green-700 font-bold">
-                              <span>Save ${volumeDiscountDetails.savingsPerStudent.toFixed(0)}/student</span>
-                              <span>Total savings: ${volumeDiscountDetails.totalSavings.toFixed(0)}</span>
-                            </div>
-                          </>
+                        {totalSavings > 0 && (
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-green-700">🎉 Volume discount: Save ${totalSavings.toFixed(0)}</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -890,8 +876,8 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
-        {/* Official Quote Section */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        {/* Official Quote Section with Light Green Background */}
+        <div className="bg-gradient-to-b from-green-50 to-emerald-50 rounded-lg shadow-lg overflow-hidden border border-green-100">
           {/* Navy Header Banner */}
           <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white p-6">
             <div className="text-center">
@@ -913,7 +899,7 @@ export const QuoteBuilder = () => {
 
           <div className="p-8">
             {/* School Information Form */}
-            <Card className="mb-8 p-6 bg-gray-50">
+            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border border-green-200/50">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">School Information</h3>
               <p className="text-sm text-gray-600 mb-4">Information not required unless placing an order</p>
               
@@ -969,7 +955,6 @@ export const QuoteBuilder = () => {
                     onChange={(e) => setSchoolInfo(prev => ({ ...prev, schoolAddress: e.target.value }))}
                     className="w-full"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Compatible with Australian address validation for Shopify integration</p>
                 </div>
                 <Input
                   placeholder="Contact Phone"
@@ -1014,15 +999,12 @@ export const QuoteBuilder = () => {
                         <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
                       </div>
                       {!schoolInfo.deliveryIsSameAsSchool && (
-                        <div>
-                          <Input
-                            placeholder="Delivery Address (Start typing for suggestions)"
-                            value={schoolInfo.deliveryAddress}
-                            onChange={(e) => setSchoolInfo(prev => ({ ...prev, deliveryAddress: e.target.value }))}
-                            className="w-full"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">Compatible with Australian address validation</p>
-                        </div>
+                        <Input
+                          placeholder="Delivery Address (Start typing for suggestions)"
+                          value={schoolInfo.deliveryAddress}
+                          onChange={(e) => setSchoolInfo(prev => ({ ...prev, deliveryAddress: e.target.value }))}
+                          className="w-full"
+                        />
                       )}
                     </div>
                   </>
@@ -1038,15 +1020,12 @@ export const QuoteBuilder = () => {
                     <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
                   </div>
                   {!schoolInfo.billingIsSameAsSchool && (
-                    <div>
-                      <Input
-                        placeholder="Billing Address (Start typing for suggestions)"
-                        value={schoolInfo.billingAddress}
-                        onChange={(e) => setSchoolInfo(prev => ({ ...prev, billingAddress: e.target.value }))}
-                        className="w-full"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Compatible with Australian address validation</p>
-                    </div>
+                    <Input
+                      placeholder="Billing Address (Start typing for suggestions)"
+                      value={schoolInfo.billingAddress}
+                      onChange={(e) => setSchoolInfo(prev => ({ ...prev, billingAddress: e.target.value }))}
+                      className="w-full"
+                    />
                   )}
                 </div>
                 
@@ -1087,9 +1066,9 @@ export const QuoteBuilder = () => {
             {/* Two Column Layout for Official Quote */}
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Left Column - Investment Breakdown */}
-              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                <h3 className="text-xl font-semibold mb-4 text-slate-800 flex items-center">
-                  <BarChart3 className="h-6 w-6 mr-2" />
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 border border-green-200/50">
+                <h3 className="text-2xl font-semibold mb-4 text-slate-800 flex items-center">
+                  <BarChart3 className="h-7 w-7 mr-3" />
                   Investment Breakdown
                 </h3>
                 
@@ -1190,7 +1169,7 @@ export const QuoteBuilder = () => {
               </div>
 
               {/* Right Column - Program Inclusions */}
-              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 border border-green-200/50">
                 <h3 className="text-lg font-semibold mb-4 text-slate-800">What's Included</h3>
                 
                 <div className="space-y-3 mb-6">
@@ -1261,12 +1240,9 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
-        {/* Lesson Explorer with Video Link Management */}
+        {/* Lesson Explorer - Previous Version */}
         <div className="mt-12">
-          <LessonExplorer 
-            videoLinks={videoLinks}
-            onVideoLinksChange={setVideoLinks}
-          />
+          <LessonExplorer />
         </div>
 
       </div>
