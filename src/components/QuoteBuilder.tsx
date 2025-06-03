@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -6,13 +5,12 @@ import { InclusionsDisplay } from './InclusionsDisplay';
 import { ActionButtons } from './ActionButtons';
 import { UnlimitedSchoolCard } from './UnlimitedSchoolCard';
 import { VideoEmbed } from './VideoEmbed';
-import { ProgramStartDate } from './ProgramStartDate';
 import { LessonExplorer } from './LessonExplorer';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, AlertTriangle, ArrowDown, Check, TrendingUp, Upload } from 'lucide-react';
+import { X, ArrowDown } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -212,338 +210,9 @@ const unlimitedTier: UnlimitedTier = {
   inclusions: [
     'Unlimited Teacher Digital Passes',
     'Unlimited Student Digital Passes',
-    'Unlimited Classroom Spaces',
-    '42 x Click & Play Powerpoint Lessons',
-    '168 x Theory Videos',
-    '168 x Printable Worksheets',
-    'Classroom Lesson Quizzes',
-    'Lesson Plans',
-    'Curriculum Alignment Guides',
-    'Digital Textbooks',
-    'Personal Student Accounts',
-    '168 x Gamified Activities',
-    'Lesson Certificates',
-    'Micro-Credential Pre & Post Testing',
-    'School-wide License',
-    'Priority Support',
-    'Admin Dashboard',
-    'Advanced Analytics'
+    'Unlimited Classroom Spaces'
   ],
   bestFor: 'Perfect for schools prioritising financial empowerment as a core student outcome'
-};
-
-const MicroCredentialsSection = () => {
-  const [selectedCredential, setSelectedCredential] = useState<string | null>(null);
-  const [uploadedImages, setUploadedImages] = useState<{ [key: string]: string }>({});
-  const [embedLinks, setEmbedLinks] = useState<{ [key: string]: string }>({});
-
-  const microCredentials = [
-    {
-      id: 'level1',
-      title: 'Level 1 - Foundations',
-      banner: 'Building Strong Financial Foundations',
-      description: 'Introduction to financial literacy basics including budgeting, spending, super, and tax fundamentals. Perfect for students beginning their financial journey.'
-    },
-    {
-      id: 'level2', 
-      title: 'Level 2 - Building Skills',
-      banner: 'Developing Essential Life Skills',
-      description: 'Intermediate concepts covering career planning, employment preparation, and real-world financial decisions like car ownership and phone plans.'
-    },
-    {
-      id: 'level3',
-      title: 'Level 3 - Advanced Topics',
-      banner: 'Understanding Financial Systems',
-      description: 'Advanced budgeting, interest concepts, financial products, banking, and developing a healthy money mindset with safety strategies.'
-    },
-    {
-      id: 'level4',
-      title: 'Level 4 - Mastery',
-      banner: 'Building Wealth & Investment Skills',
-      description: 'Wealth building, income generation, debt management, and comprehensive investment education including shares and property.'
-    }
-  ];
-
-  const handleImageUpload = (credentialId: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setUploadedImages(prev => ({
-          ...prev,
-          [credentialId]: e.target?.result as string
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleEmbedChange = (credentialId: string, value: string) => {
-    setEmbedLinks(prev => ({
-      ...prev,
-      [credentialId]: value
-    }));
-  };
-
-  return (
-    <div className="mt-12 pt-8 border-t border-gray-200">
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-8 mb-4">
-          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
-          <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-teal-700 to-green-800 bg-clip-text text-transparent">🎓 Your Four Micro-Credentials</h3>
-          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
-        </div>
-        <p className="text-lg text-gray-700">
-          Browse all micro-credential materials and explore textbook samples below
-        </p>
-        <ArrowDown className="h-6 w-6 text-blue-600 mx-auto animate-bounce mt-2" />
-      </div>
-      
-      <div className="grid md:grid-cols-4 gap-4">
-        {microCredentials.map((credential) => (
-          <div key={credential.id} className="relative">
-            <div
-              className={`cursor-pointer transition-all duration-300 hover:scale-105 border-2 rounded-lg p-4 ${
-                selectedCredential === credential.id 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-300 bg-white hover:border-gray-400'
-              }`}
-              onClick={() => setSelectedCredential(selectedCredential === credential.id ? null : credential.id)}
-            >
-              <div className="aspect-square mb-3 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                {uploadedImages[credential.id] ? (
-                  <img 
-                    src={uploadedImages[credential.id]} 
-                    alt={credential.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-center p-2">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-xs text-gray-500">Click to upload image</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(credential.id, e)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
-                  </div>
-                )}
-              </div>
-              <h4 className="font-semibold text-sm text-gray-800 text-center">{credential.title}</h4>
-            </div>
-            
-            {selectedCredential === credential.id && (
-              <div className="absolute top-full left-0 right-0 z-10 mt-2 p-4 bg-white border border-blue-300 rounded-lg shadow-lg">
-                <h5 className="font-bold text-blue-800 mb-2">{credential.banner}</h5>
-                <p className="text-sm text-gray-700 mb-3">{credential.description}</p>
-                <Input
-                  placeholder="Paste embed link here"
-                  value={embedLinks[credential.id] || ''}
-                  onChange={(e) => handleEmbedChange(credential.id, e.target.value)}
-                  className="text-sm"
-                />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const LessonExplorerWithIcon = () => {
-  const [uploadedIcon, setUploadedIcon] = useState<string | null>(null);
-
-  const handleIconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setUploadedIcon(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  return (
-    <div className="mt-12 pt-8 border-t border-gray-200">
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-8 mb-4">
-          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
-          <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-teal-700 to-green-800 bg-clip-text text-transparent">📚 Explore All 42 Financial Literacy Lessons</h3>
-          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
-        </div>
-        <p className="text-lg text-gray-700">
-          Browse all 42 lessons, watch preview videos, and explore textbook samples below
-        </p>
-        <ArrowDown className="h-6 w-6 text-blue-600 mx-auto animate-bounce mt-2" />
-      </div>
-      <LessonExplorer />
-    </div>
-  );
-};
-
-const TextbookPreview = () => {
-  const [embedLink, setEmbedLink] = useState<string>('');
-
-  return (
-    <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-8 mb-4">
-          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
-          <h4 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-teal-700 to-green-800 bg-clip-text text-transparent">How Do Micro-Credentials Work?</h4>
-          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
-        </div>
-        <p className="text-lg text-gray-700">
-          Interactive credential explanation will be embedded here
-        </p>
-        <ArrowDown className="h-6 w-6 text-blue-600 mx-auto animate-bounce mt-2" />
-      </div>
-      <div 
-        className="aspect-video bg-white rounded-lg border border-blue-300 flex items-center justify-center mb-4 cursor-pointer hover:bg-gray-50"
-        onClick={() => document.getElementById('micro-credentials-embed')?.focus()}
-      >
-        <div className="text-center">
-          <p className="text-gray-600 mb-2">FlipHTML5 Embed Section</p>
-          <p className="text-sm text-gray-500">Interactive content will display here</p>
-        </div>
-      </div>
-      <Input
-        id="micro-credentials-embed"
-        placeholder="Paste FlipHTML5 embed link here"
-        value={embedLink}
-        onChange={(e) => setEmbedLink(e.target.value)}
-        className="w-full"
-      />
-    </div>
-  );
-};
-
-const DetailedInvestmentBreakdown = ({ 
-  selectedTeacherTiers, 
-  selectedStudentTiers, 
-  useUnlimited, 
-  unlimitedAddOns, 
-  pricing 
-}: {
-  selectedTeacherTiers: TierSelection;
-  selectedStudentTiers: TierSelection;
-  useUnlimited: boolean;
-  unlimitedAddOns: any;
-  pricing: { subtotal: number; gst: number; total: number };
-}) => {
-  const calculateStudentPrice = (tier: PricingTier, totalStudents: number): number => {
-    let studentPrice = tier.basePrice.student;
-    
-    if (totalStudents >= 50) {
-      studentPrice = tier.volumeDiscounts.students50Plus;
-    } else if (totalStudents >= 12) {
-      studentPrice = tier.volumeDiscounts.students12Plus;
-    }
-
-    return studentPrice;
-  };
-
-  const getTotalStudentCount = (): number => {
-    return Object.values(selectedStudentTiers).reduce((sum, count) => sum + count, 0);
-  };
-
-  const totalStudents = getTotalStudentCount();
-
-  return (
-    <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
-      <h4 className="text-xl font-bold text-gray-800 mb-4">📊 Investment Breakdown</h4>
-      
-      {useUnlimited ? (
-        <div className="space-y-3">
-          <div className="flex justify-between items-center p-3 bg-white rounded border">
-            <span className="font-medium text-gray-700">Unlimited School Access</span>
-            <span className="font-bold text-gray-800">${unlimitedTier.basePrice.toLocaleString()}</span>
-          </div>
-          
-          {unlimitedAddOns.teacherBooks > 0 && (
-            <div className="flex justify-between items-center p-3 bg-white rounded border">
-              <span className="text-gray-700">{unlimitedAddOns.teacherBooks}x Print Teacher Textbooks @ ${unlimitedTier.addOns.teacherBooks}</span>
-              <span className="font-bold text-gray-800">${(unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks).toLocaleString()}</span>
-            </div>
-          )}
-          
-          {unlimitedAddOns.studentBooks > 0 && (
-            <div className="flex justify-between items-center p-3 bg-white rounded border">
-              <span className="text-gray-700">{unlimitedAddOns.studentBooks}x Print Student Textbooks @ ${unlimitedTier.addOns.studentBooks}</span>
-              <span className="font-bold text-gray-800">${(unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks).toLocaleString()}</span>
-            </div>
-          )}
-          
-          {unlimitedAddOns.posterA0 > 0 && (
-            <div className="flex justify-between items-center p-3 bg-white rounded border">
-              <span className="text-gray-700">{unlimitedAddOns.posterA0}x A0 Posters @ ${unlimitedTier.addOns.posterA0}</span>
-              <span className="font-bold text-gray-800">${(unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0).toLocaleString()}</span>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {/* Teacher Options */}
-          {Object.entries(selectedTeacherTiers).map(([tierId, count]) => {
-            if (count <= 0) return null;
-            const tier = teacherTiers.find(t => t.id === tierId);
-            if (!tier) return null;
-            const totalCost = tier.basePrice.teacher * count;
-            
-            return (
-              <div key={tierId} className="flex justify-between items-center p-3 bg-white rounded border">
-                <span className="text-gray-700">
-                  {count}x {tier.name} Teachers @ ${tier.basePrice.teacher} each
-                </span>
-                <span className="font-bold text-gray-800">${totalCost.toLocaleString()}</span>
-              </div>
-            );
-          })}
-          
-          {/* Student Options */}
-          {Object.entries(selectedStudentTiers).map(([tierId, count]) => {
-            if (count <= 0) return null;
-            const tier = studentTiers.find(t => t.id === tierId);
-            if (!tier) return null;
-            const pricePerStudent = calculateStudentPrice(tier, totalStudents);
-            const totalCost = pricePerStudent * count;
-            
-            return (
-              <div key={tierId} className="flex justify-between items-center p-3 bg-white rounded border">
-                <span className="text-gray-700">
-                  {count}x {tier.name} Students @ ${pricePerStudent} each
-                  {pricePerStudent < tier.basePrice.student && (
-                    <span className="text-green-600 text-sm ml-2">
-                      (${tier.basePrice.student - pricePerStudent} volume discount)
-                    </span>
-                  )}
-                </span>
-                <span className="font-bold text-gray-800">${totalCost.toLocaleString()}</span>
-              </div>
-            );
-          })}
-          
-          {totalStudents > 0 && (
-            <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
-              <div className="text-sm text-blue-800">
-                <strong>Cost per student:</strong> ${(pricing.total / totalStudents).toFixed(2)}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-      
-      <div className="mt-4 pt-4 border-t border-gray-300">
-        <div className="flex justify-between items-center text-lg">
-          <span className="font-bold text-gray-800">Total Investment (inc. GST):</span>
-          <span className="font-bold text-green-600 text-xl">${pricing.total.toLocaleString()}</span>
-        </div>
-      </div>
-    </div>
-  );
 };
 
 export const QuoteBuilder = () => {
@@ -559,7 +228,6 @@ export const QuoteBuilder = () => {
   const [schoolName, setSchoolName] = useState<string>('');
 
   const GST_RATE = 0.1;
-  const programEndDate = addMonths(programStartDate, 12);
 
   const getTotalTeacherCount = (): number => {
     return Object.values(selectedTeacherTiers).reduce((sum, count) => sum + count, 0);
@@ -581,16 +249,6 @@ export const QuoteBuilder = () => {
     return studentPrice;
   };
 
-  const getNextDiscountThreshold = (): { threshold: number; studentsToGo: number } | null => {
-    const totalStudents = getTotalStudentCount();
-    if (totalStudents < 12) {
-      return { threshold: 12, studentsToGo: 12 - totalStudents };
-    } else if (totalStudents < 50) {
-      return { threshold: 50, studentsToGo: 50 - totalStudents };
-    }
-    return null;
-  };
-
   const calculateRegularTotal = (): { subtotal: number; gst: number; total: number } => {
     let teacherCost = 0;
     let studentCost = 0;
@@ -609,18 +267,6 @@ export const QuoteBuilder = () => {
     });
     
     const total = teacherCost + studentCost;
-    const subtotal = total / (1 + GST_RATE);
-    const gst = total - subtotal;
-    
-    return { subtotal, gst, total };
-  };
-
-  const calculateUnlimitedTotal = (): { subtotal: number; gst: number; total: number } => {
-    const total = unlimitedTier.basePrice + 
-      (unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks) +
-      (unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks) +
-      (unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0);
-    
     const subtotal = total / (1 + GST_RATE);
     const gst = total - subtotal;
     
@@ -652,13 +298,6 @@ export const QuoteBuilder = () => {
   };
 
   const regularPricing = calculateRegularTotal();
-  const unlimitedPricing = calculateUnlimitedTotal();
-  const nextDiscount = getNextDiscountThreshold();
-
-  const hasValidSelection = Object.values(selectedTeacherTiers).some(count => count > 0) || 
-                           Object.values(selectedStudentTiers).some(count => count > 0);
-  const showUnlimitedSuggestion = regularPricing.total > 2000 && !useUnlimited && hasValidSelection;
-  const hasVolumeDiscount = getTotalStudentCount() >= 12;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -705,31 +344,30 @@ export const QuoteBuilder = () => {
 
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {teacherTiers.map((tier, index) => (
-                  <div key={tier.id} className="space-y-4">
-                    <PricingCard
-                      tier={tier}
-                      price={tier.basePrice.teacher}
-                      isSelected={selectedTeacherTiers[tier.id] > 0}
-                      onSelect={() => {}}
-                      teacherCount={selectedTeacherTiers[tier.id] || 0}
-                      studentCount={0}
-                      animationDelay={index * 100}
-                      showImages={true}
-                      includeGST={true}
-                      colorScheme="teal"
-                      customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)"
-                      volumeSelector={
-                        <VolumeSelector
-                          label="Number of Teachers"
-                          value={selectedTeacherTiers[tier.id] || 0}
-                          onChange={(count) => handleTeacherSelection(tier.id, count)}
-                          min={0}
-                          max={20}
-                          color="teal"
-                        />
-                      }
-                    />
-                  </div>
+                  <PricingCard
+                    key={tier.id}
+                    tier={tier}
+                    price={tier.basePrice.teacher}
+                    isSelected={selectedTeacherTiers[tier.id] > 0}
+                    onSelect={() => {}}
+                    teacherCount={selectedTeacherTiers[tier.id] || 0}
+                    studentCount={0}
+                    animationDelay={index * 100}
+                    showImages={true}
+                    includeGST={true}
+                    colorScheme="teal"
+                    customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)"
+                    volumeSelector={
+                      <VolumeSelector
+                        label="Number of Teachers"
+                        value={selectedTeacherTiers[tier.id] || 0}
+                        onChange={(count) => handleTeacherSelection(tier.id, count)}
+                        min={0}
+                        max={20}
+                        color="teal"
+                      />
+                    }
+                  />
                 ))}
               </div>
             </Card>
@@ -748,14 +386,6 @@ export const QuoteBuilder = () => {
                 <p className="text-center" style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
               </div>
 
-              {nextDiscount && (
-                <div className="mb-6 text-center">
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-sm px-3 py-1 font-normal">
-                    🎯 Add {nextDiscount.studentsToGo} more student{nextDiscount.studentsToGo > 1 ? 's' : ''} to unlock volume discounts at {nextDiscount.threshold}+ students!
-                  </Badge>
-                </div>
-              )}
-
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {studentTiers.map((tier, index) => {
                   const currentStudentCount = selectedStudentTiers[tier.id] || 0;
@@ -766,48 +396,47 @@ export const QuoteBuilder = () => {
                   const hasVolumeDiscount = totalStudents >= 12;
                   
                   return (
-                    <div key={tier.id} className="space-y-4">
-                      <PricingCard
-                        tier={tier}
-                        price={currentPrice}
-                        isSelected={selectedStudentTiers[tier.id] > 0}
-                        onSelect={() => {}}
-                        teacherCount={0}
-                        studentCount={selectedStudentTiers[tier.id] || 0}
-                        animationDelay={index * 100}
-                        showImages={true}
-                        studentPrice={currentPrice}
-                        includeGST={true}
-                        colorScheme="yellow"
-                        customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)"
-                        showSavings={savings > 0 && hasVolumeDiscount}
-                        savings={savings}
-                        volumeSelector={
-                          <VolumeSelector
-                            label="Number of Students"
-                            value={selectedStudentTiers[tier.id] || 0}
-                            onChange={(count) => handleStudentSelection(tier.id, count)}
-                            min={0}
-                            max={200}
-                            color="yellow"
-                          />
-                        }
-                      />
-                    </div>
+                    <PricingCard
+                      key={tier.id}
+                      tier={tier}
+                      price={currentPrice}
+                      isSelected={selectedStudentTiers[tier.id] > 0}
+                      onSelect={() => {}}
+                      teacherCount={0}
+                      studentCount={selectedStudentTiers[tier.id] || 0}
+                      animationDelay={index * 100}
+                      showImages={true}
+                      studentPrice={currentPrice}
+                      includeGST={true}
+                      colorScheme="yellow"
+                      customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)"
+                      showSavings={savings > 0 && hasVolumeDiscount}
+                      savings={savings}
+                      volumeSelector={
+                        <VolumeSelector
+                          label="Number of Students"
+                          value={selectedStudentTiers[tier.id] || 0}
+                          onChange={(count) => handleStudentSelection(tier.id, count)}
+                          min={0}
+                          max={200}
+                          color="yellow"
+                        />
+                      }
+                    />
                   );
                 })}
               </div>
             </Card>
 
             {/* Unlimited School Access Suggestion */}
-            {showUnlimitedSuggestion && (
+            {regularPricing.total > 2000 && !useUnlimited && (
               <Card className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
                 <div className="flex items-center space-x-3">
                   <div className="text-4xl">👇</div>
                   <div>
                     <h3 className="font-bold text-blue-800 text-lg">Consider Our Unlimited School Access Option!</h3>
                     <p className="text-blue-700">
-                      Your current quote is ${regularPricing.total.toLocaleString()}. Our Unlimited School Access option at ${unlimitedPricing.total.toLocaleString()} might offer exceptional value for your entire school community.
+                      Your current quote is ${regularPricing.total.toLocaleString()}. Our Unlimited School Access option might offer exceptional value for your entire school community.
                     </p>
                     <p className="text-blue-600 text-sm mt-1 flex items-center">
                       <ArrowDown className="h-4 w-4 mr-1" />
@@ -838,10 +467,9 @@ export const QuoteBuilder = () => {
                 onSelect={handleUnlimitedSelection}
                 addOns={unlimitedAddOns}
                 onAddOnsChange={setUnlimitedAddOns}
-                pricing={unlimitedPricing}
+                pricing={regularPricing}
                 teacherCount={getTotalTeacherCount()}
                 studentCount={getTotalStudentCount()}
-                regularPricing={regularPricing}
               />
             </div>
 
@@ -865,228 +493,82 @@ export const QuoteBuilder = () => {
               <Card className="p-6 bg-white shadow-sm border-2 border-gray-200">
                 <h3 className="text-xl font-bold mb-4 text-gray-800">Complete Package Cost</h3>
                 
-                {useUnlimited ? (
-                  <div className="space-y-3">
-                    <div className="text-3xl font-bold text-gray-800">${unlimitedPricing.total.toLocaleString()} <span className="text-sm text-gray-600">(inc. GST)</span></div>
-                    <div className="text-gray-600 text-sm">Unlimited School Access</div>
-                    <div className="text-xs text-gray-500">Includes 12 month access</div>
-                    
-                    <div className="mt-4 space-y-2">
-                      <h4 className="font-semibold text-gray-700 text-sm">Key Inclusions:</h4>
-                      <div className="text-xs text-gray-600">
-                        <div className="flex items-center mb-1">
-                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>Unlimited Teacher Digital Passes</span>
-                        </div>
-                        <div className="flex items-center mb-1">
-                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>Unlimited Student Digital Passes</span>
-                        </div>
-                        <div className="flex items-center mb-1">
-                          <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                          <span>Unlimited Classroom Spaces</span>
-                        </div>
-                        {unlimitedAddOns.teacherBooks > 0 && (
-                          <div className="flex items-center mb-1">
-                            <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                            <span>{unlimitedAddOns.teacherBooks}x Print Teacher Textbooks</span>
-                          </div>
-                        )}
-                        {unlimitedAddOns.studentBooks > 0 && (
-                          <div className="flex items-center mb-1">
-                            <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                            <span>{unlimitedAddOns.studentBooks}x Print Student Textbooks</span>
-                          </div>
-                        )}
-                        {unlimitedAddOns.posterA0 > 0 && (
-                          <div className="flex items-center mb-1">
-                            <Check className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                            <span>{unlimitedAddOns.posterA0}x A0 Posters</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                <div className="space-y-3">
+                  <div className="text-3xl font-bold text-gray-800">${regularPricing.total.toLocaleString()} <span className="text-sm text-gray-600">(inc. GST)</span></div>
+                  <div className="text-gray-600 text-sm">
+                    {getTotalTeacherCount() > 0 ? `${getTotalTeacherCount()} Teacher${getTotalTeacherCount() > 1 ? 's' : ''}` : ''}
+                    {getTotalTeacherCount() > 0 && getTotalStudentCount() > 0 ? ' + ' : ''}
+                    {getTotalStudentCount() > 0 ? `${getTotalStudentCount()} Student${getTotalStudentCount() > 1 ? 's' : ''}` : ''}
                   </div>
-                ) : hasValidSelection ? (
-                  <div className="space-y-3">
-                    <div className="text-3xl font-bold text-gray-800">${regularPricing.total.toLocaleString()} <span className="text-sm text-gray-600">(inc. GST)</span></div>
-                    <div className="text-gray-600 text-sm">
-                      {getTotalTeacherCount() > 0 ? `${getTotalTeacherCount()} Teacher${getTotalTeacherCount() > 1 ? 's' : ''}` : ''}
-                      {getTotalTeacherCount() > 0 && getTotalStudentCount() > 0 ? ' + ' : ''}
-                      {getTotalStudentCount() > 0 ? `${getTotalStudentCount()} Student${getTotalStudentCount() > 1 ? 's' : ''}` : ''}
-                    </div>
-                    <div className="text-xs text-gray-500">Includes 12 month access</div>
-                    
-                    <div className="mt-4 space-y-2">
-                      <h4 className="font-semibold text-gray-700 text-sm">Key Inclusions:</h4>
-                      <div className="text-xs text-gray-600">
-                        {Object.entries(selectedTeacherTiers).map(([tierId, count]) => {
-                          if (count <= 0) return null;
-                          const tier = teacherTiers.find(t => t.id === tierId);
-                          if (!tier) return null;
-                          return (
-                            <div key={tierId}>
-                              {count > 0 && (
-                                <div className="flex items-center mb-1">
-                                  <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                                  <span>{count}x {tier.name} Teacher Pass{count > 1 ? 'es' : ''}</span>
-                                </div>
-                              )}
-                              {(tier.id.includes('physical') || tier.id.includes('both')) && count > 0 && (
-                                <div className="flex items-center mb-1">
-                                  <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                                  <span>{count}x Print Teacher Textbook{count > 1 ? 's' : ''}</span>
-                                </div>
-                              )}
-                              {tier.id.includes('digital') && count > 0 && (
-                                <div className="flex items-center mb-1">
-                                  <Check className="h-3 w-3 text-teal-500 mr-2 flex-shrink-0" />
-                                  <span>{count}x Classroom Space{count > 1 ? 's' : ''}</span>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                        {Object.entries(selectedStudentTiers).map(([tierId, count]) => {
-                          if (count <= 0) return null;
-                          const tier = studentTiers.find(t => t.id === tierId);
-                          if (!tier) return null;
-                          return (
-                            <div key={tierId}>
-                              {count > 0 && (
-                                <div className="flex items-center mb-1">
-                                  <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
-                                  <span>{count}x {tier.name} Student Pass{count > 1 ? 'es' : ''}</span>
-                                </div>
-                              )}
-                              {(tier.id.includes('physical') || tier.id.includes('both')) && count > 0 && (
-                                <div className="flex items-center mb-1">
-                                  <Check className="h-3 w-3 text-yellow-500 mr-2 flex-shrink-0" />
-                                  <span>{count}x Print Student Textbook{count > 1 ? 's' : ''}</span>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <div className="text-gray-500 text-sm mb-2">Select options to see pricing</div>
-                    <div className="text-2xl text-gray-400">$0</div>
-                  </div>
-                )}
-
-                {/* Benefits */}
-                {hasValidSelection && (
-                  <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
-                    <div className="text-yellow-800 font-medium text-sm text-center">
-                      ✨ Includes free intro lesson
-                    </div>
-                  </div>
-                )}
-
-                {/* Student Bundle Benefits */}
-                {(Object.keys(selectedStudentTiers).some(id => id === 'student-both' && selectedStudentTiers[id] > 0) || 
-                 (Object.entries(selectedTeacherTiers).some(([id, count]) => (id.includes('digital') && count > 0)) || 
-                  Object.entries(selectedStudentTiers).some(([id, count]) => (id.includes('digital') && count > 0)) || 
-                  useUnlimited)) && (
-                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                    <div className="text-blue-800 font-medium text-sm text-center">
-                      ✨ Includes free intro lesson + pre & post-program testing
-                    </div>
-                  </div>
-                )}
+                  <div className="text-xs text-gray-500">Includes 12 month access</div>
+                </div>
               </Card>
             </div>
           </div>
         </div>
 
         {/* Official Quote Section */}
-        {((hasValidSelection && !useUnlimited) || useUnlimited) && (
-          <div className="mt-12 border-t-4 border-green-600 pt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-8">
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center gap-8 mb-4">
-                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
-                <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
-                <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
-              </div>
-              
-              {/* School Name Input */}
-              <div className="mt-4 max-w-md mx-auto">
-                <Input
-                  placeholder="Enter your school name"
-                  value={schoolName}
-                  onChange={(e) => setSchoolName(e.target.value)}
-                  className="text-center text-lg font-medium"
-                />
-              </div>
-              
-              {/* Date Stamp */}
-              <div className="mt-2 text-sm text-gray-600">
-                Quote generated on {format(new Date(), 'MMMM d, yyyy')}
-              </div>
-              
-              <div className="flex items-center justify-center mt-2">
-                <ArrowDown className="h-5 w-5 text-green-600 mr-2 animate-bounce" />
-                <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
-              </div>
+        <div className="mt-12 border-t-4 border-green-600 pt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-8">
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-8 mb-4">
+              <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
+              <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
+              <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
             </div>
-
-            <DetailedInvestmentBreakdown
-              selectedTeacherTiers={selectedTeacherTiers}
-              selectedStudentTiers={selectedStudentTiers}
-              useUnlimited={useUnlimited}
-              unlimitedAddOns={unlimitedAddOns}
-              pricing={useUnlimited ? unlimitedPricing : regularPricing}
-            />
-
-            <InclusionsDisplay
-              teacherTier={null}
-              studentTier={null}
-              pricing={useUnlimited ? unlimitedPricing : regularPricing}
-              teacherCount={getTotalTeacherCount()}
-              studentCount={getTotalStudentCount()}
-              studentPrice={0}
-              isUnlimited={useUnlimited}
-              unlimitedTier={useUnlimited ? unlimitedTier : undefined}
-              unlimitedAddOns={unlimitedAddOns}
-              programStartDate={programStartDate}
-              onStartDateChange={setProgramStartDate}
-              programEndDate={addMonths(programStartDate, 12)}
-              volumeSavings={0}
-            />
-
-            <div className="mt-6">
-              <ActionButtons
-                selectedTier={useUnlimited ? unlimitedTier : { 
-                  name: 'Custom Selection',
-                  id: 'combined'
-                }}
-                totalPrice={useUnlimited ? unlimitedPricing.total : regularPricing.total}
-                teacherCount={getTotalTeacherCount()}
-                studentCount={getTotalStudentCount()}
+            
+            {/* School Name Input */}
+            <div className="mt-4 max-w-md mx-auto">
+              <Input
+                placeholder="Enter your school name"
+                value={schoolName}
+                onChange={(e) => setSchoolName(e.target.value)}
+                className="text-center text-lg font-medium"
               />
             </div>
+            
+            {/* Date Stamp */}
+            <div className="mt-2 text-sm text-gray-600">
+              Quote generated on {format(new Date(), 'MMMM d, yyyy')}
+            </div>
           </div>
-        )}
+
+          <InclusionsDisplay
+            teacherTier={null}
+            studentTier={null}
+            pricing={regularPricing}
+            teacherCount={getTotalTeacherCount()}
+            studentCount={getTotalStudentCount()}
+            studentPrice={0}
+            isUnlimited={useUnlimited}
+            unlimitedTier={useUnlimited ? unlimitedTier : undefined}
+            unlimitedAddOns={unlimitedAddOns}
+            programStartDate={programStartDate}
+            onStartDateChange={setProgramStartDate}
+            programEndDate={addMonths(programStartDate, 12)}
+            volumeSavings={0}
+          />
+
+          <div className="mt-6">
+            <ActionButtons
+              selectedTier={{ 
+                name: 'Custom Selection',
+                id: 'combined'
+              }}
+              totalPrice={regularPricing.total}
+              teacherCount={getTotalTeacherCount()}
+              studentCount={getTotalStudentCount()}
+            />
+          </div>
+        </div>
 
         {/* Divider */}
-        {((hasValidSelection && !useUnlimited) || useUnlimited) && (
-          <div className="my-12">
-            <div className="border-t-2 border-gray-300"></div>
-          </div>
-        )}
+        <div className="my-12">
+          <div className="border-t-2 border-gray-300"></div>
+        </div>
 
         {/* Lesson Explorer with Icon */}
-        <LessonExplorerWithIcon />
+        <LessonExplorer />
 
-        {/* Micro-Credentials Section */}
-        <MicroCredentialsSection />
-
-        {/* Textbook Preview */}
-        <TextbookPreview />
       </div>
     </div>
   );

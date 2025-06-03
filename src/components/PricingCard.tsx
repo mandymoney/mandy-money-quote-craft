@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +20,7 @@ interface PricingCardProps {
   customGradient?: string;
   showSavings?: boolean;
   savings?: number;
+  volumeSelector?: React.ReactNode;
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
@@ -37,7 +37,8 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   colorScheme = 'teal',
   customGradient,
   showSavings = false,
-  savings = 0
+  savings = 0,
+  volumeSelector
 }) => {
   const getGradientClass = () => {
     if (customGradient) return '';
@@ -85,6 +86,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       )}
 
       <div className="p-6">
+        {/* Volume Selector at top */}
+        {volumeSelector && (
+          <div className="mb-4 pb-4 border-b border-gray-200">
+            {volumeSelector}
+          </div>
+        )}
+
         {/* Image Placeholder */}
         {showImages && (
           <div className={cn(
