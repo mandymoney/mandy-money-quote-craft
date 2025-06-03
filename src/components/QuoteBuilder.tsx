@@ -295,6 +295,7 @@ const MicroCredentialsSection = () => {
         <p className="text-lg text-green-700">
           Browse all micro-credential materials and explore textbook samples below
         </p>
+        <ArrowDown className="h-6 w-6 text-green-600 mx-auto animate-bounce mt-2" />
       </div>
       
       <div className="grid md:grid-cols-4 gap-4">
@@ -397,8 +398,9 @@ const TextbookPreview = () => {
         <p className="text-lg text-green-700">
           Interactive credential explanation will be embedded here
         </p>
+        <ArrowDown className="h-6 w-6 text-green-600 mx-auto animate-bounce mt-2" />
       </div>
-      <div className="aspect-video bg-white rounded-lg border border-blue-300 flex items-center justify-center mb-4">
+      <div className="aspect-video bg-white rounded-lg border border-blue-300 flex items-center justify-center mb-4 cursor-pointer">
         <div className="text-center">
           <p className="text-gray-600 mb-2">FlipHTML5 Embed Section</p>
           <p className="text-sm text-gray-500">Interactive content will display here</p>
@@ -528,6 +530,48 @@ export const QuoteBuilder = () => {
                            Object.values(selectedStudentTiers).some(count => count > 0);
   const showUnlimitedSuggestion = regularPricing.total > 2000 && !useUnlimited && hasValidSelection;
   const hasVolumeDiscount = getTotalStudentCount() >= 12;
+
+  const getDetailedBreakdown = () => {
+    const breakdown: Array<{
+      name: string;
+      count: number;
+      unitPrice: number;
+      totalPrice: number;
+      type: 'teacher' | 'student';
+    }> = [];
+
+    // Teacher breakdown
+    teacherTiers.forEach(tier => {
+      const count = selectedTeacherTiers[tier.id] || 0;
+      if (count > 0) {
+        breakdown.push({
+          name: tier.name,
+          count,
+          unitPrice: tier.basePrice.teacher,
+          totalPrice: tier.basePrice.teacher * count,
+          type: 'teacher'
+        });
+      }
+    });
+
+    // Student breakdown
+    const totalStudents = getTotalStudentCount();
+    studentTiers.forEach(tier => {
+      const count = selectedStudentTiers[tier.id] || 0;
+      if (count > 0) {
+        const unitPrice = calculateStudentPrice(tier, totalStudents);
+        breakdown.push({
+          name: tier.name,
+          count,
+          unitPrice,
+          totalPrice: unitPrice * count,
+          type: 'student'
+        });
+      }
+    });
+
+    return breakdown;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -881,16 +925,9 @@ export const QuoteBuilder = () => {
                 <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
                 <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
               </div>
-              <p className="text-lg text-green-700">
-                Use this quote for internal approval purposes or to place your program order
-              </p>
-              <div className="flex items-center justify-center mt-2">
-                <ArrowDown className="h-5 w-5 text-green-600 mr-2 animate-bounce" />
-                <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
-              </div>
               
               {/* School Name Input */}
-              <div className="mt-4 max-w-md mx-auto">
+              <div className="mb-4 max-w-md mx-auto">
                 <Input
                   placeholder="Enter your school name"
                   value={schoolName}
@@ -900,9 +937,129 @@ export const QuoteBuilder = () => {
               </div>
               
               {/* Date Stamp */}
-              <div className="mt-2 text-sm text-gray-600">
+              <div className="mb-4 text-sm text-gray-600">
                 Quote generated on {format(new Date(), 'MMMM d, yyyy')}
               </div>
+
+              <p className="text-lg text-green-700">
+                Use this quote for internal approval purposes or to place your program order
+              </p>
+              <div className="flex items-center justify-center mt-2">
+                <ArrowDown className="h-5 w-5 text-green-600 mr-2 animate-bounce" />
+                <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
+              </div>
+            </div>
+
+            {/* Detailed Investment Breakdown */}
+            <div className="mb-6 p-6 bg-white rounded-lg border border-green-200">
+              <h3 className="text-xl font-bold text-green-800 mb-4">Investment Breakdown</h3>
+              
+              {useUnlimited ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <div>
+                      <div className="font-semibold text-blue-800">Unlimited School Access</div>
+                      <div className="text-sm text-blue-600">Complete digital access for entire school</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-blue-800">${unlimitedTier.basePrice.toLocaleString()}</div>
+                    </div>
+                  </div>
+                  
+                  {unlimitedAddOns.teacherBooks > 0 && (
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <div className="font-semibold">Teacher Textbooks</div>
+                        <div className="text-sm text-gray-600">{unlimitedAddOns.teacherBooks} books</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">${(unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks).toLocaleString()}</div>
+                        <div className="text-sm text-gray-600">${unlimitedTier.addOns.teacherBooks} each</div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {unlimitedAddOns.studentBooks > 0 && (
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <div className="font-semibold">Student Textbooks</div>
+                        <div className="text-sm text-gray-600">{unlimitedAddOns.studentBooks} books</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">${(unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks).toLocaleString()}</div>
+                        <div className="text-sm text-gray-600">${unlimitedTier.addOns.studentBooks} each</div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {unlimitedAddOns.posterA0 > 0 && (
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <div className="font-semibold">A0 Posters</div>
+                        <div className="text-sm text-gray-600">{unlimitedAddOns.posterA0} posters</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">${(unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0).toLocaleString()}</div>
+                        <div className="text-sm text-gray-600">${unlimitedTier.addOns.posterA0} each</div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="flex justify-between items-center">
+                      <div className="text-lg font-bold">Total Investment</div>
+                      <div className="text-lg font-bold">${unlimitedPricing.total.toLocaleString()} <span className="text-sm text-gray-600">(inc. GST)</span></div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {getDetailedBreakdown().map((item, index) => (
+                    <div key={index} className={`flex justify-between items-center p-3 rounded-lg ${
+                      item.type === 'teacher' ? 'bg-teal-50' : 'bg-yellow-50'
+                    }`}>
+                      <div>
+                        <div className={`font-semibold ${
+                          item.type === 'teacher' ? 'text-teal-800' : 'text-yellow-800'
+                        }`}>
+                          {item.name} ({item.type === 'teacher' ? 'Teacher' : 'Student'})
+                        </div>
+                        <div className={`text-sm ${
+                          item.type === 'teacher' ? 'text-teal-600' : 'text-yellow-600'
+                        }`}>
+                          {item.count} {item.type}(s)
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`font-bold ${
+                          item.type === 'teacher' ? 'text-teal-800' : 'text-yellow-800'
+                        }`}>
+                          ${item.totalPrice.toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-600">${item.unitPrice} each</div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {getTotalStudentCount() > 0 && (
+                    <div className="p-3 bg-green-50 rounded-lg">
+                      <div className="text-center text-green-800">
+                        <div className="font-semibold">Average Cost Per Student</div>
+                        <div className="text-lg font-bold">
+                          ${Math.round(regularPricing.total / getTotalStudentCount())} per student
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="flex justify-between items-center">
+                      <div className="text-lg font-bold">Total Investment</div>
+                      <div className="text-lg font-bold">${regularPricing.total.toLocaleString()} <span className="text-sm text-gray-600">(inc. GST)</span></div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <InclusionsDisplay
