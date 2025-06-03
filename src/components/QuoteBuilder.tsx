@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -554,6 +553,37 @@ export const QuoteBuilder = () => {
     return totalSavings;
   };
 
+  const getVolumeDiscountDetails = () => {
+    const totalStudents = getTotalStudentCount();
+    if (totalStudents < 12) return null;
+
+    let originalTotal = 0;
+    let discountedTotal = 0;
+    let totalStudentsWithDiscount = 0;
+
+    studentTiers.forEach(tier => {
+      const count = selectedStudentTiers[tier.id] || 0;
+      if (count > 0) {
+        originalTotal += tier.basePrice.student * count;
+        discountedTotal += calculateStudentPrice(tier, totalStudents) * count;
+        totalStudentsWithDiscount += count;
+      }
+    });
+
+    if (totalStudentsWithDiscount === 0) return null;
+
+    const originalPerStudent = originalTotal / totalStudentsWithDiscount;
+    const discountedPerStudent = discountedTotal / totalStudentsWithDiscount;
+    const savingsPerStudent = originalPerStudent - discountedPerStudent;
+
+    return {
+      originalPerStudent,
+      discountedPerStudent,
+      savingsPerStudent,
+      totalSavings: originalTotal - discountedTotal
+    };
+  };
+
   const handleCredentialFlip = (id: string) => {
     setFlippedCredentials(prev => {
       const newSet = new Set(prev);
@@ -593,6 +623,7 @@ export const QuoteBuilder = () => {
   const regularPricing = calculateRegularTotal();
   const volumeNotification = getVolumeNotification();
   const totalSavings = getTotalSavings();
+  const volumeDiscountDetails = getVolumeDiscountDetails();
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -815,6 +846,35 @@ export const QuoteBuilder = () => {
                   {totalSavings > 0 && (
                     <div className="text-sm text-green-600 font-medium">
                       Volume discount: Save ${totalSavings.toFixed(0)}
+                    </div>
+                  )}
+                  
+                  {/* Enhanced Volume Discount Display */}
+                  {volumeDiscountDetails && (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-4 mt-4">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-green-800 mb-2">🎉 Volume Discount Applied!</div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-green-700">Before discount:</span>
+                            <span className="text-sm text-gray-500 line-through">${volumeDiscountDetails.originalPerStudent.toFixed(0)}/student</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-semibold text-green-700">Your price:</span>
+                            <span className="text-lg font-bold text-green-800">${volumeDiscountDetails.discountedPerStudent.toFixed(0)}/student</span>
+                          </div>
+                          <div className="border-t border-green-200 pt-2">
+                            <div className="text-center">
+                              <div className="text-xl font-bold text-green-700">
+                                Save ${volumeDiscountDetails.savingsPerStudent.toFixed(0)}/student
+                              </div>
+                              <div className="text-sm text-green-600">
+                                Total savings: ${volumeDiscountDetails.totalSavings.toFixed(0)}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
