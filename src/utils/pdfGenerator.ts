@@ -1,4 +1,3 @@
-
 import jsPDF from 'jspdf';
 
 interface AddressComponents {
@@ -57,6 +56,18 @@ const formatAddress = (address: AddressComponents): string => {
   return parts.join(' ');
 };
 
+const addPageHeader = (doc: jsPDF, title: string, pageNumber: number = 1) => {
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text(title, 20, 20);
+  
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Page ${pageNumber}`, 180, 20);
+  
+  return 30; // Return starting Y position for content
+};
+
 export const generateQuotePDF = (
   schoolInfo: SchoolInfo,
   quoteItems: QuoteItem[],
@@ -67,23 +78,18 @@ export const generateQuotePDF = (
   isUnlimited: boolean = false
 ): jsPDF => {
   const doc = new jsPDF();
-  let yPosition = 20;
+  let yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote');
   
-  // Header
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Mandy Money High School Program Quote', 20, yPosition);
-  yPosition += 15;
-  
+  // Quote header info
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.text(`Quote Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
   doc.text(`Valid Until: 31st December, ${new Date().getFullYear()}`, 120, yPosition);
   yPosition += 20;
   
-  // School Information
+  // School Information Section
   if (schoolInfo.schoolName) {
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('School Information', 20, yPosition);
     yPosition += 10;
@@ -91,121 +97,202 @@ export const generateQuotePDF = (
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     
-    if (schoolInfo.schoolName) {
-      doc.text(`School Name: ${schoolInfo.schoolName}`, 20, yPosition);
-      yPosition += 6;
-    }
+    const schoolDetails = [
+      { label: 'School Name', value: schoolInfo.schoolName },
+      { label: 'Address', value: formatAddress(schoolInfo.schoolAddress) },
+      { label: 'ABN', value: schoolInfo.schoolABN },
+      { label: 'Coordinator', value: schoolInfo.coordinatorName + (schoolInfo.coordinatorPosition ? ` (${schoolInfo.coordinatorPosition})` : '') },
+      { label: 'Email', value: schoolInfo.coordinatorEmail },
+      { label: 'Phone', value: schoolInfo.contactPhone }
+    ];
     
-    if (formatAddress(schoolInfo.schoolAddress)) {
-      doc.text(`Address: ${formatAddress(schoolInfo.schoolAddress)}`, 20, yPosition);
-      yPosition += 6;
-    }
-    
-    if (schoolInfo.schoolABN) {
-      doc.text(`ABN: ${schoolInfo.schoolABN}`, 20, yPosition);
-      yPosition += 6;
-    }
-    
-    if (schoolInfo.coordinatorName) {
-      doc.text(`Coordinator: ${schoolInfo.coordinatorName}`, 20, yPosition);
-      if (schoolInfo.coordinatorPosition) {
-        doc.text(` (${schoolInfo.coordinatorPosition})`, 80, yPosition);
+    schoolDetails.forEach(detail => {
+      if (detail.value) {
+        doc.text(`${detail.label}: ${detail.value}`, 20, yPosition);
+        yPosition += 6;
       }
-      yPosition += 6;
-    }
-    
-    if (schoolInfo.coordinatorEmail) {
-      doc.text(`Email: ${schoolInfo.coordinatorEmail}`, 20, yPosition);
-      yPosition += 6;
-    }
-    
-    if (schoolInfo.contactPhone) {
-      doc.text(`Phone: ${schoolInfo.contactPhone}`, 20, yPosition);
-      yPosition += 6;
-    }
+    });
     
     yPosition += 10;
   }
   
-  // Program Details
-  doc.setFontSize(16);
+  // Program Details Section
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
   doc.text('Program Details', 20, yPosition);
   yPosition += 10;
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Program Start: ${programStartDate.toLocaleDateString()}`, 20, yPosition);
-  yPosition += 6;
-  doc.text(`Access Period: 12 months`, 20, yPosition);
-  yPosition += 6;
-  doc.text(`Teachers: ${teacherCount}`, 20, yPosition);
-  yPosition += 6;
-  doc.text(`Students: ${studentCount}`, 20, yPosition);
+  
+  const accessEndDate = new Date(programStartDate);
+  accessEndDate.setFullYear(accessEndDate.getFullYear() + 1);
+  
+  const programDetails = [
+    `Program Start: ${programStartDate.toLocaleDateString()}`,
+    `Access Ends: ${accessEndDate.toLocaleDateString()}`,
+    `Access Period: 12 months`,
+    `Teachers: ${teacherCount}`,
+    `Students: ${studentCount}`,
+    `Full 12-month access to all digital content and resources`
+  ];
+  
+  programDetails.forEach(detail => {
+    doc.text(detail, 20, yPosition);
+    yPosition += 6;
+  });
+  
   yPosition += 15;
   
-  // Quote Items
-  doc.setFontSize(16);
+  // Investment Breakdown Section
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('Quote Breakdown', 20, yPosition);
+  doc.text('Investment Breakdown', 20, yPosition);
   yPosition += 10;
   
-  // Table headers
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Item', 20, yPosition);
-  doc.text('Qty', 80, yPosition);
-  doc.text('Unit Price', 100, yPosition);
-  doc.text('Total', 140, yPosition);
-  yPosition += 8;
+  // Check if we need a new page
+  if (yPosition > 220) {
+    doc.addPage();
+    yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', 2);
+  }
   
-  // Draw line under headers
-  doc.line(20, yPosition - 2, 180, yPosition - 2);
-  yPosition += 2;
-  
-  // Quote items
+  // Detailed item breakdown
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
+  
   quoteItems.forEach(item => {
     if (yPosition > 250) {
       doc.addPage();
-      yPosition = 20;
+      yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', doc.getNumberOfPages());
     }
     
-    doc.text(item.item.substring(0, 30), 20, yPosition);
-    doc.text(item.count.toString(), 80, yPosition);
-    doc.text(`$${item.unitPrice.toLocaleString()}`, 100, yPosition);
-    doc.text(`$${item.totalPrice.toLocaleString()}`, 140, yPosition);
+    // Item header with badge
+    doc.setFont('helvetica', 'bold');
+    doc.text(`● ${item.item}`, 20, yPosition);
     
-    if (item.savings && item.savings > 0) {
-      doc.setFont('helvetica', 'italic');
-      doc.text(`(Save $${item.savings.toFixed(0)} each)`, 145, yPosition + 4);
-      doc.setFont('helvetica', 'normal');
-      yPosition += 4;
-    }
+    // Add type badge
+    doc.setFillColor(item.type === 'teacher' ? 72, 187, 120 : 245, 158, 11);
+    doc.roundedRect(130, yPosition - 4, 25, 8, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.text(item.type.charAt(0).toUpperCase() + item.type.slice(1), 135, yPosition);
+    doc.setTextColor(0, 0, 0);
+    
+    // Price
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`$${item.totalPrice}`, 160, yPosition);
     
     yPosition += 8;
+    
+    // Item description
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(item.description, 25, yPosition);
+    yPosition += 6;
+    
+    // Quantity and unit price breakdown
+    doc.text(`${item.count} × $${item.unitPrice}`, 25, yPosition);
+    
+    // Show savings if applicable
+    if (item.savings && item.savings > 0) {
+      doc.setFont('helvetica', 'italic');
+      doc.text(`(Save $${item.savings.toFixed(0)} each)`, 80, yPosition);
+      doc.setFont('helvetica', 'normal');
+    }
+    
+    yPosition += 12;
   });
   
   yPosition += 10;
   
-  // Totals
-  doc.line(100, yPosition - 5, 180, yPosition - 5);
-  
-  doc.text(`Subtotal (exc. GST): $${pricing.subtotal.toFixed(2)}`, 100, yPosition);
-  yPosition += 6;
-  doc.text(`GST (10%): $${pricing.gst.toFixed(2)}`, 100, yPosition);
+  // Shipping section
+  doc.setFont('helvetica', 'bold');
+  doc.text('● Shipping', 20, yPosition);
+  doc.text('FREE', 160, yPosition);
   yPosition += 6;
   
-  if (pricing.shipping > 0) {
-    doc.text(`Shipping: $${pricing.shipping}`, 100, yPosition);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Free shipping (order over $90)', 25, yPosition);
+  yPosition += 15;
+  
+  // Financial summary
+  doc.line(20, yPosition, 190, yPosition);
+  yPosition += 8;
+  
+  const summaryItems = [
+    { label: 'Subtotal (exc. GST)', value: `$${pricing.subtotal.toFixed(2)}` },
+    { label: 'GST (10%)', value: `$${pricing.gst.toFixed(2)}` }
+  ];
+  
+  doc.setFont('helvetica', 'normal');
+  summaryItems.forEach(item => {
+    doc.text(item.label, 130, yPosition);
+    doc.text(item.value, 170, yPosition);
     yPosition += 6;
+  });
+  
+  // Total investment highlight
+  yPosition += 5;
+  doc.setFillColor(34, 197, 94);
+  doc.roundedRect(125, yPosition - 8, 65, 20, 3, 3, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('Total Investment', 130, yPosition);
+  doc.setFontSize(16);
+  doc.text(`$${pricing.total.toLocaleString()}`, 155, yPosition + 8);
+  
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.text('(Price includes 10% GST)', 135, yPosition + 15);
+  
+  doc.setTextColor(0, 0, 0);
+  
+  // What's Included section
+  yPosition += 30;
+  if (yPosition > 220) {
+    doc.addPage();
+    yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', doc.getNumberOfPages());
   }
   
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Total: $${pricing.total.toLocaleString()}`, 100, yPosition);
+  doc.text("What's Included", 20, yPosition);
+  yPosition += 10;
+  
+  // Extract inclusions from quote items and display them
+  const teacherInclusions = quoteItems
+    .filter(item => item.type === 'teacher')
+    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Teacher Digital Pass & Print Textbooks').replace('Textbook Only', 'Teacher Print Textbooks')}`);
+  
+  const studentInclusions = quoteItems
+    .filter(item => item.type === 'student')
+    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Student Digital Pass & Print Textbooks').replace('Textbook Only', 'Student Print Textbooks')}`);
+  
+  const allInclusions = [
+    ...teacherInclusions,
+    ...studentInclusions,
+    '1 × Digital Classroom Space'
+  ];
+  
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  
+  allInclusions.forEach(inclusion => {
+    doc.text('✓', 25, yPosition);
+    doc.text(inclusion, 35, yPosition);
+    yPosition += 7;
+  });
   
   // Footer
-  yPosition += 20;
+  yPosition += 15;
+  if (yPosition > 270) {
+    doc.addPage();
+    yPosition = 20;
+  }
+  
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.text('Contact: hello@mandymoney.com.au | www.mandymoney.com.au', 20, yPosition);
