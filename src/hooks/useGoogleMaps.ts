@@ -33,7 +33,7 @@ export const useGoogleMaps = (
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initAutocomplete`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAGV7qse3eHZWuKkogbxVLsMbgmsGtqvPA&libraries=places&callback=initAutocomplete`;
     script.async = true;
     script.defer = true;
 
