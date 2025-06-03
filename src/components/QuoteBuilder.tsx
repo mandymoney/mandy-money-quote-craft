@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { VolumeSelector } from './VolumeSelector';
@@ -288,13 +289,14 @@ const MicroCredentialsSection = () => {
     <div className="mt-12 pt-8 border-t border-gray-200">
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-8 mb-4">
-          <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
-          <h3 className="text-3xl font-bold text-green-800">🎓 Your Four Micro-Credentials</h3>
-          <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
+          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
+          <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-teal-700 to-green-800 bg-clip-text text-transparent">🎓 Your Four Micro-Credentials</h3>
+          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
         </div>
-        <p className="text-lg text-green-700">
+        <p className="text-lg text-gray-700">
           Browse all micro-credential materials and explore textbook samples below
         </p>
+        <ArrowDown className="h-6 w-6 text-blue-600 mx-auto animate-bounce mt-2" />
       </div>
       
       <div className="grid md:grid-cols-4 gap-4">
@@ -303,7 +305,7 @@ const MicroCredentialsSection = () => {
             <div
               className={`cursor-pointer transition-all duration-300 hover:scale-105 border-2 rounded-lg p-4 ${
                 selectedCredential === credential.id 
-                  ? 'border-green-500 bg-green-50' 
+                  ? 'border-blue-500 bg-blue-50' 
                   : 'border-gray-300 bg-white hover:border-gray-400'
               }`}
               onClick={() => setSelectedCredential(selectedCredential === credential.id ? null : credential.id)}
@@ -333,8 +335,8 @@ const MicroCredentialsSection = () => {
             </div>
             
             {selectedCredential === credential.id && (
-              <div className="absolute top-full left-0 right-0 z-10 mt-2 p-4 bg-white border border-green-300 rounded-lg shadow-lg">
-                <h5 className="font-bold text-green-800 mb-2">{credential.banner}</h5>
+              <div className="absolute top-full left-0 right-0 z-10 mt-2 p-4 bg-white border border-blue-300 rounded-lg shadow-lg">
+                <h5 className="font-bold text-blue-800 mb-2">{credential.banner}</h5>
                 <p className="text-sm text-gray-700 mb-3">{credential.description}</p>
                 <Input
                   placeholder="Paste embed link here"
@@ -369,14 +371,14 @@ const LessonExplorerWithIcon = () => {
     <div className="mt-12 pt-8 border-t border-gray-200">
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-8 mb-4">
-          <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
-          <h3 className="text-3xl font-bold text-green-800">📚 Explore All 42 Financial Literacy Lessons</h3>
-          <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
+          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
+          <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-teal-700 to-green-800 bg-clip-text text-transparent">📚 Explore All 42 Financial Literacy Lessons</h3>
+          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
         </div>
-        <p className="text-lg text-green-700">
+        <p className="text-lg text-gray-700">
           Browse all 42 lessons, watch preview videos, and explore textbook samples below
         </p>
-        <ArrowDown className="h-6 w-6 text-green-600 mx-auto animate-bounce mt-2" />
+        <ArrowDown className="h-6 w-6 text-blue-600 mx-auto animate-bounce mt-2" />
       </div>
       <LessonExplorer />
     </div>
@@ -390,21 +392,26 @@ const TextbookPreview = () => {
     <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-8 mb-4">
-          <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
-          <h4 className="text-3xl font-bold text-green-800">How Do Micro-Credentials Work?</h4>
-          <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
+          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
+          <h4 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-teal-700 to-green-800 bg-clip-text text-transparent">How Do Micro-Credentials Work?</h4>
+          <div className="text-4xl bg-gradient-to-r from-blue-500 via-teal-600 to-green-700 bg-clip-text text-transparent">✨</div>
         </div>
-        <p className="text-lg text-green-700">
+        <p className="text-lg text-gray-700">
           Interactive credential explanation will be embedded here
         </p>
+        <ArrowDown className="h-6 w-6 text-blue-600 mx-auto animate-bounce mt-2" />
       </div>
-      <div className="aspect-video bg-white rounded-lg border border-blue-300 flex items-center justify-center mb-4">
+      <div 
+        className="aspect-video bg-white rounded-lg border border-blue-300 flex items-center justify-center mb-4 cursor-pointer hover:bg-gray-50"
+        onClick={() => document.getElementById('micro-credentials-embed')?.focus()}
+      >
         <div className="text-center">
           <p className="text-gray-600 mb-2">FlipHTML5 Embed Section</p>
           <p className="text-sm text-gray-500">Interactive content will display here</p>
         </div>
       </div>
       <Input
+        id="micro-credentials-embed"
         placeholder="Paste FlipHTML5 embed link here"
         value={embedLink}
         onChange={(e) => setEmbedLink(e.target.value)}
@@ -414,10 +421,134 @@ const TextbookPreview = () => {
   );
 };
 
+const DetailedInvestmentBreakdown = ({ 
+  selectedTeacherTiers, 
+  selectedStudentTiers, 
+  useUnlimited, 
+  unlimitedAddOns, 
+  pricing 
+}: {
+  selectedTeacherTiers: TierSelection;
+  selectedStudentTiers: TierSelection;
+  useUnlimited: boolean;
+  unlimitedAddOns: any;
+  pricing: { subtotal: number; gst: number; total: number };
+}) => {
+  const calculateStudentPrice = (tier: PricingTier, totalStudents: number): number => {
+    let studentPrice = tier.basePrice.student;
+    
+    if (totalStudents >= 50) {
+      studentPrice = tier.volumeDiscounts.students50Plus;
+    } else if (totalStudents >= 12) {
+      studentPrice = tier.volumeDiscounts.students12Plus;
+    }
+
+    return studentPrice;
+  };
+
+  const getTotalStudentCount = (): number => {
+    return Object.values(selectedStudentTiers).reduce((sum, count) => sum + count, 0);
+  };
+
+  const totalStudents = getTotalStudentCount();
+
+  return (
+    <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
+      <h4 className="text-xl font-bold text-gray-800 mb-4">📊 Investment Breakdown</h4>
+      
+      {useUnlimited ? (
+        <div className="space-y-3">
+          <div className="flex justify-between items-center p-3 bg-white rounded border">
+            <span className="font-medium text-gray-700">Unlimited School Access</span>
+            <span className="font-bold text-gray-800">${unlimitedTier.basePrice.toLocaleString()}</span>
+          </div>
+          
+          {unlimitedAddOns.teacherBooks > 0 && (
+            <div className="flex justify-between items-center p-3 bg-white rounded border">
+              <span className="text-gray-700">{unlimitedAddOns.teacherBooks}x Print Teacher Textbooks @ ${unlimitedTier.addOns.teacherBooks}</span>
+              <span className="font-bold text-gray-800">${(unlimitedAddOns.teacherBooks * unlimitedTier.addOns.teacherBooks).toLocaleString()}</span>
+            </div>
+          )}
+          
+          {unlimitedAddOns.studentBooks > 0 && (
+            <div className="flex justify-between items-center p-3 bg-white rounded border">
+              <span className="text-gray-700">{unlimitedAddOns.studentBooks}x Print Student Textbooks @ ${unlimitedTier.addOns.studentBooks}</span>
+              <span className="font-bold text-gray-800">${(unlimitedAddOns.studentBooks * unlimitedTier.addOns.studentBooks).toLocaleString()}</span>
+            </div>
+          )}
+          
+          {unlimitedAddOns.posterA0 > 0 && (
+            <div className="flex justify-between items-center p-3 bg-white rounded border">
+              <span className="text-gray-700">{unlimitedAddOns.posterA0}x A0 Posters @ ${unlimitedTier.addOns.posterA0}</span>
+              <span className="font-bold text-gray-800">${(unlimitedAddOns.posterA0 * unlimitedTier.addOns.posterA0).toLocaleString()}</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {/* Teacher Options */}
+          {Object.entries(selectedTeacherTiers).map(([tierId, count]) => {
+            if (count <= 0) return null;
+            const tier = teacherTiers.find(t => t.id === tierId);
+            if (!tier) return null;
+            const totalCost = tier.basePrice.teacher * count;
+            
+            return (
+              <div key={tierId} className="flex justify-between items-center p-3 bg-white rounded border">
+                <span className="text-gray-700">
+                  {count}x {tier.name} Teachers @ ${tier.basePrice.teacher} each
+                </span>
+                <span className="font-bold text-gray-800">${totalCost.toLocaleString()}</span>
+              </div>
+            );
+          })}
+          
+          {/* Student Options */}
+          {Object.entries(selectedStudentTiers).map(([tierId, count]) => {
+            if (count <= 0) return null;
+            const tier = studentTiers.find(t => t.id === tierId);
+            if (!tier) return null;
+            const pricePerStudent = calculateStudentPrice(tier, totalStudents);
+            const totalCost = pricePerStudent * count;
+            
+            return (
+              <div key={tierId} className="flex justify-between items-center p-3 bg-white rounded border">
+                <span className="text-gray-700">
+                  {count}x {tier.name} Students @ ${pricePerStudent} each
+                  {pricePerStudent < tier.basePrice.student && (
+                    <span className="text-green-600 text-sm ml-2">
+                      (${tier.basePrice.student - pricePerStudent} volume discount)
+                    </span>
+                  )}
+                </span>
+                <span className="font-bold text-gray-800">${totalCost.toLocaleString()}</span>
+              </div>
+            );
+          })}
+          
+          {totalStudents > 0 && (
+            <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+              <div className="text-sm text-blue-800">
+                <strong>Cost per student:</strong> ${(pricing.total / totalStudents).toFixed(2)}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      <div className="mt-4 pt-4 border-t border-gray-300">
+        <div className="flex justify-between items-center text-lg">
+          <span className="font-bold text-gray-800">Total Investment (inc. GST):</span>
+          <span className="font-bold text-green-600 text-xl">${pricing.total.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const QuoteBuilder = () => {
   const [selectedTeacherTiers, setSelectedTeacherTiers] = useState<TierSelection>({});
   const [selectedStudentTiers, setSelectedStudentTiers] = useState<TierSelection>({});
-  const [studentCount, setStudentCount] = useState<number>(25);
   const [useUnlimited, setUseUnlimited] = useState<boolean>(false);
   const [unlimitedAddOns, setUnlimitedAddOns] = useState({
     teacherBooks: 0,
@@ -575,16 +706,6 @@ export const QuoteBuilder = () => {
               <div className="grid lg:grid-cols-3 gap-6 mb-4">
                 {teacherTiers.map((tier, index) => (
                   <div key={tier.id} className="space-y-4">
-                    <div className="flex justify-center">
-                      <VolumeSelector
-                        label={`Number of ${tier.name} Teachers`}
-                        value={selectedTeacherTiers[tier.id] || 0}
-                        onChange={(count) => handleTeacherSelection(tier.id, count)}
-                        min={0}
-                        max={20}
-                        color="teal"
-                      />
-                    </div>
                     <PricingCard
                       tier={tier}
                       price={tier.basePrice.teacher}
@@ -597,6 +718,16 @@ export const QuoteBuilder = () => {
                       includeGST={true}
                       colorScheme="teal"
                       customGradient="linear-gradient(135deg, #005653, #45c0a9, #80dec4)"
+                      volumeSelector={
+                        <VolumeSelector
+                          label="Number of Teachers"
+                          value={selectedTeacherTiers[tier.id] || 0}
+                          onChange={(count) => handleTeacherSelection(tier.id, count)}
+                          min={0}
+                          max={20}
+                          color="teal"
+                        />
+                      }
                     />
                   </div>
                 ))}
@@ -636,16 +767,6 @@ export const QuoteBuilder = () => {
                   
                   return (
                     <div key={tier.id} className="space-y-4">
-                      <div className="flex justify-center">
-                        <VolumeSelector
-                          label={`Number of ${tier.name} Students`}
-                          value={selectedStudentTiers[tier.id] || 0}
-                          onChange={(count) => handleStudentSelection(tier.id, count)}
-                          min={0}
-                          max={200}
-                          color="yellow"
-                        />
-                      </div>
                       <PricingCard
                         tier={tier}
                         price={currentPrice}
@@ -661,6 +782,16 @@ export const QuoteBuilder = () => {
                         customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)"
                         showSavings={savings > 0 && hasVolumeDiscount}
                         savings={savings}
+                        volumeSelector={
+                          <VolumeSelector
+                            label="Number of Students"
+                            value={selectedStudentTiers[tier.id] || 0}
+                            onChange={(count) => handleStudentSelection(tier.id, count)}
+                            min={0}
+                            max={200}
+                            color="yellow"
+                          />
+                        }
                       />
                     </div>
                   );
@@ -881,13 +1012,6 @@ export const QuoteBuilder = () => {
                 <h2 className="text-3xl font-bold text-green-800">📋 Your Official Program Quote</h2>
                 <div className="text-4xl bg-gradient-to-r from-green-500 via-green-600 to-green-700 bg-clip-text text-transparent">✨</div>
               </div>
-              <p className="text-lg text-green-700">
-                Use this quote for internal approval purposes or to place your program order
-              </p>
-              <div className="flex items-center justify-center mt-2">
-                <ArrowDown className="h-5 w-5 text-green-600 mr-2 animate-bounce" />
-                <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
-              </div>
               
               {/* School Name Input */}
               <div className="mt-4 max-w-md mx-auto">
@@ -903,7 +1027,20 @@ export const QuoteBuilder = () => {
               <div className="mt-2 text-sm text-gray-600">
                 Quote generated on {format(new Date(), 'MMMM d, yyyy')}
               </div>
+              
+              <div className="flex items-center justify-center mt-2">
+                <ArrowDown className="h-5 w-5 text-green-600 mr-2 animate-bounce" />
+                <span className="text-sm text-green-600 font-semibold">Investment breakdown with lesson details</span>
+              </div>
             </div>
+
+            <DetailedInvestmentBreakdown
+              selectedTeacherTiers={selectedTeacherTiers}
+              selectedStudentTiers={selectedStudentTiers}
+              useUnlimited={useUnlimited}
+              unlimitedAddOns={unlimitedAddOns}
+              pricing={useUnlimited ? unlimitedPricing : regularPricing}
+            />
 
             <InclusionsDisplay
               teacherTier={null}
