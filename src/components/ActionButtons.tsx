@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle } from 'lucide-react';
@@ -125,8 +126,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         const result = await generateAndUploadOrder();
         pdfUrl = result.pdfUrl;
       } else {
+        // For enquiry, generate and upload quote
         const result = await generateAndUploadQuote();
         pdfUrl = result.pdfUrl;
+        console.log('Generated PDF URL for enquiry:', pdfUrl);
       }
     } catch (error) {
       console.error('Error generating/uploading PDF:', error);
@@ -134,6 +137,8 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     
     const subject = createEmailSubject(type, schoolInfo.schoolName);
     const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount, pdfUrl || undefined);
+    
+    console.log('Email body for enquiry includes PDF URL:', body.includes('http'));
     
     const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
@@ -187,7 +192,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const handleBooklistingEnquiry = async () => {
     toast({
       title: "Preparing Enquiry...",
-      description: "Generating quote and setting up email",
+      description: "Generating quote and setting up email with PDF link",
     });
     
     try {
@@ -195,7 +200,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       
       toast({
         title: "Email Ready!",
-        description: "Your quote has been generated and email opened with the PDF link included.",
+        description: "Your enquiry email has been opened with the quote PDF link included.",
       });
     } catch (error) {
       toast({
