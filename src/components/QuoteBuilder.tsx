@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, AlertTriangle, ArrowDown, Check, TrendingUp, PointingDown } from 'lucide-react';
+import { X, AlertTriangle, ArrowDown, Check, TrendingUp } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 
 export interface PricingTier {
@@ -488,7 +488,7 @@ export const QuoteBuilder = () => {
                       Your current quote is ${regularPricing.total.toLocaleString()}. Our Unlimited School Access option at ${unlimitedPricing.total.toLocaleString()} might offer exceptional value for your entire school community.
                     </p>
                     <p className="text-blue-600 text-sm mt-1 flex items-center">
-                      <PointingDown className="h-4 w-4 mr-1" />
+                      <ArrowDown className="h-4 w-4 mr-1" />
                       See the unlimited option below for complete school-wide access
                     </p>
                   </div>
