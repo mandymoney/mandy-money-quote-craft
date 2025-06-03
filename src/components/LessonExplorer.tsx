@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -585,9 +584,6 @@ export const LessonExplorer: React.FC = () => {
                 <p className="text-sm text-teal-500">Embed teacher preview video here</p>
               </div>
             </div>
-            <Button variant="outline" className="w-full border-teal-200 text-teal-600 hover:bg-teal-50">
-              More Teacher Info ↓
-            </Button>
           </div>
 
           <div className="space-y-4">
@@ -599,9 +595,6 @@ export const LessonExplorer: React.FC = () => {
                 <p className="text-sm text-teal-500">Embed student preview video here</p>
               </div>
             </div>
-            <Button variant="outline" className="w-full border-teal-200 text-teal-600 hover:bg-teal-50">
-              More Student Info ↓
-            </Button>
           </div>
         </div>
 

@@ -329,13 +329,13 @@ export const QuoteBuilder = () => {
       items.push(`Unlimited Student Digital Passes`);
       items.push(`Unlimited Digital Classroom Spaces`);
       if (unlimitedAddOns.teacherBooks > 0) {
-        items.push(`${unlimitedAddOns.teacherBooks} Teacher Print Textbook${unlimitedAddOns.teacherBooks > 1 ? 's' : ''}`);
+        items.push(`${unlimitedAddOns.teacherBooks} x Teacher Print Textbook${unlimitedAddOns.teacherBooks > 1 ? 's' : ''}`);
       }
       if (unlimitedAddOns.studentBooks > 0) {
-        items.push(`${unlimitedAddOns.studentBooks} Student Print Textbook${unlimitedAddOns.studentBooks > 1 ? 's' : ''}`);
+        items.push(`${unlimitedAddOns.studentBooks} x Student Print Textbook${unlimitedAddOns.studentBooks > 1 ? 's' : ''}`);
       }
       if (unlimitedAddOns.posterA0 > 0) {
-        items.push(`${unlimitedAddOns.posterA0} A0 Poster${unlimitedAddOns.posterA0 > 1 ? 's' : ''}`);
+        items.push(`${unlimitedAddOns.posterA0} x A0 Poster${unlimitedAddOns.posterA0 > 1 ? 's' : ''}`);
       }
     } else {
       const teacherDigital = selectedTeacherTiers['teacher-digital'] || 0;
@@ -344,38 +344,40 @@ export const QuoteBuilder = () => {
       const studentDigital = selectedStudentTiers['student-digital'] || 0;
       const studentPhysical = selectedStudentTiers['student-physical'] || 0;
       const studentBoth = selectedStudentTiers['student-both'] || 0;
+
       const totalTeacherDigital = teacherDigital + teacherBoth;
       const totalTeacherPhysical = teacherPhysical + teacherBoth;
       const totalStudentDigital = studentDigital + studentBoth;
       const totalStudentPhysical = studentPhysical + studentBoth;
       const totalClassrooms = totalTeacherDigital;
+
       if (totalTeacherDigital > 0) {
         items.push({
-          text: `${totalTeacherDigital} Teacher Digital Pass${totalTeacherDigital > 1 ? 'es' : ''}`,
+          text: `${totalTeacherDigital} x Teacher Digital Pass${totalTeacherDigital > 1 ? 'es' : ''}`,
           type: 'teacher'
         });
       }
       if (totalTeacherPhysical > 0) {
         items.push({
-          text: `${totalTeacherPhysical} Teacher Print Textbook${totalTeacherPhysical > 1 ? 's' : ''}`,
+          text: `${totalTeacherPhysical} x Teacher Print Textbook${totalTeacherPhysical > 1 ? 's' : ''}`,
           type: 'teacher'
         });
       }
       if (totalClassrooms > 0) {
         items.push({
-          text: `${totalClassrooms} Digital Classroom Space${totalClassrooms > 1 ? 's' : ''}`,
+          text: `${totalClassrooms} x Digital Classroom Space${totalClassrooms > 1 ? 's' : ''}`,
           type: 'teacher'
         });
       }
       if (totalStudentDigital > 0) {
         items.push({
-          text: `${totalStudentDigital} Student Digital Pass${totalStudentDigital > 1 ? 'es' : ''}`,
+          text: `${totalStudentDigital} x Student Digital Pass${totalStudentDigital > 1 ? 'es' : ''}`,
           type: 'student'
         });
       }
       if (totalStudentPhysical > 0) {
         items.push({
-          text: `${totalStudentPhysical} Student Print Textbook${totalStudentPhysical > 1 ? 's' : ''}`,
+          text: `${totalStudentPhysical} x Student Print Textbook${totalStudentPhysical > 1 ? 's' : ''}`,
           type: 'student'
         });
       }
@@ -631,15 +633,15 @@ export const QuoteBuilder = () => {
             </Card>
 
             {/* Unlimited School Access Suggestion */}
-            {regularPricing.total > 2000 && !useUnlimited && <Card className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
+            {regularPricing.total > 2000 && !useUnlimited && <Card className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-lg">
                 <div className="flex items-center space-x-3">
                   <div className="text-4xl">👇</div>
                   <div>
-                    <h3 className="font-bold text-blue-800 text-lg">Consider Our Unlimited School Access Option!</h3>
-                    <p className="text-blue-700">
+                    <h3 className="font-bold text-green-800 text-lg">Consider Our Unlimited School Access Option!</h3>
+                    <p className="text-green-700">
                       Your current quote is ${regularPricing.total.toLocaleString()}. Our Unlimited School Access option might offer exceptional value for your entire school community.
                     </p>
-                    <p className="text-blue-600 text-sm mt-1 flex items-center">
+                    <p className="text-green-600 text-sm mt-1 flex items-center">
                       <ArrowDown className="h-4 w-4 mr-1" />
                       See the unlimited option below for complete school-wide access
                     </p>
@@ -693,19 +695,13 @@ export const QuoteBuilder = () => {
                       "text-sm",
                       useUnlimited ? 'text-green-600' : 'text-teal-600'
                     )}>
-                      inc. GST
+                      {hasPhysicalItems() && regularPricing.shipping > 0 
+                        ? `inc. $${regularPricing.shipping} shipping + GST`
+                        : hasPhysicalItems() && regularPricing.shipping === 0
+                        ? 'inc. free shipping + GST'
+                        : 'inc. GST'
+                      }
                     </div>
-                    
-                    {/* Shipping cost in the pricing box */}
-                    {hasPhysicalItems() && (
-                      <div className="mt-2 text-xs text-gray-600">
-                        {regularPricing.shipping === 0 ? (
-                          <span className="text-green-600 font-medium">+ Free shipping</span>
-                        ) : (
-                          <span>+ ${regularPricing.shipping} shipping</span>
-                        )}
-                      </div>
-                    )}
                   </div>
                   
                   <div className={cn(
@@ -956,7 +952,7 @@ export const QuoteBuilder = () => {
                 schoolABN: e.target.value
               }))} />
                 <div className="md:col-span-2">
-                  <Input placeholder="School Address" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
+                  <Input placeholder="School Address (Street, City, State, Postcode)" value={schoolInfo.schoolAddress} onChange={e => setSchoolInfo(prev => ({
                   ...prev,
                   schoolAddress: e.target.value
                 }))} className="w-full" />
@@ -995,7 +991,7 @@ export const QuoteBuilder = () => {
                     }))} />
                         <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
                       </div>
-                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
+                      {!schoolInfo.deliveryIsSameAsSchool && <Input placeholder="Delivery Address (Street, City, State, Postcode)" value={schoolInfo.deliveryAddress} onChange={e => setSchoolInfo(prev => ({
                     ...prev,
                     deliveryAddress: e.target.value
                   }))} className="w-full" />}
@@ -1010,7 +1006,7 @@ export const QuoteBuilder = () => {
                   }))} />
                     <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
                   </div>
-                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
+                  {!schoolInfo.billingIsSameAsSchool && <Input placeholder="Billing Address (Street, City, State, Postcode)" value={schoolInfo.billingAddress} onChange={e => setSchoolInfo(prev => ({
                   ...prev,
                   billingAddress: e.target.value
                 }))} className="w-full" />}
