@@ -591,7 +591,8 @@ export const QuoteBuilder = () => {
   const volumeDiscountDetails = getVolumeDiscountDetails();
   const unlimitedPricing = useUnlimited ? calculateUnlimitedTotal() : regularPricing;
   const finalPricing = useUnlimited ? unlimitedPricing : regularPricing;
-  return <div className="min-h-screen bg-gray-50 p-6">
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -1138,10 +1139,20 @@ export const QuoteBuilder = () => {
             </Card>
 
             <div className="mt-8">
-              <ActionButtons selectedTier={{
-              name: 'Custom Selection',
-              id: 'combined'
-            }} totalPrice={finalPricing.total} teacherCount={getTotalTeacherCount()} studentCount={getTotalStudentCount()} />
+              <ActionButtons 
+                selectedTier={{
+                  name: 'Custom Selection',
+                  id: 'combined'
+                }} 
+                totalPrice={finalPricing.total} 
+                teacherCount={getTotalTeacherCount()} 
+                studentCount={getTotalStudentCount()}
+                schoolInfo={schoolInfo}
+                quoteItems={getDetailedBreakdown()}
+                pricing={finalPricing}
+                programStartDate={programStartDate}
+                isUnlimited={useUnlimited}
+              />
             </div>
           </div>
         </div>
@@ -1170,5 +1181,6 @@ export const QuoteBuilder = () => {
         {/* Add padding at bottom for mobile to prevent overlap with sticky notification */}
         <div className="md:hidden h-24"></div>
       </div>
-    </div>;
+    </div>
+  );
 };

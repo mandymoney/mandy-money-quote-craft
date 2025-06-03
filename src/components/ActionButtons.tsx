@@ -3,60 +3,166 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { generateQuotePDF, downloadPDF, createEmailSubject, createEmailBody } from '@/utils/pdfGenerator';
+
+interface AddressComponents {
+  streetNumber: string;
+  streetName: string;
+  suburb: string;
+  state: string;
+  postcode: string;
+  country: string;
+}
+
+interface SchoolInfo {
+  schoolName: string;
+  schoolAddress: AddressComponents;
+  schoolABN: string;
+  contactPhone: string;
+  deliveryAddress: AddressComponents;
+  deliveryIsSameAsSchool: boolean;
+  billingAddress: AddressComponents;
+  billingIsSameAsSchool: boolean;
+  accountsEmail: string;
+  coordinatorEmail: string;
+  coordinatorName: string;
+  coordinatorPosition: string;
+  purchaseOrderNumber: string;
+  paymentPreference: string;
+  supplierSetupForms: string;
+  questionsComments: string;
+}
+
+interface QuoteItem {
+  item: string;
+  count: number;
+  unitPrice: number;
+  totalPrice: number;
+  type: string;
+  description: string;
+  savings?: number;
+}
 
 interface ActionButtonsProps {
   selectedTier: any;
   totalPrice: number;
   teacherCount: number;
   studentCount: number;
+  schoolInfo: SchoolInfo;
+  quoteItems: QuoteItem[];
+  pricing: {
+    subtotal: number;
+    gst: number;
+    total: number;
+    shipping: number;
+  };
+  programStartDate: Date;
+  isUnlimited?: boolean;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
   selectedTier,
   totalPrice,
   teacherCount,
-  studentCount
+  studentCount,
+  schoolInfo,
+  quoteItems,
+  pricing,
+  programStartDate,
+  isUnlimited = false
 }) => {
+  const generateAndDownloadPDF = () => {
+    const doc = generateQuotePDF(
+      schoolInfo,
+      quoteItems,
+      pricing,
+      teacherCount,
+      studentCount,
+      programStartDate,
+      isUnlimited
+    );
+    
+    const filename = `MandyMoney_Quote_${schoolInfo.schoolName || 'School'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    downloadPDF(doc, filename);
+    
+    return doc;
+  };
+
+  const openEmailWithPDF = (type: 'enquiry' | 'order') => {
+    const doc = generateAndDownloadPDF();
+    
+    const subject = createEmailSubject(type, schoolInfo.schoolName);
+    const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount);
+    
+    const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    window.open(mailtoUrl, '_blank');
+  };
+
   const handleExportPDF = () => {
     toast({
-      title: "PDF Export Started",
-      description: `Generating quote for ${selectedTier?.name} - $${totalPrice.toLocaleString()} (inc. GST)`,
+      title: "Generating PDF...",
+      description: "Creating your quote document",
     });
     
-    setTimeout(() => {
+    try {
+      generateAndDownloadPDF();
+      
       toast({
-        title: "Quote Ready!",
-        description: "Your PDF quote has been generated and is ready for download.",
+        title: "Quote Downloaded!",
+        description: "Your PDF quote has been generated and downloaded.",
       });
-    }, 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePlaceOrder = () => {
     toast({
-      title: "Redirecting to Order",
-      description: `Processing order for ${teacherCount} teacher${teacherCount > 1 ? 's' : ''} and ${studentCount} student${studentCount > 1 ? 's' : ''}`,
+      title: "Preparing Order...",
+      description: "Generating quote and setting up email",
     });
     
-    setTimeout(() => {
+    try {
+      openEmailWithPDF('order');
+      
       toast({
-        title: "Order Initiated",
-        description: "You'll be redirected to the secure checkout page.",
+        title: "Email Ready!",
+        description: "Your quote has been downloaded and email opened for order placement.",
       });
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to prepare order. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleBooklistingEnquiry = () => {
     toast({
-      title: "Booklisting Enquiry",
-      description: "Opening enquiry form for booklisting options and bulk pricing.",
+      title: "Preparing Enquiry...",
+      description: "Generating quote and setting up email",
     });
     
-    setTimeout(() => {
+    try {
+      openEmailWithPDF('enquiry');
+      
       toast({
-        title: "Contact Form Ready",
-        description: "You'll be directed to our booklisting enquiry form.",
+        title: "Email Ready!",
+        description: "Your quote has been downloaded and email opened for booklisting enquiry.",
       });
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to prepare enquiry. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!selectedTier) return null;
