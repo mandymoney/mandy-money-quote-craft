@@ -470,6 +470,7 @@ export const QuoteBuilder = () => {
                 pricing={regularPricing}
                 teacherCount={getTotalTeacherCount()}
                 studentCount={getTotalStudentCount()}
+                regularPricing={regularPricing}
               />
             </div>
 
