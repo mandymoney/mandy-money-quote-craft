@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -152,11 +151,6 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
                   <div>
                     <div className="text-3xl font-bold text-gray-800">${tier.basePrice.toLocaleString()}</div>
                     <div className="text-gray-600">Base unlimited access</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-gray-500">Unlimited Teacher Digital Passes</div>
-                    <div className="text-sm text-gray-500">Unlimited Student Digital Passes</div>
-                    <div className="text-sm text-gray-500">Unlimited Classroom Spaces</div>
                   </div>
                 </div>
               </div>
