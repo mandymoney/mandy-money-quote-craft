@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon } from 'lucide-react';
+import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon, BarChart3 } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -76,14 +76,14 @@ interface SchoolInfo {
   purchaseOrderNumber: string;
   paymentPreference: string;
   supplierSetupForms: string;
+  questionsComments: string;
 }
 
-interface MicroCredential {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  details: string;
+interface VideoLinks {
+  teacherPassVideo: string;
+  studentPassVideo: string;
+  microCredentialsVideo: string;
+  lessonEmbeds: { [key: number]: string };
 }
 
 const teacherTiers: PricingTier[] = [
@@ -247,37 +247,6 @@ const unlimitedTier: UnlimitedTier = {
   bestFor: 'Perfect for schools prioritising financial empowerment as a core student outcome'
 };
 
-const microCredentials: MicroCredential[] = [
-  {
-    id: 'budgeting',
-    title: 'Budgeting',
-    description: 'Master personal and household budgeting skills',
-    image: '/lovable-uploads/micro-credential-budgeting.png',
-    details: 'Students learn to create and manage personal budgets, track expenses, and make informed financial decisions.'
-  },
-  {
-    id: 'banking',
-    title: 'Banking & Payments',
-    description: 'Understand modern banking and payment systems',
-    image: '/lovable-uploads/micro-credential-banking.png',
-    details: 'Covers account management, digital payments, fees, and banking services for young adults.'
-  },
-  {
-    id: 'credit',
-    title: 'Credit & Debt',
-    description: 'Navigate credit products and debt management',
-    image: '/lovable-uploads/micro-credential-credit.png',
-    details: 'Learn about credit scores, responsible borrowing, and strategies for managing debt effectively.'
-  },
-  {
-    id: 'planning',
-    title: 'Financial Planning',
-    description: 'Develop long-term financial strategies',
-    image: '/lovable-uploads/micro-credential-planning.png',
-    details: 'Focus on goal setting, investment basics, insurance, and planning for major life events.'
-  }
-];
-
 export const QuoteBuilder = () => {
   const [selectedTeacherTiers, setSelectedTeacherTiers] = useState<TierSelection>({});
   const [selectedStudentTiers, setSelectedStudentTiers] = useState<TierSelection>({});
@@ -303,9 +272,15 @@ export const QuoteBuilder = () => {
     coordinatorPosition: '',
     purchaseOrderNumber: '',
     paymentPreference: '',
-    supplierSetupForms: ''
+    supplierSetupForms: '',
+    questionsComments: ''
   });
-  const [flippedCredentials, setFlippedCredentials] = useState<Set<string>>(new Set());
+  const [videoLinks, setVideoLinks] = useState<VideoLinks>({
+    teacherPassVideo: '',
+    studentPassVideo: '',
+    microCredentialsVideo: '',
+    lessonEmbeds: {}
+  });
 
   const GST_RATE = 0.1;
   const SHIPPING_THRESHOLD = 90;
@@ -585,15 +560,7 @@ export const QuoteBuilder = () => {
   };
 
   const handleCredentialFlip = (id: string) => {
-    setFlippedCredentials(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
+    // This function was used for micro-credentials flip cards, now removed
   };
 
   const handleTeacherSelection = (tierId: string, count: number) => {
@@ -709,7 +676,7 @@ export const QuoteBuilder = () => {
                 <h2 className="text-2xl font-bold mb-2 text-center" style={{ color: '#fea100' }}>
                   Step 2: Select your Student Program Elements
                 </h2>
-                <p className="text-center" style={{ color: '#ffb512' }}>Choose the learning materials that engage your students</p>
+                <p className="text-center" style={{ color: '#ffb512' }}>Choose personalised access to the program for your students</p>
                 
                 {/* Volume Notification */}
                 {volumeNotification && (
@@ -837,43 +804,35 @@ export const QuoteBuilder = () => {
                     {getTotalStudentCount() > 0 ? `${getTotalStudentCount()} Student${getTotalStudentCount() > 1 ? 's' : ''}` : ''}
                   </div>
                   <div className="text-xs text-gray-500">Includes 12 month access</div>
-                  {regularPricing.shipping > 0 && (
-                    <div className="text-xs text-gray-500">+ $14 shipping</div>
-                  )}
-                  {regularPricing.shipping === 0 && hasPhysicalItems() && (
-                    <div className="text-xs text-green-600">Free shipping included</div>
-                  )}
-                  {totalSavings > 0 && (
-                    <div className="text-sm text-green-600 font-medium">
-                      Volume discount: Save ${totalSavings.toFixed(0)}
-                    </div>
-                  )}
                   
-                  {/* Enhanced Volume Discount Display */}
-                  {volumeDiscountDetails && (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-4 mt-4">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-green-800 mb-2">🎉 Volume Discount Applied!</div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-green-700">Before discount:</span>
-                            <span className="text-sm text-gray-500 line-through">${volumeDiscountDetails.originalPerStudent.toFixed(0)}/student</span>
+                  {/* Simplified Volume Discount and Shipping Display */}
+                  {(regularPricing.shipping > 0 || (regularPricing.shipping === 0 && hasPhysicalItems()) || totalSavings > 0) && (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 mt-4">
+                      <div className="space-y-2">
+                        {regularPricing.shipping === 0 && hasPhysicalItems() && (
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-green-700">Free shipping included</span>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-semibold text-green-700">Your price:</span>
-                            <span className="text-lg font-bold text-green-800">${volumeDiscountDetails.discountedPerStudent.toFixed(0)}/student</span>
-                          </div>
-                          <div className="border-t border-green-200 pt-2">
-                            <div className="text-center">
-                              <div className="text-xl font-bold text-green-700">
-                                Save ${volumeDiscountDetails.savingsPerStudent.toFixed(0)}/student
-                              </div>
-                              <div className="text-sm text-green-600">
-                                Total savings: ${volumeDiscountDetails.totalSavings.toFixed(0)}
-                              </div>
+                        )}
+                        {totalSavings > 0 && volumeDiscountDetails && (
+                          <>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-green-700">Volume discount: Save ${totalSavings.toFixed(0)}</span>
                             </div>
-                          </div>
-                        </div>
+                            <div className="flex justify-between items-center text-xs text-green-600">
+                              <span>Before discount:</span>
+                              <span className="line-through">${volumeDiscountDetails.originalPerStudent.toFixed(0)}/student</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm font-semibold">
+                              <span className="text-green-700">Your price:</span>
+                              <span className="text-green-800">${volumeDiscountDetails.discountedPerStudent.toFixed(0)}/student</span>
+                            </div>
+                            <div className="flex justify-between items-center text-green-700 font-bold">
+                              <span>Save ${volumeDiscountDetails.savingsPerStudent.toFixed(0)}/student</span>
+                              <span>Total savings: ${volumeDiscountDetails.totalSavings.toFixed(0)}</span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -914,8 +873,25 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
+        {/* Green Background Section with Official Quote Header */}
+        <div className="mt-12 mb-8">
+          <div className="border-t-2 border-gray-300"></div>
+        </div>
+
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-8 text-center text-white mb-8">
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <div className="text-4xl">✨</div>
+            <h2 className="text-4xl font-bold">Your Official Program Quote</h2>
+            <div className="text-4xl">✨</div>
+          </div>
+          <p className="text-xl opacity-90">For internal use or to place an order</p>
+          <div className="mt-6 animate-bounce">
+            <ArrowDown className="h-8 w-8 mx-auto text-white" />
+          </div>
+        </div>
+
         {/* Official Quote Section */}
-        <div className="mt-12 bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Navy Header Banner */}
           <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white p-6">
             <div className="text-center">
@@ -936,43 +912,43 @@ export const QuoteBuilder = () => {
           </div>
 
           <div className="p-8">
-            {/* Program Start Date */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Program Access Period</h3>
-              <div className="flex justify-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-64 justify-start text-left font-normal",
-                        !programStartDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={programStartDate}
-                      onSelect={(date) => date && setProgramStartDate(date)}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="text-center mt-3 text-sm text-gray-600">
-                Access period: {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
-              </div>
-            </div>
-            
             {/* School Information Form */}
             <Card className="mb-8 p-6 bg-gray-50">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">School Information</h3>
               <p className="text-sm text-gray-600 mb-4">Information not required unless placing an order</p>
+              
+              {/* Program Start Date within School Info */}
+              <div className="mb-6">
+                <h4 className="text-md font-semibold text-gray-700 mb-3">Program Access Period</h4>
+                <div className="flex items-center gap-4 mb-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-64 justify-start text-left font-normal",
+                          !programStartDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={programStartDate}
+                        onSelect={(date) => date && setProgramStartDate(date)}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="text-sm text-gray-600">
+                  Access period: {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
+                </div>
+              </div>
               
               <div className="grid md:grid-cols-2 gap-4">
                 <Input
@@ -986,12 +962,15 @@ export const QuoteBuilder = () => {
                   value={schoolInfo.schoolABN}
                   onChange={(e) => setSchoolInfo(prev => ({ ...prev, schoolABN: e.target.value }))}
                 />
-                <Textarea
-                  placeholder="School Address"
-                  value={schoolInfo.schoolAddress}
-                  onChange={(e) => setSchoolInfo(prev => ({ ...prev, schoolAddress: e.target.value }))}
-                  className="md:col-span-2"
-                />
+                <div className="md:col-span-2">
+                  <Input
+                    placeholder="School Address (Start typing for suggestions)"
+                    value={schoolInfo.schoolAddress}
+                    onChange={(e) => setSchoolInfo(prev => ({ ...prev, schoolAddress: e.target.value }))}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Compatible with Australian address validation for Shopify integration</p>
+                </div>
                 <Input
                   placeholder="Contact Phone"
                   value={schoolInfo.contactPhone}
@@ -1035,11 +1014,15 @@ export const QuoteBuilder = () => {
                         <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
                       </div>
                       {!schoolInfo.deliveryIsSameAsSchool && (
-                        <Textarea
-                          placeholder="Delivery Address"
-                          value={schoolInfo.deliveryAddress}
-                          onChange={(e) => setSchoolInfo(prev => ({ ...prev, deliveryAddress: e.target.value }))}
-                        />
+                        <div>
+                          <Input
+                            placeholder="Delivery Address (Start typing for suggestions)"
+                            value={schoolInfo.deliveryAddress}
+                            onChange={(e) => setSchoolInfo(prev => ({ ...prev, deliveryAddress: e.target.value }))}
+                            className="w-full"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">Compatible with Australian address validation</p>
+                        </div>
                       )}
                     </div>
                   </>
@@ -1055,11 +1038,15 @@ export const QuoteBuilder = () => {
                     <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
                   </div>
                   {!schoolInfo.billingIsSameAsSchool && (
-                    <Textarea
-                      placeholder="Billing Address"
-                      value={schoolInfo.billingAddress}
-                      onChange={(e) => setSchoolInfo(prev => ({ ...prev, billingAddress: e.target.value }))}
-                    />
+                    <div>
+                      <Input
+                        placeholder="Billing Address (Start typing for suggestions)"
+                        value={schoolInfo.billingAddress}
+                        onChange={(e) => setSchoolInfo(prev => ({ ...prev, billingAddress: e.target.value }))}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Compatible with Australian address validation</p>
+                    </div>
                   )}
                 </div>
                 
@@ -1083,6 +1070,17 @@ export const QuoteBuilder = () => {
                     <SelectItem value="not-sure">Not Sure</SelectItem>
                   </SelectContent>
                 </Select>
+
+                {/* Questions/Comments Section */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Any Questions or Comments?</label>
+                  <Textarea
+                    placeholder="Please share any questions, special requirements, or additional information..."
+                    value={schoolInfo.questionsComments}
+                    onChange={(e) => setSchoolInfo(prev => ({ ...prev, questionsComments: e.target.value }))}
+                    className="min-h-20"
+                  />
+                </div>
               </div>
             </Card>
 
@@ -1090,8 +1088,9 @@ export const QuoteBuilder = () => {
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Left Column - Investment Breakdown */}
               <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                <h3 className="text-lg font-semibold mb-4 text-slate-800 flex items-center">
-                  📊 Investment Breakdown
+                <h3 className="text-xl font-semibold mb-4 text-slate-800 flex items-center">
+                  <BarChart3 className="h-6 w-6 mr-2" />
+                  Investment Breakdown
                 </h3>
                 
                 <div className="space-y-4">
@@ -1262,52 +1261,13 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
-        {/* Micro-Credentials Section */}
-        <div className="mt-16 mb-12">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Your Four Micro-Credentials</h2>
-            <p className="text-gray-600">Hover over each credential to learn more</p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {microCredentials.map((credential) => (
-              <div
-                key={credential.id}
-                className="perspective-1000 h-64"
-                onMouseEnter={() => handleCredentialFlip(credential.id)}
-                onMouseLeave={() => handleCredentialFlip(credential.id)}
-              >
-                <div className={`relative w-full h-full transform-style-preserve-3d transition-transform duration-700 ${
-                  flippedCredentials.has(credential.id) ? 'rotate-y-180' : ''
-                }`}>
-                  {/* Front */}
-                  <div className="absolute inset-0 backface-hidden rounded-lg overflow-hidden shadow-lg">
-                    <img
-                      src={credential.image}
-                      alt={credential.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
-                      <div className="absolute bottom-4 left-4 text-white">
-                        <h3 className="font-bold text-lg">{credential.title}</h3>
-                        <p className="text-sm opacity-90">{credential.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Back */}
-                  <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-6 flex flex-col justify-center text-white shadow-lg">
-                    <h3 className="font-bold text-xl mb-4">{credential.title}</h3>
-                    <p className="text-sm leading-relaxed">{credential.details}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Lesson Explorer with Video Link Management */}
+        <div className="mt-12">
+          <LessonExplorer 
+            videoLinks={videoLinks}
+            onVideoLinksChange={setVideoLinks}
+          />
         </div>
-
-        {/* Lesson Explorer */}
-        <LessonExplorer />
 
       </div>
     </div>
