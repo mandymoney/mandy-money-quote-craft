@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -68,10 +67,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     const imageMap = {
       'teacher-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/100.png',
       'teacher-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/101.png',
-      'teacher-bundle': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/63bcf350cc96ecea41b5b6012e725100d0d26886/102.png',
+      'teacher-both': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/63bcf350cc96ecea41b5b6012e725100d0d26886/102.png',
       'student-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/103.png',
       'student-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/104.png',
-      'student-bundle': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/105.png'
+      'student-both': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/105.png'
     };
     return imageMap[tier.id as keyof typeof imageMap];
   };
@@ -102,7 +101,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         )}
 
         {/* Product Image */}
-        {(showImages || tier.id.includes('bundle')) && getProductImage() && (
+        {(showImages || tier.id.includes('both')) && getProductImage() && (
           <div className="mb-4">
             <img 
               src={getProductImage()}
