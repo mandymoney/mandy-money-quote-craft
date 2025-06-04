@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronDown, ChevronRight, Search, Book, Play, Upload } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, Book, Play, Upload, Maximize2, Minimize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LessonData {
@@ -525,6 +525,7 @@ export const LessonExplorer: React.FC = () => {
   const [selectedMicroCredential, setSelectedMicroCredential] = useState<string>('all');
   const [selectedTopic, setSelectedTopic] = useState<string>('all');
   const [expandedLesson, setExpandedLesson] = useState<number | null>(null);
+  const [expandedPreview, setExpandedPreview] = useState<'teacher' | 'student' | null>(null);
   const [lessonIcons, setLessonIcons] = useState<{ [key: number]: string }>({
     1: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Setting%20The%20Scene%20Icon.png',
     2: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Budgeting%20Icon.png',
@@ -628,36 +629,91 @@ export const LessonExplorer: React.FC = () => {
       <Card className="p-6 bg-white border border-teal-200">
         <h2 className="text-2xl font-semibold text-teal-800 mb-6">Program Materials Preview</h2>
         
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-teal-700">Teacher Pass & Textbook</h3>
-            <div className="aspect-video bg-white rounded-lg overflow-hidden border border-teal-200">
-              <iframe
-                src="https://learn.mandymoney.com.au/enter/oezZ9NI"
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
-                title="Teacher Pass Preview"
-                className="w-full h-full"
-              />
+        <div className={cn(
+          "grid gap-6 mb-8",
+          expandedPreview ? "grid-cols-1" : "md:grid-cols-2"
+        )}>
+          {/* Teacher Preview */}
+          {(!expandedPreview || expandedPreview === 'teacher') && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-teal-700">Teacher Pass & Textbook</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExpandedPreview(expandedPreview === 'teacher' ? null : 'teacher')}
+                  className="border-teal-200 text-teal-600 hover:bg-teal-50"
+                >
+                  {expandedPreview === 'teacher' ? (
+                    <>
+                      <Minimize2 className="h-4 w-4 mr-2" />
+                      Minimize
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="h-4 w-4 mr-2" />
+                      Expand
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div className={cn(
+                "bg-white rounded-lg overflow-hidden border border-teal-200 transition-all duration-300",
+                expandedPreview === 'teacher' ? "aspect-video" : "aspect-video"
+              )}>
+                <iframe
+                  src="https://learn.mandymoney.com.au/enter/oezZ9NI"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+                  title="Teacher Pass Preview"
+                  className="w-full h-full"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-teal-700">Student Pass & Textbook</h3>
-            <div className="aspect-video bg-white rounded-lg overflow-hidden border border-teal-200">
-              <iframe
-                src="https://learn.mandymoney.com.au/enter/NpX8KQp"
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
-                title="Student Pass Preview"
-                className="w-full h-full"
-              />
+          {/* Student Preview */}
+          {(!expandedPreview || expandedPreview === 'student') && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-teal-700">Student Pass & Textbook</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExpandedPreview(expandedPreview === 'student' ? null : 'student')}
+                  className="border-teal-200 text-teal-600 hover:bg-teal-50"
+                >
+                  {expandedPreview === 'student' ? (
+                    <>
+                      <Minimize2 className="h-4 w-4 mr-2" />
+                      Minimize
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="h-4 w-4 mr-2" />
+                      Expand
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div className={cn(
+                "bg-white rounded-lg overflow-hidden border border-teal-200 transition-all duration-300",
+                expandedPreview === 'student' ? "aspect-video" : "aspect-video"
+              )}>
+                <iframe
+                  src="https://learn.mandymoney.com.au/enter/NpX8KQp"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+                  title="Student Pass Preview"
+                  className="w-full h-full"
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Your Four Micro-Credentials */}
