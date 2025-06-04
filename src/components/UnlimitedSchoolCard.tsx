@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -104,9 +103,17 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
           {/* Banner Image */}
           <div className="mb-6">
             <img 
-              src="https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/1599bca18c91728a2448c014064bdd3e1784dce4/Unlimited%20Access%20Banner.png"
+              src="https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/main/Unlimited%20Access%20Banner.png"
               alt="Unlimited Access Banner" 
               className="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+              onError={(e) => {
+                console.log('Banner image failed to load');
+                // Fallback to a placeholder or hide the image
+                e.currentTarget.style.display = 'none';
+              }}
+              onLoad={() => {
+                console.log('Banner image loaded successfully');
+              }}
             />
           </div>
 
