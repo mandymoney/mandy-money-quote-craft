@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -575,12 +576,7 @@ export const LessonExplorer: React.FC = () => {
     3: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/161.png',
     4: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/162.png'
   });
-  const [backImages, setBackImages] = useState<{ [key: number]: string }>({
-    1: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/f264470607283a3f8eb10ba1d70d5f1a2e8cc31f/MCL1%20Reverse.png',
-    2: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/f264470607283a3f8eb10ba1d70d5f1a2e8cc31f/MCL2%20Reverse.png',
-    3: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/f264470607283a3f8eb10ba1d70d5f1a2e8cc31f/MCL3%20Reverse.png',
-    4: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/f264470607283a3f8eb10ba1d70d5f1a2e8cc31f/MCL4%20Reverse.png'
-  });
+  const [backImages, setBackImages] = useState<{ [key: number]: string }>({});
 
   const microCredentials = Array.from(new Set(allLessons.map(l => l.microCredential)));
   const topics = Array.from(new Set(allLessons.map(l => l.topic)));
@@ -661,7 +657,7 @@ export const LessonExplorer: React.FC = () => {
                 <div className="relative aspect-square transform-style-preserve-3d transition-transform duration-500 hover:rotate-y-180">
                   {/* Front side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden">
-                    <div className="aspect-square overflow-hidden rounded-sm">
+                    <div className="aspect-square overflow-hidden">
                       <img 
                         src={microCredentialImages[level]} 
                         alt={`Level ${level} micro-credential`}
@@ -672,12 +668,26 @@ export const LessonExplorer: React.FC = () => {
                   
                   {/* Back side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-                    <div className="aspect-square overflow-hidden rounded-sm bg-white">
-                      <img 
-                        src={backImages[level]} 
-                        alt={`Level ${level} back image`}
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="aspect-square overflow-hidden">
+                      {backImages[level] ? (
+                        <img 
+                          src={backImages[level]} 
+                          alt={`Level ${level} back image`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="aspect-square bg-gray-100 flex flex-col items-center justify-center p-4 relative">
+                          <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleBackImageUpload(level, e)}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                          <p className="text-gray-600 font-medium text-center">Upload Back Image</p>
+                          <p className="text-sm text-gray-500">Level {level}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -76,14 +76,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     return imageMap[tier.id as keyof typeof imageMap];
   };
 
-  // Get display name for tier
-  const getDisplayName = () => {
-    if (tier.name.includes('Digital Pass + Textbook Bundle')) {
-      return tier.name.replace('Digital Pass + Textbook Bundle', 'Combo Bundle');
-    }
-    return tier.name;
-  };
-
   const allInclusions = [
     ...tier.inclusions.teacher,
     ...tier.inclusions.student,
@@ -109,7 +101,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Product Image - always show for bundle tiers or when showImages is true */}
+        {/* Product Image */}
         {(showImages || tier.id.includes('bundle')) && getProductImage() && (
           <div className="mb-4">
             <img 
@@ -133,7 +125,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             )}>
               {tier.type.toUpperCase()}
             </div>
-            <h3 className="text-white font-bold text-lg text-center leading-tight drop-shadow-sm">{getDisplayName()}</h3>
+            <h3 className="text-white font-bold text-lg text-center leading-tight drop-shadow-sm">{tier.name}</h3>
           </div>
         </div>
 
