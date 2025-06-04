@@ -1,4 +1,3 @@
-
 import jsPDF from 'jspdf';
 
 interface AddressComponents {
@@ -67,6 +66,23 @@ const addPageHeader = (doc: jsPDF, title: string, pageNumber: number = 1) => {
   doc.text(`Page ${pageNumber}`, 180, 20);
   
   return 30; // Return starting Y position for content
+};
+
+// Helper function to ensure teacher/student prefix is included
+const ensureProductTypePrefix = (itemName: string, type: string): string => {
+  const productType = type === 'teacher' ? 'Teacher' : 'Student';
+  
+  // If the item name doesn't already include the product type, add it
+  if (!itemName.toLowerCase().includes('teacher') && !itemName.toLowerCase().includes('student')) {
+    return `${productType} ${itemName}`;
+  }
+  
+  // If it has a generic term, replace it with the specific type
+  if (itemName.toLowerCase().includes('digital pass') && !itemName.toLowerCase().includes('teacher') && !itemName.toLowerCase().includes('student')) {
+    return itemName.replace(/Digital Pass/i, `${productType} Digital Pass`);
+  }
+  
+  return itemName;
 };
 
 export const generateQuotePDF = (
@@ -157,7 +173,7 @@ export const generateQuotePDF = (
     yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', 2);
   }
   
-  // Detailed item breakdown with enhanced clarity
+  // Detailed item breakdown with enhanced clarity and proper product names
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   
@@ -167,10 +183,13 @@ export const generateQuotePDF = (
       yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', doc.getNumberOfPages());
     }
     
+    // Ensure product name includes teacher/student prefix
+    const properProductName = ensureProductTypePrefix(item.item, item.type);
+    
     // Item header with enhanced product type distinction
     doc.setFont('helvetica', 'bold');
     const productTypeText = item.type === 'teacher' ? '[TEACHER PRODUCT]' : '[STUDENT PRODUCT]';
-    doc.text(`● ${productTypeText} ${item.item}`, 20, yPosition);
+    doc.text(`● ${productTypeText} ${properProductName}`, 20, yPosition);
     
     // Add type badge with more distinct colors
     if (item.type === 'teacher') {
@@ -259,7 +278,7 @@ export const generateQuotePDF = (
   
   doc.setTextColor(0, 0, 0);
   
-  // What's Included section with enhanced clarity
+  // What's Included section with enhanced clarity and proper naming
   yPosition += 30;
   if (yPosition > 220) {
     doc.addPage();
@@ -271,14 +290,20 @@ export const generateQuotePDF = (
   doc.text("What's Included", 20, yPosition);
   yPosition += 10;
   
-  // Separate teacher and student inclusions
+  // Separate teacher and student inclusions with proper naming
   const teacherInclusions = quoteItems
     .filter(item => item.type === 'teacher')
-    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Teacher Digital Pass & Print Textbooks').replace('Textbook Only', 'Teacher Print Textbooks')} [FOR TEACHERS]`);
+    .map(item => {
+      const properName = ensureProductTypePrefix(item.item, item.type);
+      return `${item.count} × ${properName} [FOR TEACHERS]`;
+    });
   
   const studentInclusions = quoteItems
     .filter(item => item.type === 'student')
-    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Student Digital Pass & Print Textbooks').replace('Textbook Only', 'Student Print Textbooks')} [FOR STUDENTS]`);
+    .map(item => {
+      const properName = ensureProductTypePrefix(item.item, item.type);
+      return `${item.count} × ${properName} [FOR STUDENTS]`;
+    });
   
   const generalInclusions = ['1 × Digital Classroom Space [SHARED RESOURCE]'];
   
@@ -427,7 +452,7 @@ export const generateOrderPDF = (
   doc.text(`Students: ${studentCount}`, 20, yPosition);
   yPosition += 15;
   
-  // Order Items
+  // Order Items with proper naming
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
   doc.text('Order Breakdown', 20, yPosition);
@@ -446,7 +471,7 @@ export const generateOrderPDF = (
   doc.line(20, yPosition - 2, 180, yPosition - 2);
   yPosition += 2;
   
-  // Order items
+  // Order items with proper product names
   doc.setFont('helvetica', 'normal');
   quoteItems.forEach(item => {
     if (yPosition > 250) {
@@ -454,7 +479,8 @@ export const generateOrderPDF = (
       yPosition = 20;
     }
     
-    doc.text(item.item.substring(0, 30), 20, yPosition);
+    const properProductName = ensureProductTypePrefix(item.item, item.type);
+    doc.text(properProductName.substring(0, 30), 20, yPosition);
     doc.text(item.count.toString(), 80, yPosition);
     doc.text(`$${item.unitPrice.toLocaleString()}`, 100, yPosition);
     doc.text(`$${item.totalPrice.toLocaleString()}`, 140, yPosition);
