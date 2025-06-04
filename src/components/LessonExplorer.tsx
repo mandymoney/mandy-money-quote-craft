@@ -478,7 +478,7 @@ const allLessons: LessonData[] = [
     chapters: [
       'How Risky Is My Investment?',
       'What About Crypto Currency?',
-      'What Is a Diverse Investment Portfolio?',
+      'What Is A Diverse Investment Portfolio?',
       'What Is an Investment Fund?',
       'How Do I Invest Into a Fund?'
     ]
@@ -532,6 +532,7 @@ export const LessonExplorer: React.FC = () => {
     3: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/161.png',
     4: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/162.png'
   });
+  const [backImages, setBackImages] = useState<{ [key: number]: string }>({});
 
   const microCredentials = Array.from(new Set(allLessons.map(l => l.microCredential)));
   const topics = Array.from(new Set(allLessons.map(l => l.topic)));
@@ -559,12 +560,12 @@ export const LessonExplorer: React.FC = () => {
     }
   };
 
-  const handleMicroCredentialImageUpload = (level: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBackImageUpload = (level: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setMicroCredentialImages(prev => ({
+        setBackImages(prev => ({
           ...prev,
           [level]: e.target?.result as string
         }));
@@ -612,7 +613,7 @@ export const LessonExplorer: React.FC = () => {
                 <div className="relative aspect-square transform-style-preserve-3d transition-transform duration-500 hover:rotate-y-180">
                   {/* Front side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden">
-                    <div className="aspect-square bg-teal-50 rounded-lg flex items-center justify-center border-2 border-dashed border-teal-300 hover:border-teal-400 transition-colors overflow-hidden">
+                    <div className="aspect-square rounded-lg overflow-hidden">
                       <img 
                         src={microCredentialImages[level]} 
                         alt={`Level ${level} micro-credential`}
@@ -623,17 +624,26 @@ export const LessonExplorer: React.FC = () => {
                   
                   {/* Back side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-                    <div className="aspect-square bg-teal-600 text-white rounded-lg flex flex-col items-center justify-center p-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold mb-2">Level {level}</div>
-                        <div className="text-sm opacity-90 mb-3">Micro-Credential</div>
-                        <div className="text-xs opacity-75">
-                          {level === 1 && "Foundation skills in budgeting, spending, super & tax"}
-                          {level === 2 && "Career planning, saving goals & real-world applications"}
-                          {level === 3 && "Advanced concepts, systems & financial safety"}
-                          {level === 4 && "Wealth building, debt management & investing"}
+                    <div className="aspect-square rounded-lg overflow-hidden">
+                      {backImages[level] ? (
+                        <img 
+                          src={backImages[level]} 
+                          alt={`Level ${level} back image`}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="aspect-square bg-gray-100 rounded-lg flex flex-col items-center justify-center p-4 relative">
+                          <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleBackImageUpload(level, e)}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                          />
+                          <p className="text-gray-600 font-medium text-center">Upload Back Image</p>
+                          <p className="text-sm text-gray-500">Level {level}</p>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>

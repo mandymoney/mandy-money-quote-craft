@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,13 +45,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   const getGradientClass = () => {
     if (customGradient) return '';
     if (colorScheme === 'yellow') {
-      if (tier.id.includes('digital')) return 'from-yellow-400 to-yellow-500';
-      if (tier.id.includes('physical')) return 'from-yellow-500 to-yellow-600';
-      return 'from-yellow-600 to-yellow-700';
+      if (tier.id.includes('digital')) return 'from-yellow-600 via-yellow-500 to-yellow-400';
+      if (tier.id.includes('physical')) return 'from-yellow-700 via-yellow-600 to-yellow-500';
+      return 'from-yellow-800 via-yellow-700 to-yellow-600';
     } else {
-      if (tier.id.includes('digital')) return 'from-teal-400 to-teal-500';
-      if (tier.id.includes('physical')) return 'from-teal-500 to-teal-600';
-      return 'from-teal-600 to-teal-700';
+      if (tier.id.includes('digital')) return 'from-teal-600 via-teal-500 to-teal-400';
+      if (tier.id.includes('physical')) return 'from-teal-700 via-teal-600 to-teal-500';
+      return 'from-teal-800 via-teal-700 to-teal-600';
     }
   };
 
@@ -93,14 +92,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       style={{ animationDelay: `${animationDelay}ms` }}
       onClick={onSelect}
     >
-      {tier.isPopular && (
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 hidden md:block">
-          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1">
-            Most Popular
-          </Badge>
-        </div>
-      )}
-
       <div className="p-6">
         {/* Volume Selector at top */}
         {volumeSelector && (
@@ -122,18 +113,18 @@ export const PricingCard: React.FC<PricingCardProps> = ({
 
         {/* Header */}
         <div 
-          className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-r ' + getGradientClass())}
+          className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-br ' + getGradientClass())}
           style={customGradient ? { background: customGradient } : {}}
         >
           <div className="flex flex-col items-center justify-center h-full px-2">
             <div className={cn(
-              "text-xs font-medium text-white/80 mb-1",
-              tier.type === 'teacher' ? 'bg-white/20' : 'bg-white/20',
+              "text-xs font-medium text-white/90 mb-1",
+              tier.type === 'teacher' ? 'bg-white/30' : 'bg-white/30',
               "px-2 py-1 rounded"
             )}>
               {tier.type.toUpperCase()}
             </div>
-            <h3 className="text-white font-bold text-lg text-center leading-tight">{tier.name}</h3>
+            <h3 className="text-white font-bold text-lg text-center leading-tight drop-shadow-sm">{tier.name}</h3>
           </div>
         </div>
 
