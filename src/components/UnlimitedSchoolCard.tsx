@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -101,12 +100,12 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
         )}
 
         <div className="p-8 pb-16">
-          {/* Banner Image */}
+          {/* Banner Image - fit height and no border */}
           <div className="mb-6">
             <img 
               src="https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/1599bca18c91728a2448c014064bdd3e1784dce4/Unlimited%20Access%20Banner.png"
               alt="Unlimited Access Banner" 
-              className="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+              className="w-full h-auto object-contain rounded-lg"
             />
           </div>
 

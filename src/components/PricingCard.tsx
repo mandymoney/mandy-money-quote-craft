@@ -63,6 +63,19 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     return isSelected ? 'border-teal-400' : 'border-gray-200';
   };
 
+  // Get the appropriate product image based on tier ID
+  const getProductImage = () => {
+    const imageMap = {
+      'teacher-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/100.png',
+      'teacher-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/101.png',
+      'teacher-bundle': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/63bcf350cc96ecea41b5b6012e725100d0d26886/102.png',
+      'student-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/103.png',
+      'student-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/104.png',
+      'student-bundle': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/105.png'
+    };
+    return imageMap[tier.id as keyof typeof imageMap];
+  };
+
   const allInclusions = [
     ...tier.inclusions.teacher,
     ...tier.inclusions.student,
@@ -96,18 +109,14 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Image Placeholder */}
-        {showImages && (
-          <div className={cn(
-            "h-32 rounded-lg mb-4 flex items-center justify-center border-2 border-dashed",
-            colorScheme === 'yellow' ? 'bg-yellow-50 border-yellow-300' : 'bg-teal-50 border-teal-300'
-          )}>
-            <div className="text-center">
-              <Image className={cn("h-8 w-8 mx-auto mb-2", colorScheme === 'yellow' ? 'text-yellow-400' : 'text-teal-400')} />
-              <p className={cn("text-sm font-medium", colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500')}>
-                Upload {tier.name} Image
-              </p>
-            </div>
+        {/* Product Image */}
+        {showImages && getProductImage() && (
+          <div className="mb-4">
+            <img 
+              src={getProductImage()}
+              alt={tier.name}
+              className="w-full h-32 object-contain rounded-lg"
+            />
           </div>
         )}
 
@@ -116,8 +125,15 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-r ' + getGradientClass())}
           style={customGradient ? { background: customGradient } : {}}
         >
-          <div className="flex items-center justify-center h-full">
-            <h3 className="text-white font-bold text-lg text-center">{tier.name}</h3>
+          <div className="flex flex-col items-center justify-center h-full px-2">
+            <div className={cn(
+              "text-xs font-medium text-white/80 mb-1",
+              tier.type === 'teacher' ? 'bg-white/20' : 'bg-white/20',
+              "px-2 py-1 rounded"
+            )}>
+              {tier.type.toUpperCase()}
+            </div>
+            <h3 className="text-white font-bold text-lg text-center leading-tight">{tier.name}</h3>
           </div>
         </div>
 
