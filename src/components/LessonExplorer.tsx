@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -657,26 +656,26 @@ export const LessonExplorer: React.FC = () => {
                 <div className="relative aspect-square transform-style-preserve-3d transition-transform duration-500 hover:rotate-y-180">
                   {/* Front side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden">
-                    <div className="aspect-square overflow-hidden rounded-sm">
+                    <div className="aspect-square overflow-hidden">
                       <img 
                         src={microCredentialImages[level]} 
                         alt={`Level ${level} micro-credential`}
-                        className="w-full h-full object-cover rounded-sm"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
                   
                   {/* Back side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-                    <div className="aspect-square overflow-hidden rounded-sm">
+                    <div className="aspect-square overflow-hidden">
                       {backImages[level] ? (
                         <img 
                           src={backImages[level]} 
                           alt={`Level ${level} back image`}
-                          className="w-full h-full object-cover rounded-sm"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="aspect-square bg-gray-100 flex flex-col items-center justify-center p-4 relative rounded-sm">
+                        <div className="aspect-square bg-gray-100 flex flex-col items-center justify-center p-4 relative">
                           <Upload className="h-8 w-8 text-gray-400 mb-2" />
                           <input
                             type="file"
@@ -768,7 +767,7 @@ export const LessonExplorer: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                       {lessonIcons[lesson.lesson] ? (
                         <img 
                           src={lessonIcons[lesson.lesson]} 
