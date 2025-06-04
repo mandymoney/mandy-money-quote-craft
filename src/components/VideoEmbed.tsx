@@ -12,20 +12,29 @@ export const VideoEmbed: React.FC = () => {
       <div className="p-6">
         <div className="text-center mb-4">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Watch: The Mandy Money Program Overview
+            Watch: Meet The Award Winning Mandy Money Program 🏆
           </h3>
           <p className="text-gray-600">
-            Get a quick overview of what's included in our financial literacy program
+            See how financial empowerment can become an effortless part of your students' learning outcomes
           </p>
         </div>
 
         {!showVideo ? (
-          <div className="relative bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg h-64 flex items-center justify-center cursor-pointer group"
+          <div className="relative cursor-pointer group"
                onClick={() => setShowVideo(true)}>
-            <div className="text-center text-white">
-              <Play className="h-16 w-16 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-              <p className="text-lg font-semibold">Click to Play Video</p>
-              <p className="text-sm opacity-90">Program Overview & Features</p>
+            <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden">
+              <img
+                src="https://vumbnail.com/1090351165.jpg"
+                alt="Mandy Money Program Overview"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:bg-opacity-20 transition-all">
+                <div className="text-center text-white">
+                  <Play className="h-16 w-16 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-lg font-semibold">Click to Play Video</p>
+                  <p className="text-sm opacity-90">Program Overview & Features</p>
+                </div>
+              </div>
             </div>
           </div>
         ) : (

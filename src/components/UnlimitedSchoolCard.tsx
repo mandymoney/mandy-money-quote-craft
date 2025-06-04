@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Check, Image, TrendingUp, Upload } from 'lucide-react';
+import { Check, Image, TrendingUp } from 'lucide-react';
 import { UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
@@ -40,8 +40,6 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
   studentCount,
   regularPricing
 }) => {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-
   const handleTeacherBooksChange = (value: string) => {
     const newCount = Math.max(0, parseInt(value) || 0);
     onAddOnsChange({ ...addOns, teacherBooks: newCount });
@@ -55,17 +53,6 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
   const handlePosterA0Change = (value: string) => {
     const newCount = Math.max(0, parseInt(value) || 0);
     onAddOnsChange({ ...addOns, posterA0: newCount });
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setUploadedImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const savings = regularPricing.total - pricing.total;
@@ -114,47 +101,13 @@ export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
         )}
 
         <div className="p-8 pb-16">
-          {/* Image Upload Section */}
+          {/* Banner Image */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-800 mb-2">
-              Upload Banner Image (Optional)
-            </label>
-            <div className="relative">
-              {uploadedImage ? (
-                <div className="relative">
-                  <img 
-                    src={uploadedImage} 
-                    alt="Uploaded banner" 
-                    className="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
-                  />
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setUploadedImage(null);
-                    }}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ) : (
-                <div className="border-2 border-dashed border-gray-400 rounded-lg p-4 bg-white/50">
-                  <div className="text-center">
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-gray-600" />
-                    <p className="text-sm text-gray-700 mb-2">Click to upload banner image</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <img 
+              src="https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/1599bca18c91728a2448c014064bdd3e1784dce4/Unlimited%20Access%20Banner.png"
+              alt="Unlimited Access Banner" 
+              className="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+            />
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
