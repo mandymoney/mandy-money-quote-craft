@@ -115,7 +115,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             <img 
               src={getProductImage()}
               alt={tier.name}
-              className="w-full h-32 object-contain rounded-lg"
+              className="w-full h-32 object-contain aspect-square rounded-lg"
             />
           </div>
         )}

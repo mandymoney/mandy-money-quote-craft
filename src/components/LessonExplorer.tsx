@@ -526,7 +526,12 @@ export const LessonExplorer: React.FC = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('all');
   const [expandedLesson, setExpandedLesson] = useState<number | null>(null);
   const [lessonIcons, setLessonIcons] = useState<{ [key: number]: string }>({});
-  const [microCredentialImages, setMicroCredentialImages] = useState<{ [key: number]: string }>({});
+  const [microCredentialImages, setMicroCredentialImages] = useState<{ [key: number]: string }>({
+    1: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/159.png',
+    2: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/160.png',
+    3: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/161.png',
+    4: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/162.png'
+  });
 
   const microCredentials = Array.from(new Set(allLessons.map(l => l.microCredential)));
   const topics = Array.from(new Set(allLessons.map(l => l.topic)));
@@ -608,25 +613,11 @@ export const LessonExplorer: React.FC = () => {
                   {/* Front side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden">
                     <div className="aspect-square bg-teal-50 rounded-lg flex items-center justify-center border-2 border-dashed border-teal-300 hover:border-teal-400 transition-colors overflow-hidden">
-                      {microCredentialImages[level] ? (
-                        <img 
-                          src={microCredentialImages[level]} 
-                          alt={`Level ${level} micro-credential`}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      ) : (
-                        <div className="text-center relative w-full h-full flex flex-col items-center justify-center">
-                          <Upload className="h-8 w-8 text-teal-400 mb-2" />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleMicroCredentialImageUpload(level, e)}
-                            className="absolute inset-0 opacity-0 cursor-pointer"
-                          />
-                          <p className="text-teal-600 font-medium">Upload Image</p>
-                          <p className="text-sm text-teal-500">Level {level}</p>
-                        </div>
-                      )}
+                      <img 
+                        src={microCredentialImages[level]} 
+                        alt={`Level ${level} micro-credential`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
                     </div>
                   </div>
                   
