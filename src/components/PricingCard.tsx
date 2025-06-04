@@ -26,34 +26,6 @@ interface PricingCardProps {
   volumeSelector?: React.ReactNode;
 }
 
-// Product image mapping
-const getProductImage = (tierId: string): string => {
-  const imageMap: { [key: string]: string } = {
-    'teacher-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/100.png',
-    'teacher-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/101.png',
-    'teacher-bundle': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/102.png',
-    'student-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/103.png',
-    'student-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/104.png',
-    'student-bundle': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/105.png'
-  };
-  return imageMap[tierId] || '';
-};
-
-// Get product type and name with subheading
-const getProductInfo = (tier: PricingTier) => {
-  const isTeacher = tier.id.includes('teacher');
-  const productType = isTeacher ? 'Teacher' : 'Student';
-  const subheading = isTeacher ? 'TEACHER' : 'STUDENT';
-  
-  // Clean the tier name and ensure it includes the product type
-  let productName = tier.name;
-  if (!productName.toLowerCase().includes('teacher') && !productName.toLowerCase().includes('student')) {
-    productName = `${productType} ${productName}`;
-  }
-  
-  return { productType, subheading, productName };
-};
-
 export const PricingCard: React.FC<PricingCardProps> = ({
   tier,
   price,
@@ -62,7 +34,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   teacherCount,
   studentCount,
   animationDelay,
-  showImages = true,
+  showImages = false,
   studentPrice,
   includeGST = false,
   colorScheme = 'teal',
@@ -97,9 +69,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     ...tier.inclusions.classroom
   ];
 
-  const productInfo = getProductInfo(tier);
-  const productImage = getProductImage(tier.id);
-
   return (
     <Card
       className={cn(
@@ -127,57 +96,28 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Product Image */}
-        {showImages && productImage && (
-          <div className="h-32 rounded-lg mb-4 overflow-hidden">
-            <img 
-              src={productImage}
-              alt={`${productInfo.productName} Image`}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback to placeholder if image fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.className = cn(
-                    "h-32 rounded-lg mb-4 flex items-center justify-center border-2 border-dashed",
-                    colorScheme === 'yellow' ? 'bg-yellow-50 border-yellow-300' : 'bg-teal-50 border-teal-300'
-                  );
-                  parent.innerHTML = `
-                    <div class="text-center">
-                      <div class="h-8 w-8 mx-auto mb-2 ${colorScheme === 'yellow' ? 'text-yellow-400' : 'text-teal-400'}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                        </svg>
-                      </div>
-                      <p class="text-sm font-medium ${colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'}">
-                        ${productInfo.productName}
-                      </p>
-                    </div>
-                  `;
-                }
-              }}
-            />
+        {/* Image Placeholder */}
+        {showImages && (
+          <div className={cn(
+            "h-32 rounded-lg mb-4 flex items-center justify-center border-2 border-dashed",
+            colorScheme === 'yellow' ? 'bg-yellow-50 border-yellow-300' : 'bg-teal-50 border-teal-300'
+          )}>
+            <div className="text-center">
+              <Image className={cn("h-8 w-8 mx-auto mb-2", colorScheme === 'yellow' ? 'text-yellow-400' : 'text-teal-400')} />
+              <p className={cn("text-sm font-medium", colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500')}>
+                Upload {tier.name} Image
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Header with subheading */}
-        <div className="mb-4">
-          {/* Product Type Subheading */}
-          <div className={cn(
-            "text-xs font-bold uppercase tracking-wide mb-1",
-            colorScheme === 'yellow' ? 'text-yellow-600' : 'text-teal-600'
-          )}>
-            {productInfo.subheading}
-          </div>
-          
-          {/* Product Header */}
-          <div 
-            className={cn('h-20 rounded-lg flex items-center justify-center', customGradient ? '' : 'bg-gradient-to-r ' + getGradientClass())}
-            style={customGradient ? { background: customGradient } : {}}
-          >
-            <h3 className="text-white font-bold text-lg text-center px-2">{productInfo.productName}</h3>
+        {/* Header */}
+        <div 
+          className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-r ' + getGradientClass())}
+          style={customGradient ? { background: customGradient } : {}}
+        >
+          <div className="flex items-center justify-center h-full">
+            <h3 className="text-white font-bold text-lg text-center">{tier.name}</h3>
           </div>
         </div>
 
