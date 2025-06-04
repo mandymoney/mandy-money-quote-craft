@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -525,7 +526,50 @@ export const LessonExplorer: React.FC = () => {
   const [selectedMicroCredential, setSelectedMicroCredential] = useState<string>('all');
   const [selectedTopic, setSelectedTopic] = useState<string>('all');
   const [expandedLesson, setExpandedLesson] = useState<number | null>(null);
-  const [lessonIcons, setLessonIcons] = useState<{ [key: number]: string }>({});
+  const [lessonIcons, setLessonIcons] = useState<{ [key: number]: string }>({
+    1: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Setting%20The%20Scene%20Icon.png',
+    2: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Budgeting%20Icon.png',
+    3: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Spending%20Icon.png',
+    4: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Spending%20Icon.png',
+    5: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Super%20Icon.png',
+    6: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Super%20Icon.png',
+    7: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Super%20Icon.png',
+    8: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Tax%20Icon.png',
+    9: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Tax%20Icon.png',
+    10: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Tax%20Icon.png',
+    11: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Budgeting%20Icon.png',
+    12: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Saving%20Icon.png',
+    13: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Saving%20Icon.png',
+    14: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Employment%20Icon.png',
+    15: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Employment%20Icon.png',
+    16: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Employment%20Icon.png',
+    17: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Employment%20Icon.png',
+    18: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Real%20World%20Icon.png',
+    19: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Real%20World%20Icon.png',
+    20: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Real%20World%20Icon.png',
+    21: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Real%20World%20Icon.png',
+    22: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Budgeting%20Icon.png',
+    23: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Systems%20Icon.png',
+    24: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Systems%20Icon.png',
+    25: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Systems%20Icon.png',
+    26: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Systems%20Icon.png',
+    27: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Systems%20Icon.png',
+    28: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Safety%20Icon.png',
+    29: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Safety%20Icon.png',
+    30: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Safety%20Icon.png',
+    31: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Safety%20Icon.png',
+    32: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Wealth%20Icon.png',
+    33: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Wealth%20Icon.png',
+    34: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Debt%20Icon.png',
+    35: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Debt%20Icon.png',
+    36: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Debt%20Icon.png',
+    37: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Investing%20Icon.png',
+    38: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Investing%20Icon.png',
+    39: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Investing%20Icon.png',
+    40: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Investing%20Icon.png',
+    41: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Investing%20Icon.png',
+    42: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Investing%20Icon.png'
+  });
   const [microCredentialImages, setMicroCredentialImages] = useState<{ [key: number]: string }>({
     1: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/159.png',
     2: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/3fd14589f626a8ace83dcc4562a9b9593e0a5641/160.png',
@@ -613,26 +657,26 @@ export const LessonExplorer: React.FC = () => {
                 <div className="relative aspect-square transform-style-preserve-3d transition-transform duration-500 hover:rotate-y-180">
                   {/* Front side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden">
-                    <div className="aspect-square rounded-lg overflow-hidden">
+                    <div className="aspect-square overflow-hidden rounded-sm">
                       <img 
                         src={microCredentialImages[level]} 
                         alt={`Level ${level} micro-credential`}
-                        className="w-full h-full object-cover rounded-lg"
+                        className="w-full h-full object-cover rounded-sm"
                       />
                     </div>
                   </div>
                   
                   {/* Back side */}
                   <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-                    <div className="aspect-square rounded-lg overflow-hidden">
+                    <div className="aspect-square overflow-hidden rounded-sm">
                       {backImages[level] ? (
                         <img 
                           src={backImages[level]} 
                           alt={`Level ${level} back image`}
-                          className="w-full h-full object-cover rounded-lg"
+                          className="w-full h-full object-cover rounded-sm"
                         />
                       ) : (
-                        <div className="aspect-square bg-gray-100 rounded-lg flex flex-col items-center justify-center p-4 relative">
+                        <div className="aspect-square bg-gray-100 flex flex-col items-center justify-center p-4 relative rounded-sm">
                           <Upload className="h-8 w-8 text-gray-400 mb-2" />
                           <input
                             type="file"

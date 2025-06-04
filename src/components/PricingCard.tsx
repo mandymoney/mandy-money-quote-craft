@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -45,13 +46,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   const getGradientClass = () => {
     if (customGradient) return '';
     if (colorScheme === 'yellow') {
-      if (tier.id.includes('digital')) return 'from-yellow-600 via-yellow-500 to-yellow-400';
-      if (tier.id.includes('physical')) return 'from-yellow-700 via-yellow-600 to-yellow-500';
-      return 'from-yellow-800 via-yellow-700 to-yellow-600';
+      if (tier.id.includes('digital')) return 'from-yellow-700 via-yellow-600 to-yellow-500';
+      if (tier.id.includes('physical')) return 'from-yellow-800 via-yellow-700 to-yellow-600';
+      return 'from-yellow-900 via-yellow-800 to-yellow-700';
     } else {
-      if (tier.id.includes('digital')) return 'from-teal-600 via-teal-500 to-teal-400';
-      if (tier.id.includes('physical')) return 'from-teal-700 via-teal-600 to-teal-500';
-      return 'from-teal-800 via-teal-700 to-teal-600';
+      if (tier.id.includes('digital')) return 'from-teal-700 via-teal-600 to-teal-500';
+      if (tier.id.includes('physical')) return 'from-teal-800 via-teal-700 to-teal-600';
+      return 'from-teal-900 via-teal-800 to-teal-700';
     }
   };
 
@@ -111,9 +112,9 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           </div>
         )}
 
-        {/* Header */}
+        {/* Header with increased height for alignment */}
         <div 
-          className={cn('h-20 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-br ' + getGradientClass())}
+          className={cn('h-24 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-br ' + getGradientClass())}
           style={customGradient ? { background: customGradient } : {}}
         >
           <div className="flex flex-col items-center justify-center h-full px-2">
