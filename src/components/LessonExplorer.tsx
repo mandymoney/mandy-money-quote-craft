@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -767,7 +768,7 @@ export const LessonExplorer: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                       {lessonIcons[lesson.lesson] ? (
                         <img 
                           src={lessonIcons[lesson.lesson]} 

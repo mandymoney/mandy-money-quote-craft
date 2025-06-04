@@ -102,12 +102,12 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         )}
 
         {/* Product Image */}
-        {showImages && getProductImage() && (
+        {(showImages || tier.id.includes('bundle')) && getProductImage() && (
           <div className="mb-4">
             <img 
               src={getProductImage()}
               alt={tier.name}
-              className="w-full h-32 object-contain aspect-square rounded-lg"
+              className="w-full h-32 object-contain aspect-square rounded-sm"
             />
           </div>
         )}
