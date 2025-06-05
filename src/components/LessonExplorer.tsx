@@ -583,6 +583,52 @@ export const LessonExplorer: React.FC = () => {
     4: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/f264470607283a3f8eb10ba1d70d5f1a2e8cc31f/MCL4%20Reverse.png'
   });
 
+  // FlipHTML5 lesson embed URLs
+  const lessonEmbedUrls: { [key: number]: string } = {
+    1: 'https://online.fliphtml5.com/tudtv/czxk/',
+    2: 'https://online.fliphtml5.com/tudtv/dwnc/',
+    3: 'https://online.fliphtml5.com/tudtv/sezx/',
+    4: 'https://online.fliphtml5.com/tudtv/pohv/',
+    5: 'https://online.fliphtml5.com/tudtv/ddqj/',
+    6: 'https://online.fliphtml5.com/tudtv/pkvl/',
+    7: 'https://online.fliphtml5.com/tudtv/kllg/',
+    8: 'https://online.fliphtml5.com/tudtv/keoe/',
+    9: 'https://online.fliphtml5.com/tudtv/ybme/',
+    10: 'https://online.fliphtml5.com/tudtv/vuvp/',
+    11: 'https://online.fliphtml5.com/tudtv/oxuf/',
+    12: 'https://online.fliphtml5.com/tudtv/mpxn/',
+    13: 'https://online.fliphtml5.com/tudtv/zbzr/',
+    14: 'https://online.fliphtml5.com/tudtv/fgdz/',
+    15: 'https://online.fliphtml5.com/tudtv/ybss/',
+    16: 'https://online.fliphtml5.com/tudtv/dhss/',
+    17: 'https://online.fliphtml5.com/tudtv/zvol/',
+    18: 'https://online.fliphtml5.com/tudtv/vtxx/',
+    19: 'https://online.fliphtml5.com/tudtv/psoj/',
+    20: 'https://online.fliphtml5.com/tudtv/atju/',
+    21: 'https://online.fliphtml5.com/tudtv/kuaq/',
+    22: 'https://online.fliphtml5.com/tudtv/cjfr/',
+    23: 'https://online.fliphtml5.com/tudtv/cjjh/',
+    24: 'https://online.fliphtml5.com/tudtv/gqvv/',
+    25: 'https://online.fliphtml5.com/tudtv/tndt/',
+    26: 'https://online.fliphtml5.com/tudtv/untg/',
+    27: 'https://online.fliphtml5.com/tudtv/lvid/',
+    28: 'https://online.fliphtml5.com/tudtv/yyrz/',
+    29: 'https://online.fliphtml5.com/tudtv/bfyo/',
+    30: 'https://online.fliphtml5.com/tudtv/uyxd/',
+    31: 'https://online.fliphtml5.com/tudtv/gfch/',
+    32: 'https://online.fliphtml5.com/tudtv/hxxp/',
+    33: 'https://online.fliphtml5.com/tudtv/qekk/',
+    34: 'https://online.fliphtml5.com/tudtv/mmhv/',
+    35: 'https://online.fliphtml5.com/tudtv/ntwa/',
+    36: 'https://online.fliphtml5.com/tudtv/xplo/',
+    37: 'https://online.fliphtml5.com/tudtv/yjsn/',
+    38: 'https://online.fliphtml5.com/tudtv/qkfm/',
+    39: 'https://online.fliphtml5.com/tudtv/bmke/',
+    40: 'https://online.fliphtml5.com/tudtv/jazz/',
+    41: 'https://online.fliphtml5.com/tudtv/fwzc/',
+    42: 'https://online.fliphtml5.com/tudtv/gqju/'
+  };
+
   const microCredentials = Array.from(new Set(allLessons.map(l => l.microCredential)));
   const topics = Array.from(new Set(allLessons.map(l => l.topic)));
 
@@ -753,12 +799,16 @@ export const LessonExplorer: React.FC = () => {
         {/* How Do Micro-Credentials Work */}
         <div className="border-t border-teal-200 pt-6">
           <h3 className="text-lg font-semibold text-teal-700 mb-4">How Do Micro-Credentials Work</h3>
-          <div className="aspect-video bg-teal-50 rounded-lg flex items-center justify-center border-2 border-dashed border-teal-300">
-            <div className="text-center">
-              <Book className="h-12 w-12 text-teal-400 mx-auto mb-4" />
-              <p className="text-teal-600 font-medium">Canva Public View Link</p>
-              <p className="text-sm text-teal-500">How micro-credentials work content will appear here</p>
-            </div>
+          <div className="aspect-video bg-white rounded-lg overflow-hidden border border-teal-200">
+            <iframe
+              src="https://www.canva.com/design/DAGPnJxmVKs/Pp3a8lqsyNCWtqp6grV2mg/view?utm_content=DAGPnJxmVKs&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hced5968087"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+              title="How Do Micro-Credentials Work"
+              className="w-full h-full"
+            />
           </div>
         </div>
       </Card>
@@ -875,9 +925,17 @@ export const LessonExplorer: React.FC = () => {
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t border-teal-200">
-                    <p className="text-sm text-teal-600 mb-2">FlipHTML5 embed section for this lesson:</p>
-                    <div className="bg-white border border-teal-200 rounded p-3 text-center">
-                      <p className="text-teal-500 text-sm">FlipHTML5 embed section for Lesson {lesson.lesson}</p>
+                    <p className="text-sm text-teal-600 mb-2">Lesson {lesson.lesson} Materials:</p>
+                    <div className="bg-white border border-teal-200 rounded overflow-hidden">
+                      <iframe
+                        src={lessonEmbedUrls[lesson.lesson]}
+                        width="100%"
+                        height="400"
+                        frameBorder="0"
+                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+                        title={`Lesson ${lesson.lesson} Materials`}
+                        className="w-full"
+                      />
                     </div>
                   </div>
                 </div>
