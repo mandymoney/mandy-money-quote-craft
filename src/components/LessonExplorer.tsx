@@ -526,6 +526,7 @@ export const LessonExplorer: React.FC = () => {
   const [selectedTopic, setSelectedTopic] = useState<string>('all');
   const [expandedLesson, setExpandedLesson] = useState<number | null>(null);
   const [expandedPreview, setExpandedPreview] = useState<'teacher' | 'student' | null>(null);
+  const [expandedLessonEmbed, setExpandedLessonEmbed] = useState<number | null>(null);
   const [lessonIcons, setLessonIcons] = useState<{ [key: number]: string }>({
     1: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Setting%20The%20Scene%20Icon.png',
     2: 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/30f4d582e1cb28b4c5acb693af689447234b0ab9/Budgeting%20Icon.png',
@@ -801,7 +802,7 @@ export const LessonExplorer: React.FC = () => {
           <h3 className="text-lg font-semibold text-teal-700 mb-4">How Do Micro-Credentials Work</h3>
           <div className="aspect-video bg-white rounded-lg overflow-hidden border border-teal-200">
             <iframe
-              src="https://www.canva.com/design/DAGPnJxmVKs/Pp3a8lqsyNCWtqp6grV2mg/view?utm_content=DAGPnJxmVKs&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hced5968087"
+              src="https://www.canva.com/design/DAGPnJxmVKs/e2hhanzW94XMkmFbN9zCiQ/view"
               width="100%"
               height="100%"
               frameBorder="0"
@@ -925,12 +926,35 @@ export const LessonExplorer: React.FC = () => {
                     ))}
                   </div>
                   <div className="mt-4 pt-4 border-t border-teal-200">
-                    <p className="text-sm text-teal-600 mb-2">Lesson {lesson.lesson} Materials:</p>
-                    <div className="bg-white border border-teal-200 rounded overflow-hidden">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm text-teal-600">Lesson {lesson.lesson} Materials:</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setExpandedLessonEmbed(expandedLessonEmbed === lesson.lesson ? null : lesson.lesson)}
+                        className="border-teal-200 text-teal-600 hover:bg-teal-50"
+                      >
+                        {expandedLessonEmbed === lesson.lesson ? (
+                          <>
+                            <Minimize2 className="h-4 w-4 mr-2" />
+                            Minimize
+                          </>
+                        ) : (
+                          <>
+                            <Maximize2 className="h-4 w-4 mr-2" />
+                            Expand
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <div className={cn(
+                      "bg-white border border-teal-200 rounded overflow-hidden transition-all duration-300",
+                      expandedLessonEmbed === lesson.lesson ? "w-full" : ""
+                    )}>
                       <iframe
                         src={lessonEmbedUrls[lesson.lesson]}
                         width="100%"
-                        height="400"
+                        height={expandedLessonEmbed === lesson.lesson ? "600" : "400"}
                         frameBorder="0"
                         allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
                         title={`Lesson ${lesson.lesson} Materials`}
