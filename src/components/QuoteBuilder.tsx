@@ -1000,21 +1000,11 @@ export const QuoteBuilder = () => {
               </div>
             </div>
 
-            {/* School Information Form - Updated with clearer requirements */}
+            {/* School Information Form */}
             <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border border-green-200/50" data-form-section>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">School Information</h3>
                 <FormCompletionIndicator schoolInfo={schoolInfo} isComplete={isFormComplete} />
-              </div>
-              
-              {/* Requirements explanation */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <h4 className="font-semibold text-blue-800 mb-2">Information Requirements by Action:</h4>
-                <div className="text-sm text-blue-700 space-y-1">
-                  <div><strong>Export Quote:</strong> No requirements (but recommended: school name, coordinator, email)</div>
-                  <div><strong>Make Enquiry:</strong> School name + coordinator name + email required</div>
-                  <div><strong>Place Order:</strong> Complete form required</div>
-                </div>
               </div>
               
               {/* Program Start Date */}
@@ -1145,7 +1135,7 @@ export const QuoteBuilder = () => {
                   )}
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <Input 
                     placeholder="Accounts Email" 
                     value={schoolInfo.accountsEmail} 
@@ -1162,6 +1152,35 @@ export const QuoteBuilder = () => {
                       purchaseOrderNumber: e.target.value
                     }))} 
                   />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Select value={schoolInfo.paymentPreference} onValueChange={value => setSchoolInfo(prev => ({
+                  ...prev,
+                  paymentPreference: value
+                }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Payment Preference" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="card">Card Payment</SelectItem>
+                      <SelectItem value="invoice">Invoice</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={schoolInfo.supplierSetupForms} onValueChange={value => setSchoolInfo(prev => ({
+                  ...prev,
+                  supplierSetupForms: value
+                }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Supplier Setup Forms Required?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                      <SelectItem value="not-sure">Not Sure</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
                 
@@ -1209,35 +1228,6 @@ export const QuoteBuilder = () => {
                   />
                 )}
               </div>
-              
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <Select value={schoolInfo.paymentPreference} onValueChange={value => setSchoolInfo(prev => ({
-                ...prev,
-                paymentPreference: value
-              }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Payment Preference" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="card">Card Payment</SelectItem>
-                    <SelectItem value="invoice">Invoice</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select value={schoolInfo.supplierSetupForms} onValueChange={value => setSchoolInfo(prev => ({
-                ...prev,
-                supplierSetupForms: value
-              }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Supplier Setup Forms Required?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="yes">Yes</SelectItem>
-                    <SelectItem value="no">No</SelectItem>
-                    <SelectItem value="not-sure">Not Sure</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
               {/* Questions/Comments Section */}
               <div className="mb-6">
@@ -1283,11 +1273,30 @@ export const QuoteBuilder = () => {
               />
             </div>
           </div>
-
-          {/* ... keep existing code (running total sidebar) exactly the same */}
         </div>
 
-        {/* ... keep existing code (rest of the component - dividers, official quote section, lesson explorer) exactly the same */}
+        {/* Divider */}
+        <div className="my-12">
+          <div className="border-t-2 border-gray-300"></div>
+        </div>
+
+        {/* Explore Materials Section */}
+        <div className="text-center mb-8">
+          <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
+            <div className="flex items-center justify-center gap-4 mb-3">
+              <div className="text-4xl">✨</div>
+              <h2 className="text-4xl font-bold">Explore your included materials</h2>
+              <div className="text-4xl">✨</div>
+            </div>
+          </div>
+          <p className="text-xl text-gray-600">Take a closer look at what's included in your program</p>
+          <div className="mt-6 animate-bounce">
+            <ArrowDown className="h-8 w-8 mx-auto text-gray-600" />
+          </div>
+        </div>
+
+        {/* Lesson Explorer */}
+        <LessonExplorer />
       </div>
     </div>
   );

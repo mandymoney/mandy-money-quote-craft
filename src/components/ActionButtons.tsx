@@ -357,12 +357,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           <div className="flex items-center justify-center space-x-2 text-white">
             <AlertTriangle className="h-5 w-5" />
             <div className="text-sm">
-              <div className="font-medium mb-1">Complete your information below:</div>
-              <div className="text-xs opacity-90">
-                • Export Quote: No requirements (optional: school name, coordinator, email)<br/>
-                • Make Enquiry: School name + coordinator name + email required<br/>
-                • Place Order: Complete form required
-              </div>
+              <div className="font-medium">Complete your information below to proceed</div>
             </div>
           </div>
         </div>
@@ -376,7 +371,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         >
           <FileText className="h-5 w-5 mr-2" />
           Export Quote as PDF
-          <div className="text-xs opacity-75 ml-2">(No requirements)</div>
         </Button>
         
         <Button
@@ -391,9 +385,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         >
           <MessageCircle className="h-5 w-5 mr-2" />
           Enquire about Booklisting
-          <div className="text-xs opacity-75 ml-2">
-            {isEssentialComplete ? '✓ Ready' : 'Need: Name, coordinator, email'}
-          </div>
         </Button>
         
         <Button
@@ -408,9 +399,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         >
           <Plus className="h-5 w-5 mr-2" />
           Place Order Now
-          <div className="text-xs opacity-75 ml-2">
-            {isFullComplete ? '✓ Ready' : 'Complete form required'}
-          </div>
         </Button>
       </div>
       
