@@ -239,6 +239,7 @@ export const QuoteBuilder = () => {
     posterA0: 0
   });
   const [programStartDate, setProgramStartDate] = useState<Date>(new Date());
+  const [joinCommunity, setJoinCommunity] = useState<boolean>(true); // Add missing state variable
   const [schoolInfo, setSchoolInfo] = useState<SchoolInfo>({
     schoolName: '',
     schoolAddress: {
