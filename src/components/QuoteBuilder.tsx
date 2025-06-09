@@ -19,6 +19,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon, BarChart3 } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { FormCompletionIndicator } from './FormCompletionIndicator';
+import { useFormValidation } from '@/hooks/useFormValidation';
+
 export interface PricingTier {
   id: string;
   name: string;
@@ -386,7 +389,14 @@ export const QuoteBuilder = () => {
     if (useUnlimited) {
       items.push(`Unlimited Teacher Digital Passes`);
       items.push(`Unlimited Student Digital Passes`);
-      items.push(`Unlimited Digital Classroom Spaces`);
+      
+      // Only include classroom spaces if we have both teacher and student passes selected for unlimited
+      const hasTeacherPasses = unlimitedAddOns.teacherBooks > 0 || true; // Unlimited always has teacher passes
+      const hasStudentPasses = true; // Unlimited always has student passes
+      if (hasTeacherPasses && hasStudentPasses) {
+        items.push(`Unlimited Digital Classroom Spaces`);
+      }
+      
       if (unlimitedAddOns.teacherBooks > 0) {
         items.push(`${unlimitedAddOns.teacherBooks} x Teacher Print Textbook${unlimitedAddOns.teacherBooks > 1 ? 's' : ''}`);
       }
@@ -408,7 +418,10 @@ export const QuoteBuilder = () => {
       const totalTeacherPhysical = teacherPhysical + teacherBoth;
       const totalStudentDigital = studentDigital + studentBoth;
       const totalStudentPhysical = studentPhysical + studentBoth;
-      const totalClassrooms = totalTeacherDigital;
+      
+      // Only include classroom spaces if we have both teacher digital passes AND any student passes
+      const hasStudentPasses = totalStudentDigital > 0 || totalStudentPhysical > 0;
+      const totalClassrooms = totalTeacherDigital > 0 && hasStudentPasses ? totalTeacherDigital : 0;
 
       if (totalTeacherDigital > 0) {
         items.push({
@@ -591,6 +604,9 @@ export const QuoteBuilder = () => {
   const volumeDiscountDetails = getVolumeDiscountDetails();
   const unlimitedPricing = useUnlimited ? calculateUnlimitedTotal() : regularPricing;
   const finalPricing = useUnlimited ? unlimitedPricing : regularPricing;
+  const { errors, validateSchoolInfo } = useFormValidation();
+  const isFormComplete = validateSchoolInfo(schoolInfo);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -978,10 +994,15 @@ export const QuoteBuilder = () => {
               </div>
             </div>
 
-            {/* School Information Form - Updated with address components */}
-            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border border-green-200/50">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">School Information</h3>
-              <p className="text-sm text-gray-600 mb-4">Information not required unless placing an order</p>
+            {/* School Information Form - Updated with validation */}
+            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border border-green-200/50" data-form-section>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">School Information</h3>
+                <FormCompletionIndicator schoolInfo={schoolInfo} isComplete={isFormComplete} />
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Basic information required for quotes. Complete all fields for orders and enquiries.
+              </p>
               
               {/* Program Start Date within School Info */}
               <div className="mb-6">
@@ -1005,14 +1026,28 @@ export const QuoteBuilder = () => {
               </div>
               
               <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <Input placeholder="School Name *" value={schoolInfo.schoolName} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                schoolName: e.target.value
-              }))} className="font-medium" />
-                <Input placeholder="School ABN" value={schoolInfo.schoolABN} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                schoolABN: e.target.value
-              }))} />
+                <div>
+                  <Input 
+                    placeholder="School Name *" 
+                    value={schoolInfo.schoolName} 
+                    onChange={e => setSchoolInfo(prev => ({
+                      ...prev,
+                      schoolName: e.target.value
+                    }))} 
+                    className={`font-medium ${errors.schoolName ? 'border-red-300 focus:border-red-500' : ''}`}
+                  />
+                  {errors.schoolName && (
+                    <p className="text-red-500 text-xs mt-1">{errors.schoolName}</p>
+                  )}
+                </div>
+                <Input 
+                  placeholder="School ABN" 
+                  value={schoolInfo.schoolABN} 
+                  onChange={e => setSchoolInfo(prev => ({
+                    ...prev,
+                    schoolABN: e.target.value
+                  }))} 
+                />
               </div>
 
               {/* School Address */}
@@ -1026,33 +1061,78 @@ export const QuoteBuilder = () => {
                   }))}
                   placeholder="Search for your school address..."
                 />
+                {errors.schoolAddress && (
+                  <p className="text-red-500 text-xs mt-1">{errors.schoolAddress}</p>
+                )}
               </div>
 
               <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <Input placeholder="Contact Phone" value={schoolInfo.contactPhone} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                contactPhone: e.target.value
-              }))} />
-                <Input placeholder="Coordinator Name" value={schoolInfo.coordinatorName} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                coordinatorName: e.target.value
-              }))} />
-                <Input placeholder="Coordinator Position" value={schoolInfo.coordinatorPosition} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                coordinatorPosition: e.target.value
-              }))} />
-                <Input placeholder="Coordinator Email" value={schoolInfo.coordinatorEmail} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                coordinatorEmail: e.target.value
-              }))} />
-                <Input placeholder="Accounts Email" value={schoolInfo.accountsEmail} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                accountsEmail: e.target.value
-              }))} />
-                <Input placeholder="Purchase Order Number" value={schoolInfo.purchaseOrderNumber} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                purchaseOrderNumber: e.target.value
-              }))} />
+                <div>
+                  <Input 
+                    placeholder="Contact Phone *" 
+                    value={schoolInfo.contactPhone} 
+                    onChange={e => setSchoolInfo(prev => ({
+                      ...prev,
+                      contactPhone: e.target.value
+                    }))} 
+                    className={errors.contactPhone ? 'border-red-300 focus:border-red-500' : ''}
+                  />
+                  {errors.contactPhone && (
+                    <p className="text-red-500 text-xs mt-1">{errors.contactPhone}</p>
+                  )}
+                </div>
+                <div>
+                  <Input 
+                    placeholder="Coordinator Name *" 
+                    value={schoolInfo.coordinatorName} 
+                    onChange={e => setSchoolInfo(prev => ({
+                      ...prev,
+                      coordinatorName: e.target.value
+                    }))} 
+                    className={errors.coordinatorName ? 'border-red-300 focus:border-red-500' : ''}
+                  />
+                  {errors.coordinatorName && (
+                    <p className="text-red-500 text-xs mt-1">{errors.coordinatorName}</p>
+                  )}
+                </div>
+                <Input 
+                  placeholder="Coordinator Position" 
+                  value={schoolInfo.coordinatorPosition} 
+                  onChange={e => setSchoolInfo(prev => ({
+                    ...prev,
+                    coordinatorPosition: e.target.value
+                  }))} 
+                />
+                <div>
+                  <Input 
+                    placeholder="Coordinator Email *" 
+                    value={schoolInfo.coordinatorEmail} 
+                    onChange={e => setSchoolInfo(prev => ({
+                      ...prev,
+                      coordinatorEmail: e.target.value
+                    }))} 
+                    className={errors.coordinatorEmail ? 'border-red-300 focus:border-red-500' : ''}
+                  />
+                  {errors.coordinatorEmail && (
+                    <p className="text-red-500 text-xs mt-1">{errors.coordinatorEmail}</p>
+                  )}
+                </div>
+                <Input 
+                  placeholder="Accounts Email" 
+                  value={schoolInfo.accountsEmail} 
+                  onChange={e => setSchoolInfo(prev => ({
+                    ...prev,
+                    accountsEmail: e.target.value
+                  }))} 
+                />
+                <Input 
+                  placeholder="Purchase Order Number" 
+                  value={schoolInfo.purchaseOrderNumber} 
+                  onChange={e => setSchoolInfo(prev => ({
+                    ...prev,
+                    purchaseOrderNumber: e.target.value
+                  }))} 
+                />
               </div>
                 
               {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && (
