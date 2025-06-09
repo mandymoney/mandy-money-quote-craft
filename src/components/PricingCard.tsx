@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Image } from 'lucide-react';
+import { Check, Image, X } from 'lucide-react';
 import { PricingTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 import { ExpandableSection } from './ExpandableSection';
@@ -81,6 +82,9 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     ...tier.inclusions.classroom
   ];
 
+  // Determine if this is a student tier for color styling
+  const isStudentTier = tier.type === 'student';
+
   return (
     <Card
       className={cn(
@@ -159,7 +163,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             <div key={index} className="flex items-center text-sm text-gray-700">
               <Check className={cn(
                 "h-4 w-4 mr-2 flex-shrink-0",
-                colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500'
+                isStudentTier ? 'text-green-500' : (colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500')
               )} />
               <span>{inclusion}</span>
             </div>
@@ -182,7 +186,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
               {tier.notIncluded.map((notIncluded, index) => (
                 <div key={index} className="flex items-center text-sm text-gray-500">
-                  <Check className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
+                  <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
                   <span>{notIncluded}</span>
                 </div>
               ))}
