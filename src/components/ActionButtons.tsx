@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle } from 'lucide-react';
@@ -74,14 +75,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => {
   const storeQuoteAttempt = async (type: 'quote' | 'order' | 'enquiry', pdfUrl?: string) => {
     try {
-      // Enhanced quote items with clearer product type distinction
-      const enhancedQuoteItems = quoteItems.map(item => ({
-        ...item,
-        productType: item.type === 'teacher' ? 'TEACHER_PRODUCT' : 'STUDENT_PRODUCT',
-        targetAudience: item.type === 'teacher' ? 'Teachers' : 'Students',
-        description: `${item.description} (Designed for ${item.type}s)`
-      }));
-
       const quoteData = {
         school_name: schoolInfo.schoolName || null,
         school_abn: schoolInfo.schoolABN || null,
@@ -92,16 +85,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         student_count: studentCount,
         total_price: pricing.total,
         program_start_date: programStartDate.toISOString().split('T')[0],
-        quote_items: enhancedQuoteItems as any, // Enhanced with product type clarity
+        quote_items: quoteItems as any,
         pricing: pricing as any,
         pdf_url: pdfUrl || null,
-        attempt_type: type,
-        product_breakdown: {
-          teacher_products: quoteItems.filter(item => item.type === 'teacher').length,
-          student_products: quoteItems.filter(item => item.type === 'student').length,
-          teacher_product_total: quoteItems.filter(item => item.type === 'teacher').reduce((sum, item) => sum + item.totalPrice, 0),
-          student_product_total: quoteItems.filter(item => item.type === 'student').reduce((sum, item) => sum + item.totalPrice, 0)
-        } as any
+        attempt_type: type
       };
 
       // Store in database

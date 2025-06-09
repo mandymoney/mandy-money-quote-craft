@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronDown, ChevronRight, Search, Book, Play, Upload, Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Search, Upload, Maximize2, Minimize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LessonData {
@@ -794,22 +794,6 @@ export const LessonExplorer: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* How Do Micro-Credentials Work */}
-        <div className="border-t border-teal-200 pt-6">
-          <h3 className="text-lg font-semibold text-teal-700 mb-4">How Do Micro-Credentials Work</h3>
-          <div className="aspect-video bg-white rounded-lg overflow-hidden border border-teal-200">
-            <iframe
-              src="https://www.canva.com/design/DAGPnJxmVKs/e2hhanzW94XMkmFbN9zCiQ/view"
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
-              title="How Do Micro-Credentials Work"
-              className="w-full h-full"
-            />
           </div>
         </div>
       </Card>
