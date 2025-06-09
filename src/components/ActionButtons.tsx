@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle } from 'lucide-react';
@@ -92,7 +93,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         student_count: studentCount,
         total_price: pricing.total,
         program_start_date: programStartDate.toISOString().split('T')[0],
-        quote_items: enhancedQuoteItems as any, // Enhanced with product type clarity
+        quote_items: enhancedQuoteItems as any,
         pricing: pricing as any,
         pdf_url: pdfUrl || null,
         attempt_type: type,
@@ -101,6 +102,19 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           student_products: quoteItems.filter(item => item.type === 'student').length,
           teacher_product_total: quoteItems.filter(item => item.type === 'teacher').reduce((sum, item) => sum + item.totalPrice, 0),
           student_product_total: quoteItems.filter(item => item.type === 'student').reduce((sum, item) => sum + item.totalPrice, 0)
+        } as any,
+        school_info: {
+          schoolAddress: schoolInfo.schoolAddress,
+          deliveryAddress: schoolInfo.deliveryAddress,
+          billingAddress: schoolInfo.billingAddress,
+          deliveryIsSameAsSchool: schoolInfo.deliveryIsSameAsSchool,
+          billingIsSameAsSchool: schoolInfo.billingIsSameAsSchool,
+          accountsEmail: schoolInfo.accountsEmail,
+          coordinatorPosition: schoolInfo.coordinatorPosition,
+          purchaseOrderNumber: schoolInfo.purchaseOrderNumber,
+          paymentPreference: schoolInfo.paymentPreference,
+          supplierSetupForms: schoolInfo.supplierSetupForms,
+          questionsComments: schoolInfo.questionsComments
         } as any
       };
 
@@ -111,6 +125,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 
       if (dbError) {
         console.error('Error storing quote attempt:', dbError);
+        toast({
+          title: "Database Error",
+          description: "Failed to save quote data. Please try again.",
+          variant: "destructive",
+        });
+        return false;
       }
 
       // Send alert email
@@ -129,8 +149,16 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       } catch (emailError) {
         console.error('Error sending alert email:', emailError);
       }
+
+      return true;
     } catch (error) {
       console.error('Error in storeQuoteAttempt:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save quote data. Please try again.",
+        variant: "destructive",
+      });
+      return false;
     }
   };
 
@@ -196,8 +224,11 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       console.error('Error generating/uploading PDF:', error);
     }
     
-    // Store quote attempt
-    await storeQuoteAttempt(type, pdfUrl || undefined);
+    // Store quote attempt - this is critical for all button actions
+    const success = await storeQuoteAttempt(type, pdfUrl || undefined);
+    if (!success) {
+      return; // Don't proceed if database save failed
+    }
     
     const subject = createEmailSubject(type, schoolInfo.schoolName);
     const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount, pdfUrl || undefined);
@@ -210,19 +241,21 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const handleExportPDF = async () => {
     toast({
       title: "Generating PDF...",
-      description: "Creating your quote document",
+      description: "Creating your quote document and saving to database",
     });
     
     try {
       const result = await generateAndUploadQuote();
       
-      // Store quote attempt
-      await storeQuoteAttempt('quote', result.pdfUrl || undefined);
+      // Store quote attempt - this ensures all data is saved to Supabase
+      const success = await storeQuoteAttempt('quote', result.pdfUrl || undefined);
       
-      toast({
-        title: "Quote Generated!",
-        description: "Your PDF quote has been generated, downloaded, and saved to our system.",
-      });
+      if (success) {
+        toast({
+          title: "Quote Generated!",
+          description: "Your PDF quote has been generated, downloaded, and saved to our system.",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -235,7 +268,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const handlePlaceOrder = async () => {
     toast({
       title: "Preparing Order...",
-      description: "Generating order document and setting up email",
+      description: "Generating order document, saving to database, and setting up email",
     });
     
     try {
@@ -243,7 +276,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       
       toast({
         title: "Email Ready!",
-        description: "Your order document has been generated and email opened with the PDF link included.",
+        description: "Your order document has been generated, saved to our system, and email opened with the PDF link included.",
       });
     } catch (error) {
       toast({
@@ -257,7 +290,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const handleBooklistingEnquiry = async () => {
     toast({
       title: "Preparing Enquiry...",
-      description: "Generating quote and setting up email with PDF link",
+      description: "Generating quote, saving to database, and setting up email with PDF link",
     });
     
     try {
@@ -265,7 +298,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       
       toast({
         title: "Email Ready!",
-        description: "Your enquiry email has been opened with the quote PDF link included.",
+        description: "Your enquiry email has been opened with the quote PDF link included and data saved to our system.",
       });
     } catch (error) {
       toast({
