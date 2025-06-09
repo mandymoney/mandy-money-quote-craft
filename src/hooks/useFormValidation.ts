@@ -28,7 +28,8 @@ export const useFormValidation = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isValidating, setIsValidating] = useState(false);
 
-  const validateSchoolInfo = useCallback((schoolInfo: SchoolInfo): boolean => {
+  // Pure validation function - no side effects
+  const getValidationErrors = useCallback((schoolInfo: SchoolInfo): ValidationErrors => {
     const newErrors: ValidationErrors = {};
 
     if (!schoolInfo.schoolName.trim()) {
@@ -55,9 +56,21 @@ export const useFormValidation = () => {
       newErrors.schoolAddress = 'Complete school address is required';
     }
 
+    return newErrors;
+  }, []);
+
+  // Pure validation check - returns boolean without side effects
+  const isSchoolInfoValid = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const validationErrors = getValidationErrors(schoolInfo);
+    return Object.keys(validationErrors).length === 0;
+  }, [getValidationErrors]);
+
+  // Validation function that updates state - only call when you want to show errors
+  const validateSchoolInfo = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const newErrors = getValidationErrors(schoolInfo);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, []);
+  }, [getValidationErrors]);
 
   const clearErrors = useCallback(() => {
     setErrors({});
@@ -68,6 +81,7 @@ export const useFormValidation = () => {
     isValidating,
     setIsValidating,
     validateSchoolInfo,
+    isSchoolInfoValid,
     clearErrors
   };
 };

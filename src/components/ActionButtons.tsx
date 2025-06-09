@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle, AlertTriangle } from 'lucide-react';
@@ -73,7 +74,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   programStartDate,
   isUnlimited = false
 }) => {
-  const { validateSchoolInfo, errors } = useFormValidation();
+  const { validateSchoolInfo, isSchoolInfoValid, errors } = useFormValidation();
 
   const validateBeforeSubmission = (actionType: 'quote' | 'order' | 'enquiry'): boolean => {
     // For quotes, we can be more lenient - just need basic info
@@ -314,8 +315,8 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   // Calculate potential savings (placeholder logic)
   const estimatedSavings = Math.floor(totalPrice * 0.1); // 10% example savings
 
-  // Check if form is complete for orders/enquiries
-  const isFormComplete = validateSchoolInfo(schoolInfo);
+  // Check if form is complete for orders/enquiries - using pure validation function
+  const isFormComplete = isSchoolInfoValid(schoolInfo);
   const hasBasicInfo = schoolInfo.schoolName.trim().length > 0;
 
   return (

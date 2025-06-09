@@ -598,14 +598,17 @@ export const QuoteBuilder = () => {
     }
     setUseUnlimited(!useUnlimited);
   };
+  const { errors, isSchoolInfoValid } = useFormValidation();
+  
+  // Use the pure validation function instead of the state-updating one
+  const isFormComplete = isSchoolInfoValid(schoolInfo);
+
   const regularPricing = calculateRegularTotal();
   const volumeNotification = getVolumeNotification();
   const totalSavings = getTotalSavings();
   const volumeDiscountDetails = getVolumeDiscountDetails();
   const unlimitedPricing = useUnlimited ? calculateUnlimitedTotal() : regularPricing;
   const finalPricing = useUnlimited ? unlimitedPricing : regularPricing;
-  const { errors, validateSchoolInfo } = useFormValidation();
-  const isFormComplete = validateSchoolInfo(schoolInfo);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
