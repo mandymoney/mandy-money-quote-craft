@@ -28,8 +28,41 @@ export const useFormValidation = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isValidating, setIsValidating] = useState(false);
 
-  // Pure validation function - no side effects
-  const getValidationErrors = useCallback((schoolInfo: SchoolInfo): ValidationErrors => {
+  // Basic validation - for quotes (optional but recommended)
+  const getBasicValidationErrors = useCallback((schoolInfo: SchoolInfo): ValidationErrors => {
+    const newErrors: ValidationErrors = {};
+
+    // Only validate email format if provided
+    if (schoolInfo.coordinatorEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(schoolInfo.coordinatorEmail)) {
+      newErrors.coordinatorEmail = 'Please enter a valid email address';
+    }
+
+    return newErrors;
+  }, []);
+
+  // Essential validation - for enquiries (school name, coordinator name, email)
+  const getEssentialValidationErrors = useCallback((schoolInfo: SchoolInfo): ValidationErrors => {
+    const newErrors: ValidationErrors = {};
+
+    if (!schoolInfo.schoolName.trim()) {
+      newErrors.schoolName = 'School name is required';
+    }
+
+    if (!schoolInfo.coordinatorName.trim()) {
+      newErrors.coordinatorName = 'Coordinator name is required';
+    }
+
+    if (!schoolInfo.coordinatorEmail.trim()) {
+      newErrors.coordinatorEmail = 'Coordinator email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(schoolInfo.coordinatorEmail)) {
+      newErrors.coordinatorEmail = 'Please enter a valid email address';
+    }
+
+    return newErrors;
+  }, []);
+
+  // Full validation - for orders (all required fields)
+  const getFullValidationErrors = useCallback((schoolInfo: SchoolInfo): ValidationErrors => {
     const newErrors: ValidationErrors = {};
 
     if (!schoolInfo.schoolName.trim()) {
@@ -59,18 +92,40 @@ export const useFormValidation = () => {
     return newErrors;
   }, []);
 
-  // Pure validation check - returns boolean without side effects
-  const isSchoolInfoValid = useCallback((schoolInfo: SchoolInfo): boolean => {
-    const validationErrors = getValidationErrors(schoolInfo);
+  // Pure validation checks - return boolean without side effects
+  const isBasicInfoValid = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const validationErrors = getBasicValidationErrors(schoolInfo);
     return Object.keys(validationErrors).length === 0;
-  }, [getValidationErrors]);
+  }, [getBasicValidationErrors]);
 
-  // Validation function that updates state - only call when you want to show errors
-  const validateSchoolInfo = useCallback((schoolInfo: SchoolInfo): boolean => {
-    const newErrors = getValidationErrors(schoolInfo);
+  const isEssentialInfoValid = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const validationErrors = getEssentialValidationErrors(schoolInfo);
+    return Object.keys(validationErrors).length === 0;
+  }, [getEssentialValidationErrors]);
+
+  const isFullInfoValid = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const validationErrors = getFullValidationErrors(schoolInfo);
+    return Object.keys(validationErrors).length === 0;
+  }, [getFullValidationErrors]);
+
+  // Validation functions that update state - only call when you want to show errors
+  const validateBasicInfo = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const newErrors = getBasicValidationErrors(schoolInfo);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [getValidationErrors]);
+  }, [getBasicValidationErrors]);
+
+  const validateEssentialInfo = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const newErrors = getEssentialValidationErrors(schoolInfo);
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [getEssentialValidationErrors]);
+
+  const validateFullInfo = useCallback((schoolInfo: SchoolInfo): boolean => {
+    const newErrors = getFullValidationErrors(schoolInfo);
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [getFullValidationErrors]);
 
   const clearErrors = useCallback(() => {
     setErrors({});
@@ -80,8 +135,12 @@ export const useFormValidation = () => {
     errors,
     isValidating,
     setIsValidating,
-    validateSchoolInfo,
-    isSchoolInfoValid,
+    validateBasicInfo,
+    validateEssentialInfo,
+    validateFullInfo,
+    isBasicInfoValid,
+    isEssentialInfoValid,
+    isFullInfoValid,
     clearErrors
   };
 };

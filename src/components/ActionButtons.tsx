@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle, AlertTriangle } from 'lucide-react';
@@ -74,15 +73,16 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   programStartDate,
   isUnlimited = false
 }) => {
-  const { validateSchoolInfo, isSchoolInfoValid, errors } = useFormValidation();
+  const { validateBasicInfo, validateEssentialInfo, validateFullInfo, isBasicInfoValid, isEssentialInfoValid, isFullInfoValid, errors } = useFormValidation();
 
   const validateBeforeSubmission = (actionType: 'quote' | 'order' | 'enquiry'): boolean => {
-    // For quotes, we can be more lenient - just need basic info
     if (actionType === 'quote') {
-      if (!schoolInfo.schoolName.trim()) {
+      // For quotes, validation is optional - just check for basic formatting
+      const isValid = validateBasicInfo(schoolInfo);
+      if (!isValid) {
         toast({
-          title: "School Name Required",
-          description: "Please enter your school name to generate a quote.",
+          title: "Please Check Your Information",
+          description: "Please correct any formatting errors in the form.",
           variant: "destructive",
         });
         return false;
@@ -90,25 +90,49 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       return true;
     }
 
-    // For orders and enquiries, we need complete information
-    const isValid = validateSchoolInfo(schoolInfo);
-    if (!isValid) {
-      toast({
-        title: "Please Complete Required Information",
-        description: "All required fields must be completed before placing an order or making an enquiry.",
-        variant: "destructive",
-      });
-      
-      // Scroll to the form section
-      const formSection = document.querySelector('[data-form-section]');
-      if (formSection) {
-        formSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (actionType === 'enquiry') {
+      // For enquiries, need school name, coordinator name, and email
+      const isValid = validateEssentialInfo(schoolInfo);
+      if (!isValid) {
+        toast({
+          title: "Essential Information Required",
+          description: "Please provide school name, coordinator name, and email to make an enquiry.",
+          variant: "destructive",
+        });
+        
+        // Scroll to the form section
+        const formSection = document.querySelector('[data-form-section]');
+        if (formSection) {
+          formSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        return false;
       }
-      
-      return false;
+      return true;
     }
 
-    return true;
+    if (actionType === 'order') {
+      // For orders, need complete information
+      const isValid = validateFullInfo(schoolInfo);
+      if (!isValid) {
+        toast({
+          title: "Complete Information Required",
+          description: "Please complete all required fields to place an order.",
+          variant: "destructive",
+        });
+        
+        // Scroll to the form section
+        const formSection = document.querySelector('[data-form-section]');
+        if (formSection) {
+          formSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        return false;
+      }
+      return true;
+    }
+
+    return false;
   };
 
   const storeQuoteAttempt = async (type: 'quote' | 'order' | 'enquiry', pdfUrl?: string) => {
@@ -315,9 +339,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   // Calculate potential savings (placeholder logic)
   const estimatedSavings = Math.floor(totalPrice * 0.1); // 10% example savings
 
-  // Check if form is complete for orders/enquiries - using pure validation function
-  const isFormComplete = isSchoolInfoValid(schoolInfo);
-  const hasBasicInfo = schoolInfo.schoolName.trim().length > 0;
+  // Check completion status for different actions
+  const isBasicComplete = isBasicInfoValid(schoolInfo);
+  const isEssentialComplete = isEssentialInfoValid(schoolInfo);
+  const isFullComplete = isFullInfoValid(schoolInfo);
 
   return (
     <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
@@ -326,14 +351,19 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         Lock in your ${totalPrice.toLocaleString()} price (including ${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.
       </p>
       
-      {/* Form completion warning for orders/enquiries */}
-      {!isFormComplete && (
+      {/* Dynamic form completion messages */}
+      {!isFullComplete && (
         <div className="mb-6 p-4 bg-white/20 rounded-lg border border-white/30">
           <div className="flex items-center justify-center space-x-2 text-white">
             <AlertTriangle className="h-5 w-5" />
-            <span className="text-sm font-medium">
-              Complete the school information form below to place orders or make enquiries
-            </span>
+            <div className="text-sm">
+              <div className="font-medium mb-1">Complete your information below:</div>
+              <div className="text-xs opacity-90">
+                • Export Quote: No requirements (optional: school name, coordinator, email)<br/>
+                • Make Enquiry: School name + coordinator name + email required<br/>
+                • Place Order: Complete form required
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -342,43 +372,45 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <Button
           onClick={handleExportPDF}
           size="lg"
-          disabled={!hasBasicInfo}
-          className={`flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-            hasBasicInfo 
-              ? 'bg-white hover:bg-gray-50 text-gray-800' 
-              : 'bg-white/50 text-gray-500 cursor-not-allowed'
-          }`}
+          className="flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] bg-white hover:bg-gray-50 text-gray-800"
         >
           <FileText className="h-5 w-5 mr-2" />
           Export Quote as PDF
+          <div className="text-xs opacity-75 ml-2">(No requirements)</div>
         </Button>
         
         <Button
           onClick={handleBooklistingEnquiry}
           size="lg"
-          disabled={!isFormComplete}
+          disabled={!isEssentialComplete}
           className={`flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-            isFormComplete 
+            isEssentialComplete 
               ? 'bg-white hover:bg-gray-50 text-gray-800' 
               : 'bg-white/50 text-gray-500 cursor-not-allowed'
           }`}
         >
           <MessageCircle className="h-5 w-5 mr-2" />
           Enquire about Booklisting
+          <div className="text-xs opacity-75 ml-2">
+            {isEssentialComplete ? '✓ Ready' : 'Need: Name, coordinator, email'}
+          </div>
         </Button>
         
         <Button
           onClick={handlePlaceOrder}
           size="lg"
-          disabled={!isFormComplete}
+          disabled={!isFullComplete}
           className={`flex-1 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-            isFormComplete 
+            isFullComplete 
               ? 'bg-white hover:bg-gray-50 text-orange-600 hover:text-orange-700' 
               : 'bg-white/50 text-gray-500 cursor-not-allowed'
           }`}
         >
           <Plus className="h-5 w-5 mr-2" />
           Place Order Now
+          <div className="text-xs opacity-75 ml-2">
+            {isFullComplete ? '✓ Ready' : 'Complete form required'}
+          </div>
         </Button>
       </div>
       

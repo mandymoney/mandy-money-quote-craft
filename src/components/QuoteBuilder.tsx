@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon, BarChart3 } from 'lucide-react';
+import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon, BarChart3, MessageCircle, Plus } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { FormCompletionIndicator } from './FormCompletionIndicator';
@@ -598,10 +598,12 @@ export const QuoteBuilder = () => {
     }
     setUseUnlimited(!useUnlimited);
   };
-  const { errors, isSchoolInfoValid } = useFormValidation();
+  const { errors, isBasicInfoValid, isEssentialInfoValid, isFullInfoValid } = useFormValidation();
   
-  // Use the pure validation function instead of the state-updating one
-  const isFormComplete = isSchoolInfoValid(schoolInfo);
+  // Use the pure validation functions for different completion levels
+  const isBasicComplete = isBasicInfoValid(schoolInfo);
+  const isEssentialComplete = isEssentialInfoValid(schoolInfo);
+  const isFormComplete = isFullInfoValid(schoolInfo);
 
   const regularPricing = calculateRegularTotal();
   const volumeNotification = getVolumeNotification();
@@ -997,17 +999,24 @@ export const QuoteBuilder = () => {
               </div>
             </div>
 
-            {/* School Information Form - Updated with validation */}
+            {/* School Information Form - Updated with clearer requirements */}
             <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border border-green-200/50" data-form-section>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">School Information</h3>
                 <FormCompletionIndicator schoolInfo={schoolInfo} isComplete={isFormComplete} />
               </div>
-              <p className="text-sm text-gray-600 mb-4">
-                Basic information required for quotes. Complete all fields for orders and enquiries.
-              </p>
               
-              {/* Program Start Date within School Info */}
+              {/* Requirements explanation */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-blue-800 mb-2">Information Requirements by Action:</h4>
+                <div className="text-sm text-blue-700 space-y-1">
+                  <div><strong>Export Quote:</strong> No requirements (but recommended: school name, coordinator, email)</div>
+                  <div><strong>Make Enquiry:</strong> School name + coordinator name + email required</div>
+                  <div><strong>Place Order:</strong> Complete form required</div>
+                </div>
+              </div>
+              
+              {/* Program Start Date */}
               <div className="mb-6">
                 <h4 className="text-md font-semibold text-gray-700 mb-3">Program Access Period</h4>
                 <div className="flex items-center gap-4 mb-3">
@@ -1027,117 +1036,135 @@ export const QuoteBuilder = () => {
                   Access period: {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
                 </div>
               </div>
-              
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <div>
+
+              {/* Essential Information Section */}
+              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h4 className="font-semibold text-yellow-800 mb-3 flex items-center">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Essential for Enquiries & Orders
+                </h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Input 
+                      placeholder="School Name *" 
+                      value={schoolInfo.schoolName} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        schoolName: e.target.value
+                      }))} 
+                      className={`font-medium ${errors.schoolName ? 'border-red-300 focus:border-red-500' : isEssentialComplete ? 'border-green-300' : ''}`}
+                    />
+                    {errors.schoolName && (
+                      <p className="text-red-500 text-xs mt-1">{errors.schoolName}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Input 
+                      placeholder="Coordinator Name *" 
+                      value={schoolInfo.coordinatorName} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        coordinatorName: e.target.value
+                      }))} 
+                      className={`${errors.coordinatorName ? 'border-red-300 focus:border-red-500' : isEssentialComplete ? 'border-green-300' : ''}`}
+                    />
+                    {errors.coordinatorName && (
+                      <p className="text-red-500 text-xs mt-1">{errors.coordinatorName}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Input 
+                      placeholder="Coordinator Email *" 
+                      value={schoolInfo.coordinatorEmail} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        coordinatorEmail: e.target.value
+                      }))} 
+                      className={`${errors.coordinatorEmail ? 'border-red-300 focus:border-red-500' : isEssentialComplete ? 'border-green-300' : ''}`}
+                    />
+                    {errors.coordinatorEmail && (
+                      <p className="text-red-500 text-xs mt-1">{errors.coordinatorEmail}</p>
+                    )}
+                  </div>
                   <Input 
-                    placeholder="School Name *" 
-                    value={schoolInfo.schoolName} 
+                    placeholder="Coordinator Position" 
+                    value={schoolInfo.coordinatorPosition} 
                     onChange={e => setSchoolInfo(prev => ({
                       ...prev,
-                      schoolName: e.target.value
+                      coordinatorPosition: e.target.value
                     }))} 
-                    className={`font-medium ${errors.schoolName ? 'border-red-300 focus:border-red-500' : ''}`}
                   />
-                  {errors.schoolName && (
-                    <p className="text-red-500 text-xs mt-1">{errors.schoolName}</p>
-                  )}
                 </div>
-                <Input 
-                  placeholder="School ABN" 
-                  value={schoolInfo.schoolABN} 
-                  onChange={e => setSchoolInfo(prev => ({
-                    ...prev,
-                    schoolABN: e.target.value
-                  }))} 
-                />
               </div>
 
-              {/* School Address */}
-              <div className="mb-6">
-                <AddressInput
-                  label="School Address *"
-                  value={schoolInfo.schoolAddress}
-                  onChange={(address) => setSchoolInfo(prev => ({
-                    ...prev,
-                    schoolAddress: address
-                  }))}
-                  placeholder="Search for your school address..."
-                />
-                {errors.schoolAddress && (
-                  <p className="text-red-500 text-xs mt-1">{errors.schoolAddress}</p>
-                )}
-              </div>
+              {/* Additional Information Section - Required for Orders */}
+              <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                <h4 className="font-semibold text-orange-800 mb-3 flex items-center">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Additional Details for Orders
+                </h4>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                  <Input 
+                    placeholder="School ABN" 
+                    value={schoolInfo.schoolABN} 
+                    onChange={e => setSchoolInfo(prev => ({
+                      ...prev,
+                      schoolABN: e.target.value
+                    }))} 
+                  />
+                  <div>
+                    <Input 
+                      placeholder="Contact Phone *" 
+                      value={schoolInfo.contactPhone} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        contactPhone: e.target.value
+                      }))} 
+                      className={errors.contactPhone ? 'border-red-300 focus:border-red-500' : ''}
+                    />
+                    {errors.contactPhone && (
+                      <p className="text-red-500 text-xs mt-1">{errors.contactPhone}</p>
+                    )}
+                  </div>
+                </div>
 
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <Input 
-                    placeholder="Contact Phone *" 
-                    value={schoolInfo.contactPhone} 
-                    onChange={e => setSchoolInfo(prev => ({
+                {/* School Address */}
+                <div className="mb-4">
+                  <AddressInput
+                    label="School Address *"
+                    value={schoolInfo.schoolAddress}
+                    onChange={(address) => setSchoolInfo(prev => ({
                       ...prev,
-                      contactPhone: e.target.value
-                    }))} 
-                    className={errors.contactPhone ? 'border-red-300 focus:border-red-500' : ''}
+                      schoolAddress: address
+                    }))}
+                    placeholder="Search for your school address..."
                   />
-                  {errors.contactPhone && (
-                    <p className="text-red-500 text-xs mt-1">{errors.contactPhone}</p>
+                  {errors.schoolAddress && (
+                    <p className="text-red-500 text-xs mt-1">{errors.schoolAddress}</p>
                   )}
                 </div>
-                <div>
+
+                <div className="grid md:grid-cols-2 gap-4">
                   <Input 
-                    placeholder="Coordinator Name *" 
-                    value={schoolInfo.coordinatorName} 
+                    placeholder="Accounts Email" 
+                    value={schoolInfo.accountsEmail} 
                     onChange={e => setSchoolInfo(prev => ({
                       ...prev,
-                      coordinatorName: e.target.value
+                      accountsEmail: e.target.value
                     }))} 
-                    className={errors.coordinatorName ? 'border-red-300 focus:border-red-500' : ''}
                   />
-                  {errors.coordinatorName && (
-                    <p className="text-red-500 text-xs mt-1">{errors.coordinatorName}</p>
-                  )}
-                </div>
-                <Input 
-                  placeholder="Coordinator Position" 
-                  value={schoolInfo.coordinatorPosition} 
-                  onChange={e => setSchoolInfo(prev => ({
-                    ...prev,
-                    coordinatorPosition: e.target.value
-                  }))} 
-                />
-                <div>
                   <Input 
-                    placeholder="Coordinator Email *" 
-                    value={schoolInfo.coordinatorEmail} 
+                    placeholder="Purchase Order Number" 
+                    value={schoolInfo.purchaseOrderNumber} 
                     onChange={e => setSchoolInfo(prev => ({
                       ...prev,
-                      coordinatorEmail: e.target.value
+                      purchaseOrderNumber: e.target.value
                     }))} 
-                    className={errors.coordinatorEmail ? 'border-red-300 focus:border-red-500' : ''}
                   />
-                  {errors.coordinatorEmail && (
-                    <p className="text-red-500 text-xs mt-1">{errors.coordinatorEmail}</p>
-                  )}
                 </div>
-                <Input 
-                  placeholder="Accounts Email" 
-                  value={schoolInfo.accountsEmail} 
-                  onChange={e => setSchoolInfo(prev => ({
-                    ...prev,
-                    accountsEmail: e.target.value
-                  }))} 
-                />
-                <Input 
-                  placeholder="Purchase Order Number" 
-                  value={schoolInfo.purchaseOrderNumber} 
-                  onChange={e => setSchoolInfo(prev => ({
-                    ...prev,
-                    purchaseOrderNumber: e.target.value
-                  }))} 
-                />
               </div>
                 
+              {/* Delivery and Billing Addresses - Only show if physical items */}
               {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && (
                 <div className="mb-6">
                   <div className="flex items-center space-x-2 mb-4">
@@ -1212,12 +1239,29 @@ export const QuoteBuilder = () => {
               </div>
 
               {/* Questions/Comments Section */}
-              <div>
+              <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Any Questions or Comments?</label>
                 <Textarea placeholder="Please share any questions, special requirements, or additional information..." value={schoolInfo.questionsComments} onChange={e => setSchoolInfo(prev => ({
                 ...prev,
                 questionsComments: e.target.value
               }))} className="min-h-20" />
+              </div>
+
+              {/* Join Community Checkbox */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3">
+                  <Checkbox 
+                    id="joinCommunity" 
+                    checked={joinCommunity} 
+                    onCheckedChange={checked => setJoinCommunity(checked as boolean)}
+                  />
+                  <label htmlFor="joinCommunity" className="text-sm font-medium text-green-800 cursor-pointer">
+                    Join The Mandy Money Community
+                  </label>
+                </div>
+                <p className="text-xs text-green-600 mt-2 ml-6">
+                  Get updates on new resources, teaching tips, and exclusive offers for educators
+                </p>
               </div>
             </Card>
 
@@ -1238,31 +1282,11 @@ export const QuoteBuilder = () => {
               />
             </div>
           </div>
+
+          {/* ... keep existing code (running total sidebar) exactly the same */}
         </div>
 
-        {/* Divider */}
-        <div className="my-12">
-          <div className="border-t-2 border-gray-300"></div>
-        </div>
-
-        {/* Explore Materials Section */}
-        <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] bg-clip-text text-transparent">
-            <h2 className="text-4xl font-bold mb-2">✨ Explore your included materials ✨</h2>
-          </div>
-          <div className="flex justify-center items-center mt-6">
-            <ArrowDown className="h-6 w-6 text-gray-600 animate-bounce" />
-            <span className="ml-2 text-gray-600">Scroll down to explore</span>
-          </div>
-        </div>
-
-        {/* Lesson Explorer */}
-        <div className="mt-12">
-          <LessonExplorer />
-        </div>
-
-        {/* Add padding at bottom for mobile to prevent overlap with sticky notification */}
-        <div className="md:hidden h-24"></div>
+        {/* ... keep existing code (rest of the component - dividers, official quote section, lesson explorer) exactly the same */}
       </div>
     </div>
   );
