@@ -69,11 +69,6 @@ const addPageHeader = (doc: jsPDF, title: string, pageNumber: number = 1) => {
   return 30; // Return starting Y position for content
 };
 
-// Helper function to clean text of problematic characters
-const cleanText = (text: string): string => {
-  return text.replace(/[^\x00-\x7F]/g, ''); // Remove non-ASCII characters
-};
-
 export const generateQuotePDF = (
   schoolInfo: SchoolInfo,
   quoteItems: QuoteItem[],
@@ -104,12 +99,12 @@ export const generateQuotePDF = (
     doc.setFont('helvetica', 'normal');
     
     const schoolDetails = [
-      { label: 'School Name', value: cleanText(schoolInfo.schoolName) },
-      { label: 'Address', value: cleanText(formatAddress(schoolInfo.schoolAddress)) },
-      { label: 'ABN', value: cleanText(schoolInfo.schoolABN) },
-      { label: 'Coordinator', value: cleanText(schoolInfo.coordinatorName + (schoolInfo.coordinatorPosition ? ` (${schoolInfo.coordinatorPosition})` : '')) },
-      { label: 'Email', value: cleanText(schoolInfo.coordinatorEmail) },
-      { label: 'Phone', value: cleanText(schoolInfo.contactPhone) }
+      { label: 'School Name', value: schoolInfo.schoolName },
+      { label: 'Address', value: formatAddress(schoolInfo.schoolAddress) },
+      { label: 'ABN', value: schoolInfo.schoolABN },
+      { label: 'Coordinator', value: schoolInfo.coordinatorName + (schoolInfo.coordinatorPosition ? ` (${schoolInfo.coordinatorPosition})` : '') },
+      { label: 'Email', value: schoolInfo.coordinatorEmail },
+      { label: 'Phone', value: schoolInfo.contactPhone }
     ];
     
     schoolDetails.forEach(detail => {
@@ -162,7 +157,7 @@ export const generateQuotePDF = (
     yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', 2);
   }
   
-  // Detailed item breakdown
+  // Detailed item breakdown with enhanced clarity
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   
@@ -172,9 +167,24 @@ export const generateQuotePDF = (
       yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', doc.getNumberOfPages());
     }
     
-    // Item header
+    // Item header with enhanced product type distinction
     doc.setFont('helvetica', 'bold');
-    doc.text(`${cleanText(item.item)}`, 20, yPosition);
+    const productTypeText = item.type === 'teacher' ? '[TEACHER PRODUCT]' : '[STUDENT PRODUCT]';
+    doc.text(`● ${productTypeText} ${item.item}`, 20, yPosition);
+    
+    // Add type badge with more distinct colors
+    if (item.type === 'teacher') {
+      doc.setFillColor(34, 139, 34); // Forest Green for teachers
+      doc.setTextColor(255, 255, 255);
+    } else {
+      doc.setFillColor(255, 140, 0); // Dark Orange for students
+      doc.setTextColor(255, 255, 255);
+    }
+    doc.roundedRect(140, yPosition - 4, 35, 8, 2, 2, 'F');
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`FOR ${item.type.toUpperCase()}S`, 142, yPosition);
+    doc.setTextColor(0, 0, 0);
     
     // Price
     doc.setFontSize(12);
@@ -183,14 +193,15 @@ export const generateQuotePDF = (
     
     yPosition += 8;
     
-    // Item description
+    // Item description with type clarification
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(cleanText(item.description), 25, yPosition);
+    const enhancedDescription = `${item.description} (Designed specifically for ${item.type}s)`;
+    doc.text(enhancedDescription, 25, yPosition);
     yPosition += 6;
     
     // Quantity and unit price breakdown
-    doc.text(`${item.count} x $${item.unitPrice} per ${item.type}`, 25, yPosition);
+    doc.text(`${item.count} × $${item.unitPrice} per ${item.type}`, 25, yPosition);
     
     // Show savings if applicable
     if (item.savings && item.savings > 0) {
@@ -206,7 +217,7 @@ export const generateQuotePDF = (
   
   // Shipping section
   doc.setFont('helvetica', 'bold');
-  doc.text('Shipping', 20, yPosition);
+  doc.text('● Shipping', 20, yPosition);
   doc.text('FREE', 160, yPosition);
   yPosition += 6;
   
@@ -248,7 +259,7 @@ export const generateQuotePDF = (
   
   doc.setTextColor(0, 0, 0);
   
-  // What's Included section
+  // What's Included section with enhanced clarity
   yPosition += 30;
   if (yPosition > 220) {
     doc.addPage();
@@ -260,28 +271,60 @@ export const generateQuotePDF = (
   doc.text("What's Included", 20, yPosition);
   yPosition += 10;
   
-  // Check if we should include digital classroom spaces
-  const hasTeacherDigital = quoteItems.some(item => 
-    item.type === 'teacher' && (item.item.includes('Digital') || item.item.includes('Bundle'))
-  );
-  const hasStudentDigital = quoteItems.some(item => 
-    item.type === 'student' && (item.item.includes('Digital') || item.item.includes('Bundle'))
-  );
-  const shouldIncludeClassrooms = hasTeacherDigital && hasStudentDigital;
+  // Separate teacher and student inclusions
+  const teacherInclusions = quoteItems
+    .filter(item => item.type === 'teacher')
+    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Teacher Digital Pass & Print Textbooks').replace('Textbook Only', 'Teacher Print Textbooks')} [FOR TEACHERS]`);
   
-  const inclusions = [
-    ...quoteItems.map(item => `${item.count} x ${cleanText(item.item)}`),
-    ...(shouldIncludeClassrooms ? [`${teacherCount} x Digital Classroom Space`] : [])
-  ];
+  const studentInclusions = quoteItems
+    .filter(item => item.type === 'student')
+    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Student Digital Pass & Print Textbooks').replace('Textbook Only', 'Student Print Textbooks')} [FOR STUDENTS]`);
+  
+  const generalInclusions = ['1 × Digital Classroom Space [SHARED RESOURCE]'];
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   
-  inclusions.forEach(inclusion => {
-    doc.text('✓', 25, yPosition);
-    doc.text(inclusion, 35, yPosition);
+  // Display teacher items first
+  if (teacherInclusions.length > 0) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Teacher Resources:', 25, yPosition);
     yPosition += 7;
-  });
+    doc.setFont('helvetica', 'normal');
+    teacherInclusions.forEach(inclusion => {
+      doc.text('✓', 30, yPosition);
+      doc.text(inclusion, 40, yPosition);
+      yPosition += 7;
+    });
+    yPosition += 3;
+  }
+  
+  // Display student items
+  if (studentInclusions.length > 0) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Student Resources:', 25, yPosition);
+    yPosition += 7;
+    doc.setFont('helvetica', 'normal');
+    studentInclusions.forEach(inclusion => {
+      doc.text('✓', 30, yPosition);
+      doc.text(inclusion, 40, yPosition);
+      yPosition += 7;
+    });
+    yPosition += 3;
+  }
+  
+  // Display general inclusions
+  if (generalInclusions.length > 0) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Shared Resources:', 25, yPosition);
+    yPosition += 7;
+    doc.setFont('helvetica', 'normal');
+    generalInclusions.forEach(inclusion => {
+      doc.text('✓', 30, yPosition);
+      doc.text(inclusion, 40, yPosition);
+      yPosition += 7;
+    });
+  }
   
   // Footer
   yPosition += 15;
@@ -332,35 +375,35 @@ export const generateOrderPDF = (
     doc.setFont('helvetica', 'normal');
     
     if (schoolInfo.schoolName) {
-      doc.text(`School Name: ${cleanText(schoolInfo.schoolName)}`, 20, yPosition);
+      doc.text(`School Name: ${schoolInfo.schoolName}`, 20, yPosition);
       yPosition += 6;
     }
     
     if (formatAddress(schoolInfo.schoolAddress)) {
-      doc.text(`Address: ${cleanText(formatAddress(schoolInfo.schoolAddress))}`, 20, yPosition);
+      doc.text(`Address: ${formatAddress(schoolInfo.schoolAddress)}`, 20, yPosition);
       yPosition += 6;
     }
     
     if (schoolInfo.schoolABN) {
-      doc.text(`ABN: ${cleanText(schoolInfo.schoolABN)}`, 20, yPosition);
+      doc.text(`ABN: ${schoolInfo.schoolABN}`, 20, yPosition);
       yPosition += 6;
     }
     
     if (schoolInfo.coordinatorName) {
-      doc.text(`Coordinator: ${cleanText(schoolInfo.coordinatorName)}`, 20, yPosition);
+      doc.text(`Coordinator: ${schoolInfo.coordinatorName}`, 20, yPosition);
       if (schoolInfo.coordinatorPosition) {
-        doc.text(` (${cleanText(schoolInfo.coordinatorPosition)})`, 80, yPosition);
+        doc.text(` (${schoolInfo.coordinatorPosition})`, 80, yPosition);
       }
       yPosition += 6;
     }
     
     if (schoolInfo.coordinatorEmail) {
-      doc.text(`Email: ${cleanText(schoolInfo.coordinatorEmail)}`, 20, yPosition);
+      doc.text(`Email: ${schoolInfo.coordinatorEmail}`, 20, yPosition);
       yPosition += 6;
     }
     
     if (schoolInfo.contactPhone) {
-      doc.text(`Phone: ${cleanText(schoolInfo.contactPhone)}`, 20, yPosition);
+      doc.text(`Phone: ${schoolInfo.contactPhone}`, 20, yPosition);
       yPosition += 6;
     }
     
@@ -411,7 +454,7 @@ export const generateOrderPDF = (
       yPosition = 20;
     }
     
-    doc.text(cleanText(item.item.substring(0, 30)), 20, yPosition);
+    doc.text(item.item.substring(0, 30), 20, yPosition);
     doc.text(item.count.toString(), 80, yPosition);
     doc.text(`$${item.unitPrice.toLocaleString()}`, 100, yPosition);
     doc.text(`$${item.totalPrice.toLocaleString()}`, 140, yPosition);
