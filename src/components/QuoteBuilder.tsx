@@ -408,11 +408,7 @@ export const QuoteBuilder = () => {
       const totalTeacherPhysical = teacherPhysical + teacherBoth;
       const totalStudentDigital = studentDigital + studentBoth;
       const totalStudentPhysical = studentPhysical + studentBoth;
-      
-      // Only include digital classroom spaces if both teacher and student digital passes are selected
-      const hasTeacherDigital = totalTeacherDigital > 0;
-      const hasStudentDigital = totalStudentDigital > 0;
-      const totalClassrooms = hasTeacherDigital && hasStudentDigital ? totalTeacherDigital : 0;
+      const totalClassrooms = totalTeacherDigital;
 
       if (totalTeacherDigital > 0) {
         items.push({
@@ -521,26 +517,6 @@ export const QuoteBuilder = () => {
           });
         }
       });
-
-      // Add digital classroom spaces only if both teacher and student digital passes are selected
-      const teacherDigital = selectedTeacherTiers['teacher-digital'] || 0;
-      const teacherBoth = selectedTeacherTiers['teacher-both'] || 0;
-      const studentDigital = selectedStudentTiers['student-digital'] || 0;
-      const studentBoth = selectedStudentTiers['student-both'] || 0;
-      
-      const totalTeacherDigital = teacherDigital + teacherBoth;
-      const totalStudentDigital = studentDigital + studentBoth;
-      
-      if (totalTeacherDigital > 0 && totalStudentDigital > 0) {
-        breakdown.push({
-          item: 'Digital Classroom Spaces',
-          count: totalTeacherDigital,
-          unitPrice: 0,
-          totalPrice: 0,
-          type: 'teacher',
-          description: 'Included with Teacher Digital Passes when students also have digital access'
-        });
-      }
     }
     return breakdown;
   };

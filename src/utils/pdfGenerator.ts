@@ -167,15 +167,10 @@ export const generateQuotePDF = (
       yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote', doc.getNumberOfPages());
     }
     
-    // Skip digital classroom spaces if they have 0 price (they're included)
-    if (item.item.includes('Digital Classroom') && item.totalPrice === 0) {
-      return;
-    }
-    
     // Item header with enhanced product type distinction
     doc.setFont('helvetica', 'bold');
     const productTypeText = item.type === 'teacher' ? '[TEACHER PRODUCT]' : '[STUDENT PRODUCT]';
-    doc.text(`• ${productTypeText} ${item.item}`, 20, yPosition);
+    doc.text(`● ${productTypeText} ${item.item}`, 20, yPosition);
     
     // Add type badge with more distinct colors
     if (item.type === 'teacher') {
@@ -206,7 +201,7 @@ export const generateQuotePDF = (
     yPosition += 6;
     
     // Quantity and unit price breakdown
-    doc.text(`${item.count} x $${item.unitPrice} per ${item.type}`, 25, yPosition);
+    doc.text(`${item.count} × $${item.unitPrice} per ${item.type}`, 25, yPosition);
     
     // Show savings if applicable
     if (item.savings && item.savings > 0) {
@@ -222,7 +217,7 @@ export const generateQuotePDF = (
   
   // Shipping section
   doc.setFont('helvetica', 'bold');
-  doc.text('• Shipping', 20, yPosition);
+  doc.text('● Shipping', 20, yPosition);
   doc.text('FREE', 160, yPosition);
   yPosition += 6;
   
@@ -276,29 +271,16 @@ export const generateQuotePDF = (
   doc.text("What's Included", 20, yPosition);
   yPosition += 10;
   
-  // Filter out digital classroom spaces with 0 price and separate teacher and student inclusions
-  const paidItems = quoteItems.filter(item => !(item.item.includes('Digital Classroom') && item.totalPrice === 0));
-  
-  const teacherInclusions = paidItems
+  // Separate teacher and student inclusions
+  const teacherInclusions = quoteItems
     .filter(item => item.type === 'teacher')
-    .map(item => `${item.count} x ${item.item.replace('Digital Pass + Textbook Bundle', 'Teacher Digital Pass & Print Textbooks').replace('Textbook Only', 'Teacher Print Textbooks')} [FOR TEACHERS]`);
+    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Teacher Digital Pass & Print Textbooks').replace('Textbook Only', 'Teacher Print Textbooks')} [FOR TEACHERS]`);
   
-  const studentInclusions = paidItems
+  const studentInclusions = quoteItems
     .filter(item => item.type === 'student')
-    .map(item => `${item.count} x ${item.item.replace('Digital Pass + Textbook Bundle', 'Student Digital Pass & Print Textbooks').replace('Textbook Only', 'Student Print Textbooks')} [FOR STUDENTS]`);
+    .map(item => `${item.count} × ${item.item.replace('Digital Pass + Textbook Bundle', 'Student Digital Pass & Print Textbooks').replace('Textbook Only', 'Student Print Textbooks')} [FOR STUDENTS]`);
   
-  // Check if we should include digital classroom spaces
-  const hasTeacherDigital = quoteItems.some(item => item.type === 'teacher' && (item.item.includes('Digital Pass') || item.item.includes('Bundle')));
-  const hasStudentDigital = quoteItems.some(item => item.type === 'student' && (item.item.includes('Digital Pass') || item.item.includes('Bundle')));
-  
-  const generalInclusions = [];
-  if (hasTeacherDigital && hasStudentDigital) {
-    const teacherDigitalCount = quoteItems
-      .filter(item => item.type === 'teacher' && (item.item.includes('Digital Pass') || item.item.includes('Bundle')))
-      .reduce((sum, item) => sum + item.count, 0);
-    
-    generalInclusions.push(`${teacherDigitalCount} x Digital Classroom Space${teacherDigitalCount > 1 ? 's' : ''} [SHARED RESOURCE]`);
-  }
+  const generalInclusions = ['1 × Digital Classroom Space [SHARED RESOURCE]'];
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
