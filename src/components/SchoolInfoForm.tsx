@@ -82,10 +82,16 @@ export const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
 
       {/* School Address */}
       <div>
-        <Label className="text-lg font-medium">School Address</Label>
         <AddressInput
-          address={schoolInfo.schoolAddress}
-          onAddressChange={(field, value) => onAddressChange('schoolAddress', field, value)}
+          label="School Address"
+          value={schoolInfo.schoolAddress}
+          onChange={(address) => {
+            // Update all fields of the address at once
+            Object.keys(address).forEach(field => {
+              onAddressChange('schoolAddress', field, address[field as keyof AddressComponents]);
+            });
+          }}
+          placeholder="Enter school address"
         />
       </div>
 
@@ -149,13 +155,17 @@ export const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
         </div>
         
         {!schoolInfo.deliveryIsSameAsSchool && (
-          <div>
-            <Label className="text-lg font-medium">Delivery Address</Label>
-            <AddressInput
-              address={schoolInfo.deliveryAddress}
-              onAddressChange={(field, value) => onAddressChange('deliveryAddress', field, value)}
-            />
-          </div>
+          <AddressInput
+            label="Delivery Address"
+            value={schoolInfo.deliveryAddress}
+            onChange={(address) => {
+              // Update all fields of the address at once
+              Object.keys(address).forEach(field => {
+                onAddressChange('deliveryAddress', field, address[field as keyof AddressComponents]);
+              });
+            }}
+            placeholder="Enter delivery address"
+          />
         )}
       </div>
 
@@ -171,13 +181,17 @@ export const SchoolInfoForm: React.FC<SchoolInfoFormProps> = ({
         </div>
         
         {!schoolInfo.billingIsSameAsSchool && (
-          <div>
-            <Label className="text-lg font-medium">Billing Address</Label>
-            <AddressInput
-              address={schoolInfo.billingAddress}
-              onAddressChange={(field, value) => onAddressChange('billingAddress', field, value)}
-            />
-          </div>
+          <AddressInput
+            label="Billing Address"
+            value={schoolInfo.billingAddress}
+            onChange={(address) => {
+              // Update all fields of the address at once
+              Object.keys(address).forEach(field => {
+                onAddressChange('billingAddress', field, address[field as keyof AddressComponents]);
+              });
+            }}
+            placeholder="Enter billing address"
+          />
         )}
       </div>
 
