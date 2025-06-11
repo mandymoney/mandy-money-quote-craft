@@ -1,114 +1,258 @@
-
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Infinity, Users, Globe, BookOpen, Award, Zap } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Check, Image, TrendingUp } from 'lucide-react';
+import { UnlimitedTier } from './QuoteBuilder';
 import { cn } from '@/lib/utils';
 
 interface UnlimitedSchoolCardProps {
-  onSelect: () => void;
+  tier: UnlimitedTier;
   isSelected: boolean;
-  price: number;
-  animationDelay?: number;
+  onSelect: () => void;
+  addOns: {
+    teacherBooks: number;
+    studentBooks: number;
+    posterA0: number;
+  };
+  onAddOnsChange: (addOns: { teacherBooks: number; studentBooks: number; posterA0: number }) => void;
+  pricing: {
+    subtotal: number;
+    gst: number;
+    total: number;
+  };
+  teacherCount: number;
+  studentCount: number;
+  regularPricing: {
+    total: number;
+  };
 }
 
 export const UnlimitedSchoolCard: React.FC<UnlimitedSchoolCardProps> = ({
-  onSelect,
+  tier,
   isSelected,
-  price,
-  animationDelay = 0
+  onSelect,
+  addOns,
+  onAddOnsChange,
+  pricing,
+  teacherCount,
+  studentCount,
+  regularPricing
 }) => {
-  const features = [
-    "Unlimited student access",
-    "All teacher resources included",
-    "Complete digital platform",
-    "Physical teacher materials",
-    "Professional development",
-    "Ongoing support"
-  ];
+  const handleTeacherBooksChange = (value: string) => {
+    const newCount = Math.max(0, parseInt(value) || 0);
+    onAddOnsChange({ ...addOns, teacherBooks: newCount });
+  };
 
-  const getIcon = (feature: string) => {
-    if (feature.includes('student')) return Users;
-    if (feature.includes('digital')) return Globe;
-    if (feature.includes('physical')) return BookOpen;
-    if (feature.includes('development')) return Award;
-    if (feature.includes('support')) return Zap;
-    return Infinity;
+  const handleStudentBooksChange = (value: string) => {
+    const newCount = Math.max(0, parseInt(value) || 0);
+    onAddOnsChange({ ...addOns, studentBooks: newCount });
+  };
+
+  const handlePosterA0Change = (value: string) => {
+    const newCount = Math.max(0, parseInt(value) || 0);
+    onAddOnsChange({ ...addOns, posterA0: newCount });
+  };
+
+  const savings = regularPricing.total - pricing.total;
+  const percentSavings = Math.round((savings / regularPricing.total) * 100);
+
+  // Get all inclusions including add-ons
+  const getAllInclusions = () => {
+    const inclusions = [...tier.inclusions];
+    
+    if (addOns.teacherBooks > 0) {
+      inclusions.push(`${addOns.teacherBooks} x Teacher Print Textbook${addOns.teacherBooks > 1 ? 's' : ''}`);
+    }
+    if (addOns.studentBooks > 0) {
+      inclusions.push(`${addOns.studentBooks} x Student Print Textbook${addOns.studentBooks > 1 ? 's' : ''}`);
+    }
+    if (addOns.posterA0 > 0) {
+      inclusions.push(`${addOns.posterA0} x A0 Poster${addOns.posterA0 > 1 ? 's' : ''}`);
+    }
+    
+    return inclusions;
   };
 
   return (
-    <Card
-      className={cn(
-        'relative cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl',
-        'bg-gradient-to-br from-purple-50 via-white to-indigo-50 border-2',
-        isSelected ? 'border-purple-400 shadow-lg' : 'border-gray-200',
-        'animate-scale-in'
-      )}
-      style={{ animationDelay: `${animationDelay}ms` }}
-      onClick={onSelect}
-    >
-      {/* Popular badge */}
-      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-        <Badge className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-1">
-          Most Popular
-        </Badge>
-      </div>
-
-      <div className="p-6 pt-8">
-        {/* Header */}
-        <div className="h-28 rounded-lg mb-4 bg-gradient-to-br from-purple-800 via-purple-700 to-indigo-600">
-          <div className="flex flex-col items-center justify-center h-full px-2">
-            <div className="text-xs font-medium text-white/90 mb-1 bg-white/30 px-2 py-1 rounded">
-              UNLIMITED
+    <div className="relative">
+      {/* Main card */}
+      <div
+        className={cn(
+          'relative cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl',
+          'text-white overflow-hidden rounded-lg',
+          isSelected ? 'ring-4 ring-green-300 ring-opacity-70 shadow-xl' : 'shadow-lg'
+        )}
+        style={{ 
+          background: 'linear-gradient(135deg, #ebff00, #8ace00)'
+        }}
+        onClick={onSelect}
+      >
+        {/* Savings Badge */}
+        {savings > 0 && (
+          <div className="absolute -top-4 -right-4 bg-red-500 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg">
+            <div className="flex items-center">
+              <TrendingUp className="h-4 w-4 mr-1" />
+              Save ${savings.toLocaleString()}!
             </div>
-            <h3 className="text-white font-bold text-lg text-center leading-tight drop-shadow-sm">
-              Whole School Access
-            </h3>
-          </div>
-        </div>
-
-        <p className="text-gray-600 text-sm mb-4 min-h-[40px]">
-          Perfect for schools wanting unlimited access for all students and complete teacher resources
-        </p>
-
-        {/* Pricing */}
-        <div className="mb-6 rounded-lg p-4 text-center bg-purple-50">
-          <div className="text-2xl font-bold text-purple-900">
-            ${price.toLocaleString()}
-          </div>
-          <div className="text-sm text-purple-600">
-            one-time payment (inc. GST)
-          </div>
-          <div className="mt-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
-            <Infinity className="h-4 w-4 inline mr-1" />
-            Unlimited Students!
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="space-y-3 mb-6">
-          {features.map((feature, index) => {
-            const IconComponent = getIcon(feature);
-            return (
-              <div key={index} className="flex items-center text-sm text-gray-700">
-                <IconComponent className="h-4 w-4 mr-2 flex-shrink-0 text-purple-500" />
-                <span>{feature}</span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Selection Indicator */}
-        {isSelected && (
-          <div className="mt-4 p-2 border rounded-lg bg-purple-50 border-purple-200">
-            <div className="flex items-center justify-center font-medium text-sm text-purple-700">
-              <Infinity className="h-4 w-4 mr-1" />
-              Selected
-            </div>
+            <div className="text-xs">{percentSavings}% savings</div>
           </div>
         )}
+
+        <div className="p-8 pb-16">
+          {/* Banner Image - fit height and no border */}
+          <div className="mb-6">
+            <img 
+              src="https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/1599bca18c91728a2448c014064bdd3e1784dce4/Unlimited%20Access%20Banner.png"
+              alt="Unlimited Access Banner" 
+              className="w-full h-auto object-contain rounded-lg"
+            />
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Main Content */}
+            <div>
+              <h3 className="text-3xl font-bold mb-2 text-gray-800">{tier.name}</h3>
+              <p className="text-gray-700 text-lg mb-6">{tier.description}</p>
+
+              {/* Base Price - Clean and Simple */}
+              <div className="bg-white/90 rounded-lg p-6 mb-6 shadow-inner">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-3xl font-bold text-gray-800">${tier.basePrice.toLocaleString()}</div>
+                    <div className="text-gray-600">Base unlimited access</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add-on Options */}
+              <div className="space-y-4">
+                <h4 className="text-xl font-semibold text-gray-800 flex items-center">
+                  Optional Hard-Copy Add-ons
+                </h4>
+                
+                {/* Print Teacher Textbooks */}
+                <div className="bg-white/80 rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-3">
+                      <Image className="h-5 w-5 text-gray-600" />
+                      <span className="font-medium text-gray-800">Print Teacher Textbooks</span>
+                      <span className="text-sm text-gray-600">(${tier.addOns.teacherBooks} each)</span>
+                    </div>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={addOns.teacherBooks}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleTeacherBooksChange(e.target.value);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-20 bg-white text-gray-800 border-gray-300"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="text-gray-600 text-sm">
+                    Total: ${(addOns.teacherBooks * tier.addOns.teacherBooks).toLocaleString()}
+                  </div>
+                </div>
+
+                {/* Print Student Textbooks */}
+                <div className="bg-white/80 rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-3">
+                      <Image className="h-5 w-5 text-gray-600" />
+                      <span className="font-medium text-gray-800">Print Student Textbooks</span>
+                      <span className="text-sm text-gray-600">(${tier.addOns.studentBooks} each)</span>
+                    </div>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={addOns.studentBooks}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleStudentBooksChange(e.target.value);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-20 bg-white text-gray-800 border-gray-300"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="text-gray-600 text-sm">
+                    Total: ${(addOns.studentBooks * tier.addOns.studentBooks).toLocaleString()}
+                  </div>
+                </div>
+
+                {/* A0 Posters */}
+                <div className="bg-white/80 rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-3">
+                      <Image className="h-5 w-5 text-gray-600" />
+                      <span className="font-medium text-gray-800">A0 Posters</span>
+                      <span className="text-sm text-gray-600">(${tier.addOns.posterA0} each)</span>
+                    </div>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={addOns.posterA0}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handlePosterA0Change(e.target.value);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-20 bg-white text-gray-800 border-gray-300"
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="text-gray-600 text-sm">
+                    Total: ${(addOns.posterA0 * tier.addOns.posterA0).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Inclusions */}
+            <div>
+              {/* Key Inclusions */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-semibold text-gray-800">What's Included</h4>
+                {getAllInclusions().map((inclusion, index) => (
+                  <div key={index} className="flex items-center text-gray-700">
+                    <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
+                    <span>{inclusion}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Selection Indicator */}
+              {isSelected && (
+                <div className="mt-6 p-3 bg-orange-400 text-white rounded-lg shadow-lg">
+                  <div className="flex items-center justify-center font-bold">
+                    <Check className="h-5 w-5 mr-2" />
+                    Selected Option
+                  </div>
+                </div>
+              )}
+
+              {savings > 0 && (
+                <div className="mt-4 p-4 bg-white/90 rounded-lg shadow-inner text-center">
+                  <div className="text-green-600 font-bold text-lg">
+                    ${savings.toLocaleString()} cheaper than individual options!
+                  </div>
+                  <div className="text-green-500 text-sm">{percentSavings}% total savings</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Banner that doesn't cover content */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-4">
+          <div className="text-center font-bold text-sm">
+            {tier.bestFor}
+          </div>
+        </div>
       </div>
-    </Card>
+    </div>
   );
 };

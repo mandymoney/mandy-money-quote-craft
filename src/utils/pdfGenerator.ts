@@ -1,3 +1,4 @@
+
 import jsPDF from 'jspdf';
 
 interface AddressComponents {
@@ -68,31 +69,6 @@ const addPageHeader = (doc: jsPDF, title: string, pageNumber: number = 1) => {
   return 30; // Return starting Y position for content
 };
 
-const addImportantNotice = (doc: jsPDF, yPosition: number): number => {
-  // Add prominent notice box
-  doc.setFillColor(255, 59, 48); // Red background
-  doc.roundedRect(15, yPosition, 180, 25, 5, 5, 'F');
-  
-  // Add white border
-  doc.setDrawColor(255, 255, 255);
-  doc.setLineWidth(2);
-  doc.roundedRect(15, yPosition, 180, 25, 5, 5, 'S');
-  
-  // Add warning icon and text
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text('⚠️ IMPORTANT NOTICE ⚠️', 105, yPosition + 8, { align: 'center' });
-  
-  doc.setFontSize(14);
-  doc.text('THIS PDF MUST BE SUBMITTED TO', 105, yPosition + 16, { align: 'center' });
-  doc.text('HELLO@MANDYMONEY.COM.AU', 105, yPosition + 22, { align: 'center' });
-  
-  doc.setTextColor(0, 0, 0); // Reset to black
-  
-  return yPosition + 35;
-};
-
 export const generateQuotePDF = (
   schoolInfo: SchoolInfo,
   quoteItems: QuoteItem[],
@@ -104,9 +80,6 @@ export const generateQuotePDF = (
 ): jsPDF => {
   const doc = new jsPDF();
   let yPosition = addPageHeader(doc, 'Mandy Money High School Program Quote');
-  
-  // Add important notice at the top
-  yPosition = addImportantNotice(doc, yPosition);
   
   // Quote header info
   doc.setFontSize(12);
@@ -344,9 +317,6 @@ export const generateOrderPDF = (
   doc.text('Mandy Money High School Program Order', 20, yPosition);
   yPosition += 15;
   
-  // Add important notice
-  yPosition = addImportantNotice(doc, yPosition);
-  
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.text(`Order Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
@@ -515,45 +485,26 @@ export const createEmailBody = (
   body += `School Details:\n`;
   if (schoolInfo.schoolName) body += `- School: ${schoolInfo.schoolName}\n`;
   if (schoolInfo.coordinatorName) body += `- Coordinator: ${schoolInfo.coordinatorName}\n`;
-  if (schoolInfo.coordinatorPosition) body += `- Position: ${schoolInfo.coordinatorPosition}\n`;
   if (schoolInfo.coordinatorEmail) body += `- Email: ${schoolInfo.coordinatorEmail}\n`;
   if (schoolInfo.contactPhone) body += `- Phone: ${schoolInfo.contactPhone}\n`;
-  if (schoolInfo.schoolABN) body += `- ABN: ${schoolInfo.schoolABN}\n`;
-  
-  if (schoolInfo.schoolAddress && (schoolInfo.schoolAddress.streetNumber || schoolInfo.schoolAddress.streetName)) {
-    body += `- Address: ${schoolInfo.schoolAddress.streetNumber} ${schoolInfo.schoolAddress.streetName}`;
-    if (schoolInfo.schoolAddress.suburb) body += `, ${schoolInfo.schoolAddress.suburb}`;
-    if (schoolInfo.schoolAddress.state) body += `, ${schoolInfo.schoolAddress.state}`;
-    if (schoolInfo.schoolAddress.postcode) body += ` ${schoolInfo.schoolAddress.postcode}`;
-    body += `\n`;
-  }
   
   body += `\nProgram Requirements:\n`;
   body += `- Teachers: ${teacherCount}\n`;
   body += `- Students: ${studentCount}\n`;
-  body += `- Total Investment: $${pricing.total.toLocaleString()}\n`;
-  body += `- Program Start Date: ${new Date().toLocaleDateString()}\n\n`;
-  
-  if (schoolInfo.paymentPreference) {
-    body += `Payment Preference: ${schoolInfo.paymentPreference}\n`;
-  }
-  
-  if (schoolInfo.purchaseOrderNumber) {
-    body += `Purchase Order Number: ${schoolInfo.purchaseOrderNumber}\n`;
-  }
+  body += `- Total Investment: $${pricing.total.toLocaleString()}\n\n`;
   
   if (schoolInfo.questionsComments) {
-    body += `\nAdditional Comments:\n${schoolInfo.questionsComments}\n\n`;
+    body += `Additional Comments:\n${schoolInfo.questionsComments}\n\n`;
   }
   
   const documentType = isEnquiry ? 'quote' : 'order';
   
   if (pdfUrl) {
-    body += `IMPORTANT: Please find the detailed ${documentType} document at the following link:\n`;
+    body += `Please find the detailed ${documentType} document at the following link:\n`;
     body += `${pdfUrl}\n\n`;
-    body += `You can view and download the PDF by clicking the link above. Please process this ${documentType} and respond with next steps.\n\n`;
+    body += `You can view and download the PDF by clicking the link above.\n\n`;
   } else {
-    body += `Please find the detailed ${documentType} attached. Please process this ${documentType} and respond with next steps.\n\n`;
+    body += `Please find the detailed ${documentType} attached.\n\n`;
   }
   
   body += `Best regards,\n${schoolInfo.coordinatorName || 'School Coordinator'}`;
