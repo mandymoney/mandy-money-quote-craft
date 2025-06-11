@@ -1,4 +1,3 @@
-
 import jsPDF from 'jspdf';
 
 interface AddressComponents {
@@ -58,15 +57,29 @@ const formatAddress = (address: AddressComponents): string => {
 };
 
 const addPageHeader = (doc: jsPDF, title: string, pageNumber: number = 1) => {
+  // Add prominent notice at the top
+  doc.setFillColor(255, 0, 0); // Red background
+  doc.rect(10, 10, 190, 25, 'F');
+  
+  doc.setTextColor(255, 255, 255); // White text
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('⚠️ IMPORTANT: THIS PDF MUST BE SUBMITTED TO', 105, 20, { align: 'center' });
+  doc.text('HELLO@MANDYMONEY.COM.AU FOR THE ENQUIRY OR ORDER TO BE RECEIVED', 105, 28, { align: 'center' });
+  
+  // Reset colors for rest of document
+  doc.setTextColor(0, 0, 0);
+  
+  // Add title below the notice
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, 20, 20);
+  doc.text(title, 20, 50);
   
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Page ${pageNumber}`, 180, 20);
+  doc.text(`Page ${pageNumber}`, 180, 50);
   
-  return 30; // Return starting Y position for content
+  return 60; // Return starting Y position for content (moved down due to notice)
 };
 
 export const generateQuotePDF = (
@@ -309,14 +322,9 @@ export const generateOrderPDF = (
   isUnlimited: boolean = false
 ): jsPDF => {
   const doc = new jsPDF();
-  let yPosition = 20;
+  let yPosition = addPageHeader(doc, 'Mandy Money High School Program Order');
   
-  // Header
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Mandy Money High School Program Order', 20, yPosition);
-  yPosition += 15;
-  
+  // Order header info
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.text(`Order Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
@@ -482,29 +490,44 @@ export const createEmailBody = (
     body += `I would like to place an order for the High School Program.\n\n`;
   }
   
+  // Add PDF link prominently if available
+  if (pdfUrl) {
+    const documentType = isEnquiry ? 'quote' : 'order';
+    body += `IMPORTANT - Please find the detailed ${documentType} document here:\n`;
+    body += `${pdfUrl}\n\n`;
+    body += `You can view and download the PDF by clicking the link above.\n\n`;
+  }
+  
   body += `School Details:\n`;
   if (schoolInfo.schoolName) body += `- School: ${schoolInfo.schoolName}\n`;
   if (schoolInfo.coordinatorName) body += `- Coordinator: ${schoolInfo.coordinatorName}\n`;
   if (schoolInfo.coordinatorEmail) body += `- Email: ${schoolInfo.coordinatorEmail}\n`;
   if (schoolInfo.contactPhone) body += `- Phone: ${schoolInfo.contactPhone}\n`;
+  if (schoolInfo.schoolABN) body += `- ABN: ${schoolInfo.schoolABN}\n`;
+  
+  // Add full address if available
+  const address = formatAddress(schoolInfo.schoolAddress);
+  if (address.trim()) body += `- Address: ${address}\n`;
   
   body += `\nProgram Requirements:\n`;
   body += `- Teachers: ${teacherCount}\n`;
   body += `- Students: ${studentCount}\n`;
-  body += `- Total Investment: $${pricing.total.toLocaleString()}\n\n`;
+  body += `- Program Start Date: ${new Date().toLocaleDateString()}\n`;
+  body += `- Total Investment: $${pricing.total.toLocaleString()} (including GST)\n\n`;
+  
+  // Add detailed pricing breakdown
+  body += `Investment Breakdown:\n`;
+  body += `- Subtotal (exc. GST): $${pricing.subtotal.toFixed(2)}\n`;
+  body += `- GST (10%): $${pricing.gst.toFixed(2)}\n`;
+  if (pricing.shipping > 0) {
+    body += `- Shipping: $${pricing.shipping.toFixed(2)}\n`;
+  } else {
+    body += `- Shipping: FREE (order over $90)\n`;
+  }
+  body += `- Total: $${pricing.total.toLocaleString()}\n\n`;
   
   if (schoolInfo.questionsComments) {
     body += `Additional Comments:\n${schoolInfo.questionsComments}\n\n`;
-  }
-  
-  const documentType = isEnquiry ? 'quote' : 'order';
-  
-  if (pdfUrl) {
-    body += `Please find the detailed ${documentType} document at the following link:\n`;
-    body += `${pdfUrl}\n\n`;
-    body += `You can view and download the PDF by clicking the link above.\n\n`;
-  } else {
-    body += `Please find the detailed ${documentType} attached.\n\n`;
   }
   
   body += `Best regards,\n${schoolInfo.coordinatorName || 'School Coordinator'}`;
