@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PricingCard } from './PricingCard';
 import { ActionButtons } from './ActionButtons';
@@ -17,7 +18,7 @@ import { ExpandableSection } from './ExpandableSection';
 import { LessonExplorer } from './LessonExplorer';
 import { VideoEmbed } from './VideoEmbed';
 
-interface AddressComponents {
+export interface AddressComponents {
   streetNumber: string;
   streetName: string;
   suburb: string;
@@ -26,7 +27,7 @@ interface AddressComponents {
   country: string;
 }
 
-interface SchoolInfo {
+export interface SchoolInfo {
   schoolName: string;
   schoolAddress: AddressComponents;
   schoolABN: string;
@@ -45,7 +46,7 @@ interface SchoolInfo {
   questionsComments: string;
 }
 
-interface QuoteItem {
+export interface QuoteItem {
   item: string;
   count: number;
   unitPrice: number;
@@ -55,14 +56,28 @@ interface QuoteItem {
   savings?: number;
 }
 
-interface PricingDetails {
+export interface PricingDetails {
   subtotal: number;
   gst: number;
   total: number;
   shipping: number;
 }
 
-interface UnlimitedTier {
+export interface PricingTier {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  basePrice: number;
+  inclusions: {
+    teacher: string[];
+    student: string[];
+    classroom: string[];
+  };
+  notIncluded: string[];
+}
+
+export interface UnlimitedTier {
   id: string;
   name: string;
   description: string;
@@ -127,7 +142,7 @@ export const QuoteBuilder = () => {
     posterA0: 0,
   });
 
-  const pricingTiers = [
+  const pricingTiers: PricingTier[] = [
     {
       id: 'teacher-digital',
       name: 'Digital Pass + Textbook Bundle',
@@ -448,14 +463,16 @@ export const QuoteBuilder = () => {
 
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {pricingTiers.map((tier) => (
+          {pricingTiers.map((tier, index) => (
             <PricingCard
               key={tier.id}
               tier={tier}
+              price={tier.basePrice}
               teacherCount={teacherCount}
               studentCount={studentCount}
               isSelected={selectedTier === tier.id}
               onSelect={() => setSelectedTier(tier.id)}
+              animationDelay={index * 100}
             />
           ))}
         </div>
@@ -506,7 +523,7 @@ export const QuoteBuilder = () => {
 
           {/* School Address */}
           <AddressInput
-            address={schoolInfo.schoolAddress}
+            value={schoolInfo.schoolAddress}
             onChange={(newAddress) => setSchoolInfo({ ...schoolInfo, schoolAddress: newAddress })}
             label="School Address"
           />
@@ -514,7 +531,7 @@ export const QuoteBuilder = () => {
           {/* Manual Address Inputs */}
           <ExpandableSection title="Enter address manually">
             <ManualAddressInputs
-              address={schoolInfo.schoolAddress}
+              value={schoolInfo.schoolAddress}
               onChange={(newAddress) => setSchoolInfo({ ...schoolInfo, schoolAddress: newAddress })}
             />
           </ExpandableSection>
@@ -556,8 +573,9 @@ export const QuoteBuilder = () => {
                 id="deliveryIsSameAsSchool"
                 checked={schoolInfo.deliveryIsSameAsSchool}
                 onCheckedChange={(checked) => {
-                  setSchoolInfo({ ...schoolInfo, deliveryIsSameAsSchool: checked });
-                  if (checked) {
+                  const isChecked = checked === true;
+                  setSchoolInfo({ ...schoolInfo, deliveryIsSameAsSchool: isChecked });
+                  if (isChecked) {
                     setSchoolInfo({ ...schoolInfo, deliveryAddress: schoolInfo.schoolAddress });
                   }
                 }}
@@ -569,7 +587,7 @@ export const QuoteBuilder = () => {
 
           {!schoolInfo.deliveryIsSameAsSchool && (
             <AddressInput
-              address={schoolInfo.deliveryAddress}
+              value={schoolInfo.deliveryAddress}
               onChange={(newAddress) => setSchoolInfo({ ...schoolInfo, deliveryAddress: newAddress })}
               label="Delivery Address"
             />
@@ -582,8 +600,9 @@ export const QuoteBuilder = () => {
                 id="billingIsSameAsSchool"
                 checked={schoolInfo.billingIsSameAsSchool}
                 onCheckedChange={(checked) => {
-                  setSchoolInfo({ ...schoolInfo, billingIsSameAsSchool: checked });
-                  if (checked) {
+                  const isChecked = checked === true;
+                  setSchoolInfo({ ...schoolInfo, billingIsSameAsSchool: isChecked });
+                  if (isChecked) {
                     setSchoolInfo({ ...schoolInfo, billingAddress: schoolInfo.schoolAddress });
                   }
                 }}
@@ -595,7 +614,7 @@ export const QuoteBuilder = () => {
 
           {!schoolInfo.billingIsSameAsSchool && (
             <AddressInput
-              address={schoolInfo.billingAddress}
+              value={schoolInfo.billingAddress}
               onChange={(newAddress) => setSchoolInfo({ ...schoolInfo, billingAddress: newAddress })}
               label="Billing Address"
             />
