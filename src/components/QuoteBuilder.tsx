@@ -147,7 +147,7 @@ export const QuoteBuilder = () => {
       name: 'Digital Pass + Textbook Bundle',
       description: 'Complete digital access plus physical textbooks for teachers',
       type: 'teacher',
-      basePrice: 198, // Updated from 149 to 198
+      basePrice: 198,
       inclusions: {
         teacher: [
           '12-month digital platform access',
@@ -448,16 +448,16 @@ export const QuoteBuilder = () => {
 
         {/* Volume Selectors */}
         <VolumeSelector
-          teacherCount={teacherCount}
-          studentCount={studentCount}
-          onTeacherChange={setTeacherCount}
-          onStudentChange={setStudentCount}
+          teacherVolume={teacherCount}
+          studentVolume={studentCount}
+          onTeacherVolumeChange={setTeacherCount}
+          onStudentVolumeChange={setStudentCount}
         />
 
         {/* Program Start Date */}
         <ProgramStartDate
-          programStartDate={programStartDate}
-          onDateChange={setProgramStartDate}
+          startDate={programStartDate}
+          onStartDateChange={setProgramStartDate}
         />
 
         {/* Pricing Cards */}
@@ -573,10 +573,11 @@ export const QuoteBuilder = () => {
                 checked={schoolInfo.deliveryIsSameAsSchool}
                 onCheckedChange={(checked) => {
                   const isChecked = checked === true;
-                  setSchoolInfo({ ...schoolInfo, deliveryIsSameAsSchool: isChecked });
-                  if (isChecked) {
-                    setSchoolInfo({ ...schoolInfo, deliveryAddress: schoolInfo.schoolAddress });
-                  }
+                  setSchoolInfo({ 
+                    ...schoolInfo, 
+                    deliveryIsSameAsSchool: isChecked,
+                    deliveryAddress: isChecked ? schoolInfo.schoolAddress : schoolInfo.deliveryAddress
+                  });
                 }}
                 className="mr-2"
               />
@@ -600,10 +601,11 @@ export const QuoteBuilder = () => {
                 checked={schoolInfo.billingIsSameAsSchool}
                 onCheckedChange={(checked) => {
                   const isChecked = checked === true;
-                  setSchoolInfo({ ...schoolInfo, billingIsSameAsSchool: isChecked });
-                  if (isChecked) {
-                    setSchoolInfo({ ...schoolInfo, billingAddress: schoolInfo.schoolAddress });
-                  }
+                  setSchoolInfo({ 
+                    ...schoolInfo, 
+                    billingIsSameAsSchool: isChecked,
+                    billingAddress: isChecked ? schoolInfo.schoolAddress : schoolInfo.billingAddress
+                  });
                 }}
                 className="mr-2"
               />

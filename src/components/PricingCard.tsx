@@ -1,217 +1,144 @@
-
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Check, Image, X } from 'lucide-react';
-import { PricingTier } from './QuoteBuilder';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Check, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ExpandableSection } from './ExpandableSection';
-import { PricingDisplay } from './PricingDisplay';
+import { PricingTier } from './QuoteBuilder';
 
 interface PricingCardProps {
   tier: PricingTier;
   price: number;
-  isSelected: boolean;
-  onSelect: () => void;
   teacherCount: number;
   studentCount: number;
+  isSelected: boolean;
+  onSelect: () => void;
   animationDelay: number;
-  showImages?: boolean;
-  studentPrice?: number;
-  includeGST?: boolean;
-  colorScheme?: 'teal' | 'yellow';
-  customGradient?: string;
-  showSavings?: boolean;
-  savings?: number;
-  volumeSelector?: React.ReactNode;
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
   tier,
   price,
-  isSelected,
-  onSelect,
   teacherCount,
   studentCount,
-  animationDelay,
-  showImages = false,
-  studentPrice,
-  includeGST = false,
-  colorScheme = 'teal',
-  customGradient,
-  showSavings = false,
-  savings = 0,
-  volumeSelector
+  isSelected,
+  onSelect,
+  animationDelay
 }) => {
-  const getGradientClass = () => {
-    if (customGradient) return '';
-    if (colorScheme === 'yellow') {
-      if (tier.id.includes('digital')) return 'from-yellow-800 via-yellow-700 to-yellow-600';
-      if (tier.id.includes('physical')) return 'from-yellow-900 via-yellow-800 to-yellow-700';
-      return 'from-yellow-900 via-yellow-800 to-yellow-600';
-    } else {
-      if (tier.id.includes('digital')) return 'from-teal-800 via-teal-700 to-teal-600';
-      if (tier.id.includes('physical')) return 'from-teal-900 via-teal-800 to-teal-700';
-      return 'from-teal-900 via-teal-800 to-teal-600';
+  const calculateTotalPrice = () => {
+    if (tier.type === 'teacher') {
+      return price * teacherCount;
+    } else if (tier.type === 'student') {
+      return price * studentCount;
+    } else if (tier.type === 'classroom') {
+      return price;
     }
+    return price;
   };
 
-  const getBorderClass = () => {
-    if (colorScheme === 'yellow') {
-      return isSelected ? 'border-yellow-400' : 'border-gray-200';
+  const renderPriceDisplay = () => {
+    if (tier.type === 'classroom' && price === 0) {
+      return (
+        <div className="text-center mb-4">
+          <div className="text-3xl font-bold text-green-600">FREE</div>
+          <div className="text-sm text-gray-500">Digital access only</div>
+        </div>
+      );
     }
-    return isSelected ? 'border-teal-400' : 'border-gray-200';
+
+    const totalPrice = calculateTotalPrice();
+    const unitLabel = tier.type === 'teacher' ? 'teacher' : tier.type === 'student' ? 'student' : 'classroom';
+    const count = tier.type === 'teacher' ? teacherCount : tier.type === 'student' ? studentCount : 1;
+
+    return (
+      <div className="text-center mb-4">
+        <div className="text-sm text-gray-500 mb-1">
+          ${price} per {unitLabel} × {count}
+        </div>
+        <div className="text-3xl font-bold text-gray-900">
+          ${totalPrice.toLocaleString()}
+        </div>
+        <div className="text-sm text-gray-500">Total price</div>
+      </div>
+    );
   };
 
-  // Get the appropriate product image based on tier ID
-  const getProductImage = () => {
-    const imageMap = {
-      'teacher-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/100.png',
-      'teacher-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/101.png',
-      'teacher-both': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/63bcf350cc96ecea41b5b6012e725100d0d26886/102.png',
-      'student-digital': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/103.png',
-      'student-physical': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/104.png',
-      'student-both': 'https://raw.githubusercontent.com/mandymoney/mandy-money-quote-craft/24586180d5908f398c59c364ae1084346bc6b776/105.png'
-    };
-    return imageMap[tier.id as keyof typeof imageMap];
+  const getCardClasses = () => {
+    const baseClasses = "h-full transition-all duration-300 hover:shadow-lg cursor-pointer border-2";
+    
+    if (isSelected) {
+      return cn(baseClasses, "border-blue-500 bg-blue-50 shadow-lg transform scale-105");
+    }
+    
+    return cn(baseClasses, "border-gray-200 hover:border-blue-300");
   };
 
-  const allInclusions = [
-    ...tier.inclusions.teacher,
-    ...tier.inclusions.student,
-    ...tier.inclusions.classroom
-  ];
-
-  // Determine if this is a student tier for color styling
-  const isStudentTier = tier.type === 'student';
+  const getAllInclusions = () => {
+    return [
+      ...tier.inclusions.teacher,
+      ...tier.inclusions.student,
+      ...tier.inclusions.classroom
+    ].filter(Boolean);
+  };
 
   return (
-    <Card
-      className={cn(
-        'relative cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl',
-        'bg-white border-2',
-        getBorderClass(),
-        'animate-scale-in'
-      )}
-      style={{ animationDelay: `${animationDelay}ms` }}
+    <Card 
+      className={getCardClasses()}
       onClick={onSelect}
+      style={{ animationDelay: `${animationDelay}ms` }}
     >
-      <div className="p-6">
-        {/* Volume Selector at top */}
-        {volumeSelector && (
-          <div className="mb-4 pb-4 border-b border-gray-200">
-            {volumeSelector}
-          </div>
-        )}
-
-        {/* Product Image */}
-        {(showImages || tier.id.includes('both')) && getProductImage() && (
-          <div className="mb-4">
-            <img 
-              src={getProductImage()}
-              alt={tier.name}
-              className="w-full h-32 object-contain aspect-square rounded-sm"
-            />
-          </div>
-        )}
-
-        {/* Header with increased height for alignment */}
-        <div 
-          className={cn('h-28 rounded-lg mb-4', customGradient ? '' : 'bg-gradient-to-br ' + getGradientClass())}
-          style={customGradient ? { background: customGradient } : {}}
-        >
-          <div className="flex flex-col items-center justify-center h-full px-2">
-            <div className={cn(
-              "text-xs font-medium text-white/90 mb-1",
-              tier.type === 'teacher' ? 'bg-white/30' : 'bg-white/30',
-              "px-2 py-1 rounded"
-            )}>
-              {tier.type.toUpperCase()}
-            </div>
-            <h3 className="text-white font-bold text-lg text-center leading-tight drop-shadow-sm">{tier.name}</h3>
-          </div>
-        </div>
-
-        <p className="text-gray-600 text-sm mb-4 min-h-[40px]">{tier.description}</p>
-
-        {/* Pricing with savings */}
-        <PricingDisplay
-          price={price}
-          studentPrice={studentPrice}
-          tierType={tier.type}
-          showSavings={showSavings}
-          savings={savings}
-          colorScheme={colorScheme}
-        />
-
-        {/* Mobile: Expandable Inclusions */}
-        <ExpandableSection
-          title="Inclusions"
-          items={allInclusions}
-          colorScheme={colorScheme}
+      <CardHeader className="text-center pb-4">
+        <CardTitle className="text-xl font-bold text-gray-900">
+          {tier.name}
+        </CardTitle>
+        <p className="text-gray-600 text-sm">{tier.description}</p>
+        {renderPriceDisplay()}
+      </CardHeader>
+      
+      <CardContent className="pt-0 space-y-4">
+        <ExpandableSection 
+          title="What's included"
+          items={getAllInclusions()}
+          colorScheme="teal"
           isPositive={true}
-          className="md:hidden mb-4"
-        />
+          className="mb-4"
+        >
+          <div></div>
+        </ExpandableSection>
 
-        {/* Desktop: All Inclusions - displayed without expandable */}
-        <div className="hidden md:block space-y-2 mb-4">
-          <h4 className={cn(
-            "font-semibold text-sm",
-            colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
-          )}>Inclusions:</h4>
-          {allInclusions.map((inclusion, index) => (
-            <div key={index} className="flex items-center text-sm text-gray-700">
-              <Check className={cn(
-                "h-4 w-4 mr-2 flex-shrink-0",
-                isStudentTier ? 'text-green-500' : (colorScheme === 'yellow' ? 'text-yellow-500' : 'text-teal-500')
-              )} />
-              <span>{inclusion}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* What's Not Included - Mobile: Expandable, Desktop: Always shown */}
-        {tier.notIncluded && tier.notIncluded.length > 0 && (
-          <>
-            {/* Mobile: Expandable */}
-            <ExpandableSection
-              title="What's Not Included"
-              items={tier.notIncluded}
-              isPositive={false}
-              className="md:hidden mb-4"
-            />
-
-            {/* Desktop: Always shown */}
-            <div className="hidden md:block space-y-2 mb-4">
-              <h4 className="font-semibold text-gray-700 text-sm">What's Not Included:</h4>
-              {tier.notIncluded.map((notIncluded, index) => (
-                <div key={index} className="flex items-center text-sm text-gray-500">
-                  <X className="h-4 w-4 text-red-400 mr-2 flex-shrink-0" />
-                  <span>{notIncluded}</span>
-                </div>
-              ))}
-            </div>
-          </>
+        {tier.notIncluded.length > 0 && (
+          <ExpandableSection 
+            title="Not included"
+            items={tier.notIncluded}
+            isPositive={false}
+            className="mb-4"
+          >
+            <div></div>
+          </ExpandableSection>
         )}
 
-        {/* Selection Indicator */}
-        {isSelected && (
-          <div className={cn(
-            "mt-4 p-2 border rounded-lg",
-            colorScheme === 'yellow' 
-              ? 'bg-yellow-50 border-yellow-200' 
-              : 'bg-teal-50 border-teal-200'
-          )}>
-            <div className={cn(
-              "flex items-center justify-center font-medium text-sm",
-              colorScheme === 'yellow' ? 'text-yellow-700' : 'text-teal-700'
-            )}>
-              <Check className="h-4 w-4 mr-1" />
+        <Button 
+          className={cn(
+            "w-full font-semibold transition-all duration-300",
+            isSelected 
+              ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg" 
+              : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect();
+          }}
+        >
+          {isSelected ? (
+            <>
+              <Check className="w-4 h-4 mr-2" />
               Selected
-            </div>
-          </div>
-        )}
-      </div>
+            </>
+          ) : (
+            'Select This Option'
+          )}
+        </Button>
+      </CardContent>
     </Card>
   );
 };
