@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils';
 
 interface ExpandableSectionProps {
   title: string;
-  items: string[];
+  children: React.ReactNode;
+  items?: string[];
   colorScheme?: 'teal' | 'yellow';
   isPositive?: boolean;
   className?: string;
@@ -13,7 +14,8 @@ interface ExpandableSectionProps {
 
 export const ExpandableSection: React.FC<ExpandableSectionProps> = ({
   title,
-  items,
+  children,
+  items = [],
   colorScheme = 'teal',
   isPositive = true,
   className = ''
@@ -48,7 +50,7 @@ export const ExpandableSection: React.FC<ExpandableSectionProps> = ({
           getButtonClass()
         )}
       >
-        <span>{title} ({items.length})</span>
+        <span>{title} {items.length > 0 && `(${items.length})`}</span>
         {isExpanded ? (
           <ChevronUp className="h-4 w-4" />
         ) : (
@@ -58,16 +60,22 @@ export const ExpandableSection: React.FC<ExpandableSectionProps> = ({
       
       {isExpanded && (
         <div className="mt-2 space-y-2">
-          {items.map((item, index) => (
-            <div key={index} className="flex items-center text-sm text-gray-700 px-3">
-              {isPositive ? (
-                <Check className={cn("h-3 w-3 mr-2 flex-shrink-0", getIconClass())} />
-              ) : (
-                <X className="h-3 w-3 text-red-400 mr-2 flex-shrink-0" />
-              )}
-              <span>{item}</span>
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <div key={index} className="flex items-center text-sm text-gray-700 px-3">
+                {isPositive ? (
+                  <Check className={cn("h-3 w-3 mr-2 flex-shrink-0", getIconClass())} />
+                ) : (
+                  <X className="h-3 w-3 text-red-400 mr-2 flex-shrink-0" />
+                )}
+                <span>{item}</span>
+              </div>
+            ))
+          ) : (
+            <div className="px-3">
+              {children}
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
