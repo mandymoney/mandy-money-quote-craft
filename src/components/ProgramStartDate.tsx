@@ -5,21 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
-import { format, addYears } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface ProgramStartDateProps {
   startDate: Date;
   onStartDateChange: (date: Date) => void;
+  endDate: Date;
 }
 
 export const ProgramStartDate: React.FC<ProgramStartDateProps> = ({
   startDate,
-  onStartDateChange
+  onStartDateChange,
+  endDate
 }) => {
-  // Calculate end date by adding 12 months (1 year)
-  const endDate = addYears(startDate, 1);
-
   return (
     <Card className="mb-8 p-6 bg-white border border-gray-200">
       <div className="max-w-2xl mx-auto text-center">

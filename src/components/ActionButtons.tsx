@@ -6,14 +6,6 @@ import { generateQuotePDF, generateOrderPDF, downloadPDF, createEmailSubject, cr
 import { uploadPDFToStorage, generatePDFBlob } from '@/utils/pdfUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog';
 
 interface AddressComponents {
   streetNumber: string;
@@ -82,53 +74,33 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   isUnlimited = false
 }) => {
   const { validateBasicInfo, validateEssentialInfo, validateFullInfo, isBasicInfoValid, isEssentialInfoValid, isFullInfoValid, errors } = useFormValidation();
-  const [showSuccessDialog, setShowSuccessDialog] = React.useState(false);
 
   const validateBeforeSubmission = (actionType: 'quote' | 'order' | 'enquiry'): boolean => {
     if (actionType === 'quote') {
+      // For quotes, validation is optional - just check for basic formatting
       const isValid = validateBasicInfo(schoolInfo);
       if (!isValid) {
         toast({
           title: "Please Check Your Information",
-          description: "Please correct any formatting errors in the form before generating a quote.",
+          description: "Please correct any formatting errors in the form.",
           variant: "destructive",
         });
-        
-        // Show specific missing fields
-        const missingFields = [];
-        if (!schoolInfo.coordinatorEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(schoolInfo.coordinatorEmail)) {
-          missingFields.push("Valid coordinator email");
-        }
-        
-        if (missingFields.length > 0) {
-          setTimeout(() => {
-            toast({
-              title: "Missing Information",
-              description: `Please provide: ${missingFields.join(", ")}`,
-              variant: "destructive",
-            });
-          }, 1000);
-        }
-        
         return false;
       }
       return true;
     }
 
     if (actionType === 'enquiry') {
+      // For enquiries, need school name, coordinator name, and email
       const isValid = validateEssentialInfo(schoolInfo);
       if (!isValid) {
-        const missingFields = [];
-        if (!schoolInfo.schoolName.trim()) missingFields.push("School name");
-        if (!schoolInfo.coordinatorName.trim()) missingFields.push("Coordinator name");
-        if (!schoolInfo.coordinatorEmail.trim()) missingFields.push("Coordinator email");
-        
         toast({
           title: "Essential Information Required",
-          description: `Please provide: ${missingFields.join(", ")} to make an enquiry.`,
+          description: "Please provide school name, coordinator name, and email to make an enquiry.",
           variant: "destructive",
         });
         
+        // Scroll to the form section
         const formSection = document.querySelector('[data-form-section]');
         if (formSection) {
           formSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -140,25 +112,16 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     }
 
     if (actionType === 'order') {
+      // For orders, need complete information
       const isValid = validateFullInfo(schoolInfo);
       if (!isValid) {
-        const missingFields = [];
-        if (!schoolInfo.schoolName.trim()) missingFields.push("School name");
-        if (!schoolInfo.coordinatorName.trim()) missingFields.push("Coordinator name");
-        if (!schoolInfo.coordinatorEmail.trim()) missingFields.push("Coordinator email");
-        if (!schoolInfo.contactPhone.trim()) missingFields.push("Contact phone");
-        
-        const { streetNumber, streetName, suburb, state, postcode } = schoolInfo.schoolAddress;
-        if (!streetNumber || !streetName || !suburb || !state || !postcode) {
-          missingFields.push("Complete school address");
-        }
-        
         toast({
           title: "Complete Information Required",
-          description: `Please provide: ${missingFields.join(", ")} to place an order.`,
+          description: "Please complete all required fields to place an order.",
           variant: "destructive",
         });
         
+        // Scroll to the form section
         const formSection = document.querySelector('[data-form-section]');
         if (formSection) {
           formSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -233,9 +196,11 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     
     const filename = `MandyMoney_Quote_${schoolInfo.schoolName || 'School'}_${new Date().toISOString().split('T')[0]}.pdf`;
     
+    // Generate blob and upload to storage
     const pdfBlob = generatePDFBlob(doc);
     const pdfUrl = await uploadPDFToStorage(pdfBlob, filename);
     
+    // Also download locally
     downloadPDF(doc, filename);
     
     return { doc, pdfUrl };
@@ -254,9 +219,11 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     
     const filename = `MandyMoney_Order_${schoolInfo.schoolName || 'School'}_${new Date().toISOString().split('T')[0]}.pdf`;
     
+    // Generate blob and upload to storage
     const pdfBlob = generatePDFBlob(doc);
     const pdfUrl = await uploadPDFToStorage(pdfBlob, filename);
     
+    // Also download locally
     downloadPDF(doc, filename);
     
     return { doc, pdfUrl };
@@ -270,6 +237,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         const result = await generateAndUploadOrder();
         pdfUrl = result.pdfUrl;
       } else {
+        // For enquiry, generate and upload quote
         const result = await generateAndUploadQuote();
         pdfUrl = result.pdfUrl;
       }
@@ -277,7 +245,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       console.error('Error generating/uploading PDF:', error);
     }
     
-    // Store quote attempt with PDF URL
+    // Store quote attempt
     await storeQuoteAttempt(type, pdfUrl || undefined);
     
     const subject = createEmailSubject(type, schoolInfo.schoolName);
@@ -286,9 +254,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     window.open(mailtoUrl, '_blank');
-    
-    // Show success dialog
-    setShowSuccessDialog(true);
   };
 
   const handleExportPDF = async () => {
@@ -302,6 +267,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     try {
       const result = await generateAndUploadQuote();
       
+      // Store quote attempt
       await storeQuoteAttempt('quote', result.pdfUrl || undefined);
       
       toast({
@@ -370,102 +336,75 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   if (!selectedTier) return null;
 
-  const estimatedSavings = Math.floor(totalPrice * 0.1);
+  // Calculate potential savings (placeholder logic)
+  const estimatedSavings = Math.floor(totalPrice * 0.1); // 10% example savings
+
+  // Check completion status for different actions
   const isBasicComplete = isBasicInfoValid(schoolInfo);
   const isEssentialComplete = isEssentialInfoValid(schoolInfo);
   const isFullComplete = isFullInfoValid(schoolInfo);
 
   return (
-    <>
-      <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
-        <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
-        <p className="text-white/90 mb-6">
-          Lock in your ${totalPrice.toLocaleString()} price (including ${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.
-        </p>
-        
-        {!isFullComplete && (
-          <div className="mb-6 p-4 bg-white/20 rounded-lg border border-white/30">
-            <div className="flex items-center justify-center space-x-2 text-white">
-              <AlertTriangle className="h-5 w-5" />
-              <div className="text-sm">
-                <div className="font-medium">Complete your information below to proceed</div>
-              </div>
+    <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
+      <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
+      <p className="text-white/90 mb-6">
+        Lock in your ${totalPrice.toLocaleString()} price (including ${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.
+      </p>
+      
+      {/* Dynamic form completion messages */}
+      {!isFullComplete && (
+        <div className="mb-6 p-4 bg-white/20 rounded-lg border border-white/30">
+          <div className="flex items-center justify-center space-x-2 text-white">
+            <AlertTriangle className="h-5 w-5" />
+            <div className="text-sm">
+              <div className="font-medium">Complete your information below to proceed</div>
             </div>
           </div>
-        )}
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-4xl mx-auto">
-          <Button
-            onClick={handleExportPDF}
-            size="lg"
-            className="flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] bg-white hover:bg-gray-50 text-gray-800"
-          >
-            <FileText className="h-5 w-5 mr-2" />
-            Export Quote as PDF
-          </Button>
-          
-          <Button
-            onClick={handleBooklistingEnquiry}
-            size="lg"
-            disabled={!isEssentialComplete}
-            className={`flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-              isEssentialComplete 
-                ? 'bg-white hover:bg-gray-50 text-gray-800' 
-                : 'bg-white/50 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            <MessageCircle className="h-5 w-5 mr-2" />
-            Enquire about Booklisting
-          </Button>
-          
-          <Button
-            onClick={handlePlaceOrder}
-            size="lg"
-            disabled={!isFullComplete}
-            className={`flex-1 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-              isFullComplete 
-                ? 'bg-white hover:bg-gray-50 text-orange-600 hover:text-orange-700' 
-                : 'bg-white/50 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Place Order Now
-          </Button>
         </div>
+      )}
+      
+      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-4xl mx-auto">
+        <Button
+          onClick={handleExportPDF}
+          size="lg"
+          className="flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] bg-white hover:bg-gray-50 text-gray-800"
+        >
+          <FileText className="h-5 w-5 mr-2" />
+          Export Quote as PDF
+        </Button>
         
-        <p className="text-white/80 text-sm mt-4">
-          Questions? Contact our team at hello@mandymoney.com.au
-        </p>
+        <Button
+          onClick={handleBooklistingEnquiry}
+          size="lg"
+          disabled={!isEssentialComplete}
+          className={`flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
+            isEssentialComplete 
+              ? 'bg-white hover:bg-gray-50 text-gray-800' 
+              : 'bg-white/50 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          <MessageCircle className="h-5 w-5 mr-2" />
+          Enquire about Booklisting
+        </Button>
+        
+        <Button
+          onClick={handlePlaceOrder}
+          size="lg"
+          disabled={!isFullComplete}
+          className={`flex-1 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
+            isFullComplete 
+              ? 'bg-white hover:bg-gray-50 text-orange-600 hover:text-orange-700' 
+              : 'bg-white/50 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Place Order Now
+        </Button>
       </div>
-
-      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-center text-green-600">
-              📧 Email Ready!
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-lg">
-              <div className="space-y-3">
-                <p className="font-semibold">
-                  Important: Your PDF must be emailed to 
-                  <span className="text-orange-600"> hello@mandymoney.com.au</span> 
-                  for the enquiry or order to be received.
-                </p>
-                <p className="text-sm text-gray-600">
-                  We've opened your email client with the PDF link included. 
-                  Please send the email to complete your submission.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogAction 
-            onClick={() => setShowSuccessDialog(false)}
-            className="w-full bg-green-600 hover:bg-green-700"
-          >
-            Got it!
-          </AlertDialogAction>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+      
+      <p className="text-white/80 text-sm mt-4">
+        Questions? Contact our team at hello@mandymoney.com.au
+      </p>
+    </div>
   );
 };

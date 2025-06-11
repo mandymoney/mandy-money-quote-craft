@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -181,8 +182,8 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                   {teacherTier && (
                     <div className="py-3 border-b border-gray-200">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-700">{teacherCount} Teacher{teacherCount > 1 ? 's' : ''} × ${teacherTier.basePrice}</span>
-                        <span className="font-bold text-lg">${(teacherTier.basePrice * teacherCount).toLocaleString()}</span>
+                        <span className="text-gray-700">{teacherCount} Teacher{teacherCount > 1 ? 's' : ''} × ${teacherTier.basePrice.teacher}</span>
+                        <span className="font-bold text-lg">${(teacherTier.basePrice.teacher * teacherCount).toLocaleString()}</span>
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
                         {teacherTier.name}
@@ -208,7 +209,7 @@ export const InclusionsDisplay: React.FC<InclusionsDisplayProps> = ({
                       </div>
                       {volumeSavings > 0 && (
                         <div className="text-sm text-green-600 mt-1">
-                          Volume savings: ${volumeSavings.toLocaleString()} (${((studentTier.basePrice - studentPrice) || 0).toFixed(0)} per student)
+                          Volume savings: ${volumeSavings.toLocaleString()} (${((studentTier.basePrice.student - studentPrice) || 0).toFixed(0)} per student)
                         </div>
                       )}
                     </div>
