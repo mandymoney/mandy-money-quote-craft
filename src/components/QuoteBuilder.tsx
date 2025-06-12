@@ -298,7 +298,7 @@ export const QuoteBuilder = () => {
     if (useUnlimited) {
       return unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0;
     }
-    return selectedTeacherTiers['teacher-physical'] > 0 || selectedTeacherTiers['teacher-both'] > 0 || selectedStudentTiers['student-physical'] > 0 || selectedStudentTiers['student-both'] > 0;
+    return (selectedTeacherTiers['teacher-physical'] || 0) > 0 || (selectedTeacherTiers['teacher-both'] || 0) > 0 || (selectedStudentTiers['student-physical'] || 0) > 0 || (selectedStudentTiers['student-both'] || 0) > 0;
   };
   const calculateStudentPrice = (tier: PricingTier, currentStudentCount: number): number => {
     let studentPrice = tier.basePrice.student;
@@ -859,6 +859,26 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
+        {/* First Ready to Get Started Section - Above School Information */}
+        <div className="mb-8">
+          <ActionButtons 
+            selectedTier={{
+              name: 'Custom Selection',
+              id: 'combined'
+            }} 
+            totalPrice={finalPricing.total} 
+            teacherCount={getTotalTeacherCount()} 
+            studentCount={getTotalStudentCount()}
+            schoolInfo={schoolInfo}
+            quoteItems={getDetailedBreakdown()}
+            pricing={finalPricing}
+            programStartDate={programStartDate}
+            isUnlimited={useUnlimited}
+            titleOverride="Ready to Get Started"
+            descriptionOverride="Complete your information below to proceed"
+          />
+        </div>
+
         {/* Official Quote Section with Light Green Background */}
         <div className="bg-gradient-to-b from-green-50 to-emerald-50 rounded-lg shadow-lg overflow-hidden border border-green-100 pb-8 md:pb-0">
           {/* Navy Header Banner */}
@@ -960,38 +980,62 @@ export const QuoteBuilder = () => {
                 </div>
               </div>
 
-              {/* Right Column - Program Inclusions */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 border border-green-200/50">
-                <h3 className="text-lg font-semibold mb-4 text-slate-800">What's Included</h3>
-                
-                <div className="space-y-3 mb-6">
-                  {getIncludedItems().map((item, index) => {
-                  if (useUnlimited) {
-                    // Color coding for unlimited items
-                    let itemType = 'both';
-                    if (typeof item === 'string') {
-                      if (item.includes('Teacher')) itemType = 'teacher';
-                      else if (item.includes('Student')) itemType = 'student';
+              {/* Right Column - Program Inclusions & Access Period */}
+              <div className="space-y-6">
+                {/* What's Included */}
+                <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 border border-green-200/50">
+                  <h3 className="text-lg font-semibold mb-4 text-slate-800">What's Included</h3>
+                  
+                  <div className="space-y-3">
+                    {getIncludedItems().map((item, index) => {
+                    if (useUnlimited) {
+                      // Color coding for unlimited items
+                      let itemType = 'both';
+                      if (typeof item === 'string') {
+                        if (item.includes('Teacher')) itemType = 'teacher';
+                        else if (item.includes('Student')) itemType = 'student';
+                      }
+                      
+                      return <div key={index} className={`p-3 rounded-lg flex items-center ${itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' : itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gradient-to-r from-blue-50 to-blue-100'}`}>
+                          <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${itemType === 'teacher' ? 'text-teal-600' : itemType === 'student' ? 'text-yellow-600' : 'text-blue-600'}`} />
+                          <span className={`text-sm font-medium ${itemType === 'teacher' ? 'text-teal-800' : itemType === 'student' ? 'text-yellow-800' : 'text-blue-800'}`}>{item}</span>
+                        </div>;
+                    } else {
+                      const itemType = typeof item === 'object' ? item.type : 'both';
+                      const itemText = typeof item === 'object' ? item.text : item;
+                      return <div key={index} className={`p-3 rounded-lg flex items-center ${itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' : itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gradient-to-r from-blue-50 to-blue-100'}`}>
+                          <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${itemType === 'teacher' ? 'text-teal-600' : itemType === 'student' ? 'text-yellow-600' : 'text-blue-600'}`} />
+                          <span className={`text-sm font-medium ${itemType === 'teacher' ? 'text-teal-800' : itemType === 'student' ? 'text-yellow-800' : 'text-blue-800'}`}>{itemText}</span>
+                        </div>;
                     }
-                    
-                    return <div key={index} className={`p-3 rounded-lg flex items-center ${itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' : itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gradient-to-r from-blue-50 to-blue-100'}`}>
-                        <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${itemType === 'teacher' ? 'text-teal-600' : itemType === 'student' ? 'text-yellow-600' : 'text-blue-600'}`} />
-                        <span className={`text-sm font-medium ${itemType === 'teacher' ? 'text-teal-800' : itemType === 'student' ? 'text-yellow-800' : 'text-blue-800'}`}>{item}</span>
-                      </div>;
-                  } else {
-                    const itemType = typeof item === 'object' ? item.type : 'both';
-                    const itemText = typeof item === 'object' ? item.text : item;
-                    return <div key={index} className={`p-3 rounded-lg flex items-center ${itemType === 'teacher' ? 'bg-gradient-to-r from-teal-50 to-teal-100' : itemType === 'student' ? 'bg-gradient-to-r from-yellow-50 to-yellow-100' : 'bg-gradient-to-r from-blue-50 to-blue-100'}`}>
-                        <Check className={`h-4 w-4 mr-3 flex-shrink-0 ${itemType === 'teacher' ? 'text-teal-600' : itemType === 'student' ? 'text-yellow-600' : 'text-blue-600'}`} />
-                        <span className={`text-sm font-medium ${itemType === 'teacher' ? 'text-teal-800' : itemType === 'student' ? 'text-yellow-800' : 'text-blue-800'}`}>{itemText}</span>
-                      </div>;
-                  }
-                })}
+                  })}
+                  </div>
                 </div>
-                
-                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                  <h4 className="font-semibold text-green-800 mb-2">Access Period Summary</h4>
-                  <div className="text-sm text-green-700 space-y-1">
+
+                {/* Program Access Period with selector */}
+                <div className="bg-gradient-to-r from-green-50/70 to-emerald-50/70 backdrop-blur-sm rounded-lg p-6 border border-green-200/50">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-green-100/80 rounded-lg">
+                      <Clock className="h-5 w-5 text-green-600" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-green-900">Program Access Period</h4>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className={cn("w-full justify-start text-left font-normal bg-white/80 shadow-sm hover:shadow-md transition-shadow hover:bg-white", !programStartDate && "text-muted-foreground")}>
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar mode="single" selected={programStartDate} onSelect={date => date && setProgramStartDate(date)} initialFocus className="p-3 pointer-events-auto" />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  
+                  <div className="text-sm text-green-700 bg-green-100/50 p-3 rounded-lg">
                     <div><strong>Program starts:</strong> {format(programStartDate, 'MMMM d, yyyy')}</div>
                     <div><strong>Access ends:</strong> {format(addMonths(programStartDate, 12), 'MMMM d, yyyy')}</div>
                     <div className="text-xs mt-2 text-green-600">Full 12-month access to all digital content and resources</div>
@@ -1010,32 +1054,6 @@ export const QuoteBuilder = () => {
                   <h3 className="text-2xl font-bold text-gray-800">School Information</h3>
                 </div>
                 <FormCompletionIndicator schoolInfo={schoolInfo} isComplete={isFormComplete} />
-              </div>
-              
-              {/* Program Start Date with enhanced styling */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <h4 className="text-lg font-semibold text-blue-900">Program Access Period</h4>
-                </div>
-                <div className="flex items-center gap-4 mb-3">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-72 justify-start text-left font-normal bg-white shadow-sm hover:shadow-md transition-shadow", !programStartDate && "text-muted-foreground")}>
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={programStartDate} onSelect={date => date && setProgramStartDate(date)} initialFocus className="p-3 pointer-events-auto" />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="text-sm text-blue-700 bg-blue-100/50 p-3 rounded-lg">
-                  <strong>Access period:</strong> {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
-                </div>
               </div>
 
               {/* Essential Information Section with enhanced styling */}
@@ -1059,7 +1077,7 @@ export const QuoteBuilder = () => {
                         ...prev,
                         schoolName: e.target.value
                       }))} 
-                      className={`font-medium transition-all duration-200 ${errors.schoolName ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
+                      className={`font-medium transition-all duration-200 hover:shadow-md focus:shadow-lg ${errors.schoolName ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.schoolName && (
                       <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
@@ -1080,7 +1098,7 @@ export const QuoteBuilder = () => {
                         ...prev,
                         coordinatorName: e.target.value
                       }))} 
-                      className={`transition-all duration-200 ${errors.coordinatorName ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
+                      className={`transition-all duration-200 hover:shadow-md focus:shadow-lg ${errors.coordinatorName ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.coordinatorName && (
                       <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
@@ -1102,7 +1120,7 @@ export const QuoteBuilder = () => {
                         ...prev,
                         coordinatorEmail: e.target.value
                       }))} 
-                      className={`transition-all duration-200 ${errors.coordinatorEmail ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
+                      className={`transition-all duration-200 hover:shadow-md focus:shadow-lg ${errors.coordinatorEmail ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.coordinatorEmail && (
                       <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
@@ -1123,7 +1141,7 @@ export const QuoteBuilder = () => {
                         ...prev,
                         coordinatorPosition: e.target.value
                       }))} 
-                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md focus:shadow-lg focus:ring-2 focus:ring-opacity-20"
                     />
                   </div>
                 </div>
@@ -1150,7 +1168,7 @@ export const QuoteBuilder = () => {
                         ...prev,
                         schoolABN: e.target.value
                       }))} 
-                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md focus:shadow-lg focus:ring-2 focus:ring-opacity-20"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1165,7 +1183,7 @@ export const QuoteBuilder = () => {
                         ...prev,
                         contactPhone: e.target.value
                       }))} 
-                      className={`transition-all duration-200 ${errors.contactPhone ? 'border-red-300 focus:border-red-500 bg-red-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
+                      className={`transition-all duration-200 hover:shadow-md focus:shadow-lg ${errors.contactPhone ? 'border-red-300 focus:border-red-500 bg-red-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.contactPhone && (
                       <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
@@ -1177,7 +1195,7 @@ export const QuoteBuilder = () => {
                 </div>
 
                 {/* Enhanced School Address */}
-                <div className="mb-6 p-4 bg-white/70 rounded-lg border border-gray-200">
+                <div className="mb-6 p-4 bg-white/70 rounded-lg border border-gray-200 shadow-sm">
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
                     <MapPin className="h-4 w-4" />
                     <span className="font-medium">School Address *</span>
@@ -1213,7 +1231,7 @@ export const QuoteBuilder = () => {
                         ...prev,
                         accountsEmail: e.target.value
                       }))} 
-                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md focus:shadow-lg focus:ring-2 focus:ring-opacity-20"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1228,12 +1246,12 @@ export const QuoteBuilder = () => {
                         ...prev,
                         purchaseOrderNumber: e.target.value
                       }))} 
-                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md focus:shadow-lg focus:ring-2 focus:ring-opacity-20"
                     />
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
                       <CreditCard className="h-4 w-4" />
@@ -1243,10 +1261,10 @@ export const QuoteBuilder = () => {
                     ...prev,
                     paymentPreference: value
                   }))}>
-                      <SelectTrigger className="bg-white hover:bg-gray-50 transition-all duration-200">
+                      <SelectTrigger className="bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md focus:shadow-lg">
                         <SelectValue placeholder="How would you like to pay?" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         <SelectItem value="card">Card Payment</SelectItem>
                         <SelectItem value="invoice">Invoice</SelectItem>
                       </SelectContent>
@@ -1262,10 +1280,10 @@ export const QuoteBuilder = () => {
                     ...prev,
                     supplierSetupForms: value
                   }))}>
-                      <SelectTrigger className="bg-white hover:bg-gray-50 transition-all duration-200">
+                      <SelectTrigger className="bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md focus:shadow-lg">
                         <SelectValue placeholder="Do you need supplier forms?" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         <SelectItem value="yes">Yes</SelectItem>
                         <SelectItem value="no">No</SelectItem>
                         <SelectItem value="not-sure">Not Sure</SelectItem>
@@ -1273,76 +1291,86 @@ export const QuoteBuilder = () => {
                     </Select>
                   </div>
                 </div>
-              </div>
-                
-              {/* Delivery and Billing Addresses - Only show if physical items */}
-              {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && (
-                <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl shadow-sm">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <MapPin className="h-5 w-5 text-purple-600" />
+
+                {/* Delivery and Billing Options */}
+                {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && (
+                  <div className="space-y-6">
+                    {/* Delivery Address Option */}
+                    <div className="p-4 bg-gray-50/70 rounded-lg border border-gray-200/50 shadow-sm">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <Checkbox 
+                          id="deliveryIsSame" 
+                          checked={schoolInfo.deliveryIsSameAsSchool} 
+                          onCheckedChange={checked => setSchoolInfo(prev => ({
+                            ...prev,
+                            deliveryIsSameAsSchool: checked as boolean
+                          }))} 
+                          className="data-[state=checked]:bg-gray-600"
+                        />
+                        <label htmlFor="deliveryIsSame" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Delivery address same as school address
+                        </label>
+                      </div>
+                      {!schoolInfo.deliveryIsSameAsSchool && (
+                        <div className="mt-4 p-4 bg-white/80 rounded-lg border border-gray-200">
+                          <div className="text-sm text-gray-600 mb-2 font-medium">Delivery Address</div>
+                          <AddressInput
+                            label=""
+                            value={schoolInfo.deliveryAddress}
+                            onChange={(address) => setSchoolInfo(prev => ({
+                              ...prev,
+                              deliveryAddress: address
+                            }))}
+                            placeholder="Start typing your delivery address..."
+                          />
+                        </div>
+                      )}
                     </div>
-                    <h4 className="font-bold text-purple-900 text-lg">Delivery Address</h4>
-                  </div>
-                  <div className="flex items-center space-x-3 mb-4 p-3 bg-white/60 rounded-lg">
-                    <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
-                    ...prev,
-                    deliveryIsSameAsSchool: checked as boolean
-                  }))} className="data-[state=checked]:bg-purple-600" />
-                    <label htmlFor="deliveryIsSame" className="text-sm font-medium cursor-pointer">Delivery address same as school address</label>
-                  </div>
-                  {!schoolInfo.deliveryIsSameAsSchool && (
-                    <div className="p-4 bg-white/70 rounded-lg border border-gray-200">
-                      <AddressInput
-                        label=""
-                        value={schoolInfo.deliveryAddress}
-                        onChange={(address) => setSchoolInfo(prev => ({
-                          ...prev,
-                          deliveryAddress: address
-                        }))}
-                        placeholder="Start typing your delivery address..."
-                      />
+
+                    {/* Billing Address Option */}
+                    <div className="p-4 bg-gray-50/70 rounded-lg border border-gray-200/50 shadow-sm">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <Checkbox 
+                          id="billingIsSame" 
+                          checked={schoolInfo.billingIsSameAsSchool} 
+                          onCheckedChange={checked => setSchoolInfo(prev => ({
+                            ...prev,
+                            billingIsSameAsSchool: checked as boolean
+                          }))} 
+                          className="data-[state=checked]:bg-gray-600"
+                        />
+                        <label htmlFor="billingIsSame" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          Billing address same as school address
+                        </label>
+                      </div>
+                      {!schoolInfo.billingIsSameAsSchool && (
+                        <div className="mt-4 p-4 bg-white/80 rounded-lg border border-gray-200">
+                          <div className="text-sm text-gray-600 mb-2 font-medium">Billing Address</div>
+                          <AddressInput
+                            label=""
+                            value={schoolInfo.billingAddress}
+                            onChange={(address) => setSchoolInfo(prev => ({
+                              ...prev,
+                              billingAddress: address
+                            }))}
+                            placeholder="Start typing your billing address..."
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
-              
-              <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-200 rounded-xl shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <CreditCard className="h-5 w-5 text-green-600" />
-                  </div>
-                  <h4 className="font-bold text-green-900 text-lg">Billing Address</h4>
-                </div>
-                <div className="flex items-center space-x-3 mb-4 p-3 bg-white/60 rounded-lg">
-                  <Checkbox id="billingIsSame" checked={schoolInfo.billingIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
-                  ...prev,
-                  billingIsSameAsSchool: checked as boolean
-                }))} className="data-[state=checked]:bg-green-600" />
-                  <label htmlFor="billingIsSame" className="text-sm font-medium cursor-pointer">Billing address same as school address</label>
-                </div>
-                {!schoolInfo.billingIsSameAsSchool && (
-                  <div className="p-4 bg-white/70 rounded-lg border border-gray-200">
-                    <AddressInput
-                      label=""
-                      value={schoolInfo.billingAddress}
-                      onChange={(address) => setSchoolInfo(prev => ({
-                        ...prev,
-                        billingAddress: address
-                      }))}
-                      placeholder="Start typing your billing address..."
-                    />
                   </div>
                 )}
               </div>
 
               {/* Questions/Comments Section with enhanced styling */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-xl shadow-sm">
+              <div className="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-indigo-100 rounded-lg">
-                    <MessageCircle className="h-5 w-5 text-indigo-600" />
+                  <div className="p-2 bg-emerald-100 rounded-lg">
+                    <MessageCircle className="h-5 w-5 text-emerald-600" />
                   </div>
-                  <label className="text-lg font-bold text-indigo-900">Any Questions or Comments?</label>
+                  <label className="text-lg font-bold text-emerald-900">Any Questions or Comments?</label>
                 </div>
                 <Textarea 
                   placeholder="Please share any questions, special requirements, or additional information..." 
@@ -1351,7 +1379,7 @@ export const QuoteBuilder = () => {
                   ...prev,
                   questionsComments: e.target.value
                 }))} 
-                  className="min-h-24 bg-white/80 hover:bg-white transition-all duration-200 focus:ring-2 focus:ring-indigo-200" 
+                  className="min-h-24 bg-white/80 hover:bg-white transition-all duration-200 hover:shadow-md focus:shadow-lg focus:ring-2 focus:ring-emerald-200" 
                 />
               </div>
 
@@ -1382,6 +1410,7 @@ export const QuoteBuilder = () => {
               </div>
             </Card>
 
+            {/* Second Ready to Get Started Section - Bottom (You're Ready!) */}
             <div className="mt-8">
               <ActionButtons 
                 selectedTier={{
@@ -1396,6 +1425,7 @@ export const QuoteBuilder = () => {
                 pricing={finalPricing}
                 programStartDate={programStartDate}
                 isUnlimited={useUnlimited}
+                titleOverride="You're Ready to Get Started!"
               />
             </div>
           </div>
