@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle, AlertTriangle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -6,6 +6,7 @@ import { generateQuotePDF, generateOrderPDF, downloadPDF, createEmailSubject, cr
 import { uploadPDFToStorage, generatePDFBlob } from '@/utils/pdfUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { SuccessPopup } from './SuccessPopup';
 
 interface AddressComponents {
   streetNumber: string;
@@ -74,6 +75,8 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   isUnlimited = false
 }) => {
   const { validateBasicInfo, validateEssentialInfo, validateFullInfo, isBasicInfoValid, isEssentialInfoValid, isFullInfoValid, errors } = useFormValidation();
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successPopupType, setSuccessPopupType] = useState<'enquiry' | 'order'>('enquiry');
 
   const validateBeforeSubmission = (actionType: 'quote' | 'order' | 'enquiry'): boolean => {
     if (actionType === 'quote') {
@@ -160,6 +163,13 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 
       if (dbError) {
         console.error('Error storing quote attempt:', dbError);
+        toast({
+          title: "Database Error",
+          description: "Failed to store quote attempt. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        console.log('Quote attempt stored successfully');
       }
 
       // Send alert email
@@ -254,6 +264,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     window.open(mailtoUrl, '_blank');
+    
+    // Show success popup
+    setSuccessPopupType(type);
+    setShowSuccessPopup(true);
   };
 
   const handleExportPDF = async () => {
@@ -345,66 +359,74 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const isFullComplete = isFullInfoValid(schoolInfo);
 
   return (
-    <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
-      <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
-      <p className="text-white/90 mb-6">
-        Lock in your ${totalPrice.toLocaleString()} price (including ${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.
-      </p>
-      
-      {/* Dynamic form completion messages */}
-      {!isFullComplete && (
-        <div className="mb-6 p-4 bg-white/20 rounded-lg border border-white/30">
-          <div className="flex items-center justify-center space-x-2 text-white">
-            <AlertTriangle className="h-5 w-5" />
-            <div className="text-sm">
-              <div className="font-medium">Complete your information below to proceed</div>
+    <>
+      <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
+        <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
+        <p className="text-white/90 mb-6">
+          Lock in your ${totalPrice.toLocaleString()} price (including ${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.
+        </p>
+        
+        {/* Dynamic form completion messages */}
+        {!isFullComplete && (
+          <div className="mb-6 p-4 bg-white/20 rounded-lg border border-white/30">
+            <div className="flex items-center justify-center space-x-2 text-white">
+              <AlertTriangle className="h-5 w-5" />
+              <div className="text-sm">
+                <div className="font-medium">Complete your information below to proceed</div>
+              </div>
             </div>
           </div>
+        )}
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-4xl mx-auto">
+          <Button
+            onClick={handleExportPDF}
+            size="lg"
+            className="flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] bg-white hover:bg-gray-50 text-gray-800"
+          >
+            <FileText className="h-5 w-5 mr-2" />
+            Export Quote as PDF
+          </Button>
+          
+          <Button
+            onClick={handleBooklistingEnquiry}
+            size="lg"
+            disabled={!isEssentialComplete}
+            className={`flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
+              isEssentialComplete 
+                ? 'bg-white hover:bg-gray-50 text-gray-800' 
+                : 'bg-white/50 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            <MessageCircle className="h-5 w-5 mr-2" />
+            Enquire about Booklisting
+          </Button>
+          
+          <Button
+            onClick={handlePlaceOrder}
+            size="lg"
+            disabled={!isFullComplete}
+            className={`flex-1 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
+              isFullComplete 
+                ? 'bg-white hover:bg-gray-50 text-orange-600 hover:text-orange-700' 
+                : 'bg-white/50 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Place Order Now
+          </Button>
         </div>
-      )}
-      
-      <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-4xl mx-auto">
-        <Button
-          onClick={handleExportPDF}
-          size="lg"
-          className="flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] bg-white hover:bg-gray-50 text-gray-800"
-        >
-          <FileText className="h-5 w-5 mr-2" />
-          Export Quote as PDF
-        </Button>
         
-        <Button
-          onClick={handleBooklistingEnquiry}
-          size="lg"
-          disabled={!isEssentialComplete}
-          className={`flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-            isEssentialComplete 
-              ? 'bg-white hover:bg-gray-50 text-gray-800' 
-              : 'bg-white/50 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          <MessageCircle className="h-5 w-5 mr-2" />
-          Enquire about Booklisting
-        </Button>
-        
-        <Button
-          onClick={handlePlaceOrder}
-          size="lg"
-          disabled={!isFullComplete}
-          className={`flex-1 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-            isFullComplete 
-              ? 'bg-white hover:bg-gray-50 text-orange-600 hover:text-orange-700' 
-              : 'bg-white/50 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Place Order Now
-        </Button>
+        <p className="text-white/80 text-sm mt-4">
+          Questions? Contact our team at hello@mandymoney.com.au
+        </p>
       </div>
-      
-      <p className="text-white/80 text-sm mt-4">
-        Questions? Contact our team at hello@mandymoney.com.au
-      </p>
-    </div>
+
+      <SuccessPopup 
+        isOpen={showSuccessPopup}
+        onClose={() => setShowSuccessPopup(false)}
+        type={successPopupType}
+      />
+    </>
   );
 };

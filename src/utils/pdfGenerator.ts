@@ -1,4 +1,3 @@
-
 import jsPDF from 'jspdf';
 
 interface AddressComponents {
@@ -57,16 +56,52 @@ const formatAddress = (address: AddressComponents): string => {
   return parts.join(' ');
 };
 
+const addImportantNotice = (doc: jsPDF, yPosition: number): number => {
+  // Add a large, prominent warning box
+  doc.setFillColor(255, 0, 0); // Red background
+  doc.roundedRect(10, yPosition, 190, 30, 5, 5, 'F');
+  
+  // White border
+  doc.setDrawColor(255, 255, 255);
+  doc.setLineWidth(2);
+  doc.roundedRect(10, yPosition, 190, 30, 5, 5, 'D');
+  
+  // Warning text
+  doc.setTextColor(255, 255, 255); // White text
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  
+  const warningLines = [
+    'IMPORTANT: THIS PDF MUST BE SUBMITTED TO',
+    'HELLO@MANDYMONEY.COM.AU',
+    'FOR THE ENQUIRY OR ORDER TO BE RECEIVED'
+  ];
+  
+  warningLines.forEach((line, index) => {
+    const textWidth = doc.getTextWidth(line);
+    const xPosition = (210 - textWidth) / 2; // Center the text
+    doc.text(line, xPosition, yPosition + 10 + (index * 6));
+  });
+  
+  doc.setTextColor(0, 0, 0); // Reset to black
+  return yPosition + 40; // Return new Y position after the notice
+};
+
 const addPageHeader = (doc: jsPDF, title: string, pageNumber: number = 1) => {
+  let yPosition = 10;
+  
+  // Add the important notice first
+  yPosition = addImportantNotice(doc, yPosition);
+  
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text(title, 20, 20);
+  doc.text(title, 20, yPosition + 10);
   
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Page ${pageNumber}`, 180, 20);
+  doc.text(`Page ${pageNumber}`, 180, yPosition + 10);
   
-  return 30; // Return starting Y position for content
+  return yPosition + 20; // Return starting Y position for content
 };
 
 export const generateQuotePDF = (
@@ -309,14 +344,9 @@ export const generateOrderPDF = (
   isUnlimited: boolean = false
 ): jsPDF => {
   const doc = new jsPDF();
-  let yPosition = 20;
+  let yPosition = addPageHeader(doc, 'Mandy Money High School Program Order');
   
   // Header
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Mandy Money High School Program Order', 20, yPosition);
-  yPosition += 15;
-  
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   doc.text(`Order Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
@@ -410,7 +440,7 @@ export const generateOrderPDF = (
   quoteItems.forEach(item => {
     if (yPosition > 250) {
       doc.addPage();
-      yPosition = 20;
+      yPosition = addPageHeader(doc, 'Mandy Money High School Program Order', doc.getNumberOfPages());
     }
     
     doc.text(item.item.substring(0, 30), 20, yPosition);
@@ -484,14 +514,33 @@ export const createEmailBody = (
   
   body += `School Details:\n`;
   if (schoolInfo.schoolName) body += `- School: ${schoolInfo.schoolName}\n`;
+  if (formatAddress(schoolInfo.schoolAddress)) body += `- Address: ${formatAddress(schoolInfo.schoolAddress)}\n`;
+  if (schoolInfo.schoolABN) body += `- ABN: ${schoolInfo.schoolABN}\n`;
   if (schoolInfo.coordinatorName) body += `- Coordinator: ${schoolInfo.coordinatorName}\n`;
+  if (schoolInfo.coordinatorPosition) body += `- Position: ${schoolInfo.coordinatorPosition}\n`;
   if (schoolInfo.coordinatorEmail) body += `- Email: ${schoolInfo.coordinatorEmail}\n`;
   if (schoolInfo.contactPhone) body += `- Phone: ${schoolInfo.contactPhone}\n`;
+  
+  // Add delivery address if different
+  if (!schoolInfo.deliveryIsSameAsSchool && formatAddress(schoolInfo.deliveryAddress)) {
+    body += `- Delivery Address: ${formatAddress(schoolInfo.deliveryAddress)}\n`;
+  }
+  
+  // Add billing address if different
+  if (!schoolInfo.billingIsSameAsSchool && formatAddress(schoolInfo.billingAddress)) {
+    body += `- Billing Address: ${formatAddress(schoolInfo.billingAddress)}\n`;
+  }
+  
+  if (schoolInfo.accountsEmail) body += `- Accounts Email: ${schoolInfo.accountsEmail}\n`;
+  if (schoolInfo.purchaseOrderNumber) body += `- Purchase Order Number: ${schoolInfo.purchaseOrderNumber}\n`;
+  if (schoolInfo.paymentPreference) body += `- Payment Preference: ${schoolInfo.paymentPreference}\n`;
   
   body += `\nProgram Requirements:\n`;
   body += `- Teachers: ${teacherCount}\n`;
   body += `- Students: ${studentCount}\n`;
-  body += `- Total Investment: $${pricing.total.toLocaleString()}\n\n`;
+  body += `- Total Investment: $${pricing.total.toLocaleString()}\n`;
+  body += `- Subtotal (exc. GST): $${pricing.subtotal.toFixed(2)}\n`;
+  body += `- GST (10%): $${pricing.gst.toFixed(2)}\n\n`;
   
   if (schoolInfo.questionsComments) {
     body += `Additional Comments:\n${schoolInfo.questionsComments}\n\n`;
