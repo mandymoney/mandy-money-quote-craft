@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle, AlertTriangle } from 'lucide-react';
@@ -63,6 +62,8 @@ interface ActionButtonsProps {
   };
   programStartDate: Date;
   isUnlimited?: boolean;
+  titleOverride?: string;
+  descriptionOverride?: string;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
@@ -74,7 +75,9 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   quoteItems,
   pricing,
   programStartDate,
-  isUnlimited = false
+  isUnlimited = false,
+  titleOverride,
+  descriptionOverride
 }) => {
   const { validateBasicInfo, validateEssentialInfo, validateFullInfo, isBasicInfoValid, isEssentialInfoValid, isFullInfoValid, errors } = useFormValidation();
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -379,12 +382,16 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     return missing;
   };
 
+  // Use override values if provided, otherwise use defaults
+  const title = titleOverride || "Ready to Get Started?";
+  const description = descriptionOverride || `Lock in your $${totalPrice.toLocaleString()} price (including $${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.`;
+
   return (
     <TooltipProvider>
       <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
-        <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
+        <h2 className="text-white text-2xl font-bold mb-2">{title}</h2>
         <p className="text-white/90 mb-6">
-          Lock in your ${totalPrice.toLocaleString()} price (including ${estimatedSavings.toLocaleString()} savings) today by exporting this quote or placing your order.
+          {description}
         </p>
         
         {/* Dynamic form completion messages */}
