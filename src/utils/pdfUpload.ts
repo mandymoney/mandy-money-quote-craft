@@ -6,6 +6,11 @@ export const uploadPDFToStorage = async (
   filename: string
 ): Promise<string | null> => {
   try {
+    // Ensure the bucket exists by attempting to create it (will fail silently if it already exists)
+    await supabase.storage.createBucket('quote-pdfs', {
+      public: true
+    });
+
     const { data, error } = await supabase.storage
       .from('quote-pdfs')
       .upload(filename, pdfBlob, {

@@ -57,8 +57,9 @@ const formatAddress = (address: AddressComponents): string => {
 };
 
 const addImportantNotice = (doc: jsPDF, yPosition: number): number => {
-  // Add a large, prominent warning box
-  doc.setFillColor(255, 0, 0); // Red background
+  // Add a large, prominent warning box with orange gradient effect
+  // Since jsPDF doesn't support gradients, we'll use a solid orange color
+  doc.setFillColor(254, 131, 3); // Orange color from the gradient
   doc.roundedRect(10, yPosition, 190, 30, 5, 5, 'F');
   
   // White border

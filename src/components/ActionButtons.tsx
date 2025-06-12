@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle, AlertTriangle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { generateQuotePDF, generateOrderPDF, downloadPDF, createEmailSubject, createEmailBody } from '@/utils/pdfGenerator';
 import { uploadPDFToStorage, generatePDFBlob } from '@/utils/pdfUpload';
 import { supabase } from '@/integrations/supabase/client';
@@ -358,8 +360,27 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const isEssentialComplete = isEssentialInfoValid(schoolInfo);
   const isFullComplete = isFullInfoValid(schoolInfo);
 
+  // Helper function to get missing info for tooltips
+  const getMissingInfo = (level: 'essential' | 'full') => {
+    const missing: string[] = [];
+    
+    if (!schoolInfo.schoolName.trim()) missing.push('School name');
+    if (!schoolInfo.coordinatorName.trim()) missing.push('Coordinator name');
+    if (!schoolInfo.coordinatorEmail.trim()) missing.push('Coordinator email');
+    
+    if (level === 'full') {
+      if (!schoolInfo.contactPhone.trim()) missing.push('Contact phone');
+      const { streetNumber, streetName, suburb, state, postcode } = schoolInfo.schoolAddress;
+      if (!streetNumber || !streetName || !suburb || !state || !postcode) {
+        missing.push('Complete school address');
+      }
+    }
+    
+    return missing;
+  };
+
   return (
-    <>
+    <TooltipProvider>
       <div className="bg-gradient-to-r from-[#fe5510] via-[#fea700] to-[#fe8303] rounded-lg p-8 text-center shadow-xl">
         <h2 className="text-white text-2xl font-bold mb-2">Ready to Get Started?</h2>
         <p className="text-white/90 mb-6">
@@ -372,7 +393,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             <div className="flex items-center justify-center space-x-2 text-white">
               <AlertTriangle className="h-5 w-5" />
               <div className="text-sm">
-                <div className="font-medium">Complete your information below to proceed</div>
+                <div className="font-medium">Complete your information above to proceed</div>
               </div>
             </div>
           </div>
@@ -388,33 +409,55 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
             Export Quote as PDF
           </Button>
           
-          <Button
-            onClick={handleBooklistingEnquiry}
-            size="lg"
-            disabled={!isEssentialComplete}
-            className={`flex-1 font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-              isEssentialComplete 
-                ? 'bg-white hover:bg-gray-50 text-gray-800' 
-                : 'bg-white/50 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            <MessageCircle className="h-5 w-5 mr-2" />
-            Enquire about Booklisting
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex-1">
+                <Button
+                  onClick={handleBooklistingEnquiry}
+                  size="lg"
+                  disabled={!isEssentialComplete}
+                  className={`w-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
+                    isEssentialComplete 
+                      ? 'bg-white hover:bg-gray-50 text-gray-800' 
+                      : 'bg-white/50 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Enquire about Booklisting
+                </Button>
+              </div>
+            </TooltipTrigger>
+            {!isEssentialComplete && (
+              <TooltipContent>
+                <p>Missing: {getMissingInfo('essential').join(', ')}</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
           
-          <Button
-            onClick={handlePlaceOrder}
-            size="lg"
-            disabled={!isFullComplete}
-            className={`flex-1 font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
-              isFullComplete 
-                ? 'bg-white hover:bg-gray-50 text-orange-600 hover:text-orange-700' 
-                : 'bg-white/50 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Place Order Now
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex-1">
+                <Button
+                  onClick={handlePlaceOrder}
+                  size="lg"
+                  disabled={!isFullComplete}
+                  className={`w-full font-bold transition-all duration-300 hover:scale-105 shadow-lg border-0 hover:shadow-xl min-h-[3rem] ${
+                    isFullComplete 
+                      ? 'bg-white hover:bg-gray-50 text-orange-600 hover:text-orange-700' 
+                      : 'bg-white/50 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Place Order Now
+                </Button>
+              </div>
+            </TooltipTrigger>
+            {!isFullComplete && (
+              <TooltipContent>
+                <p>Missing: {getMissingInfo('full').join(', ')}</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
         </div>
         
         <p className="text-white/80 text-sm mt-4">
@@ -427,6 +470,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         onClose={() => setShowSuccessPopup(false)}
         type={successPopupType}
       />
-    </>
+    </TooltipProvider>
   );
 };
