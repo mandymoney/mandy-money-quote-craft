@@ -6,11 +6,7 @@ export const uploadPDFToStorage = async (
   filename: string
 ): Promise<string | null> => {
   try {
-    // Ensure the bucket exists by attempting to create it (will fail silently if it already exists)
-    await supabase.storage.createBucket('quote-pdfs', {
-      public: true
-    });
-
+    // Upload the PDF directly to the existing bucket
     const { data, error } = await supabase.storage
       .from('quote-pdfs')
       .upload(filename, pdfBlob, {
@@ -20,6 +16,8 @@ export const uploadPDFToStorage = async (
 
     if (error) {
       console.error('Error uploading PDF:', error);
+      // If bucket doesn't exist, the SQL migration should have created it
+      // Don't try to create it here as it causes permission issues
       return null;
     }
 
@@ -28,9 +26,10 @@ export const uploadPDFToStorage = async (
       .from('quote-pdfs')
       .getPublicUrl(filename);
 
+    console.log('PDF uploaded successfully:', publicData.publicUrl);
     return publicData.publicUrl;
   } catch (error) {
-    console.error('Error uploading PDF:', error);
+    console.error('Error in uploadPDFToStorage:', error);
     return null;
   }
 };

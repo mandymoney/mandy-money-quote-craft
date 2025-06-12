@@ -248,6 +248,8 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     let pdfUrl: string | null = null;
     
     try {
+      console.log(`Starting ${type} process...`);
+      
       if (type === 'order') {
         const result = await generateAndUploadOrder();
         pdfUrl = result.pdfUrl;
@@ -257,36 +259,43 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         pdfUrl = result.pdfUrl;
       }
 
-      // Ensure PDF was uploaded successfully before proceeding
+      console.log('PDF upload result:', pdfUrl);
+
+      // Continue even if PDF upload fails - user can still send the locally downloaded PDF
       if (!pdfUrl) {
+        console.warn('PDF upload failed, but continuing with email generation');
         toast({
-          title: "PDF Upload Failed",
-          description: "Failed to upload PDF to storage. Please try again.",
-          variant: "destructive",
+          title: "PDF Upload Warning",
+          description: "PDF was downloaded locally but cloud storage failed. Please attach the downloaded PDF to your email.",
+          variant: "default",
         });
-        return;
       }
     } catch (error) {
       console.error('Error generating/uploading PDF:', error);
       toast({
-        title: "Error",
-        description: "Failed to generate or upload PDF. Please try again.",
+        title: "PDF Generation Error",
+        description: "There was an issue with PDF generation. Please try again.",
         variant: "destructive",
       });
       return;
     }
     
-    // Store quote attempt with PDF URL
-    await storeQuoteAttempt(type, pdfUrl);
+    // Store quote attempt with PDF URL (even if null)
+    await storeQuoteAttempt(type, pdfUrl || undefined);
     
     const subject = createEmailSubject(type, schoolInfo.schoolName);
     const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount, pdfUrl);
     
+    console.log('Opening email with subject:', subject);
+    console.log('Email body length:', body.length);
+    
     const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
+    // Open the email client
     window.open(mailtoUrl, '_blank');
     
-    // Show success popup
+    // Show success popup - this should always happen
+    console.log('Showing success popup for type:', type);
     setSuccessPopupType(type);
     setShowSuccessPopup(true);
   };
@@ -330,10 +339,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     try {
       await openEmailWithPDF('order');
       
-      toast({
-        title: "Email Ready!",
-        description: "Your order document has been generated and email opened with the PDF link included.",
-      });
+      console.log('Order process completed successfully');
     } catch (error) {
       console.error('Error preparing order:', error);
       toast({
@@ -355,10 +361,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     try {
       await openEmailWithPDF('enquiry');
       
-      toast({
-        title: "Email Ready!",
-        description: "Your enquiry email has been opened with the quote PDF link included.",
-      });
+      console.log('Enquiry process completed successfully');
     } catch (error) {
       console.error('Error preparing enquiry:', error);
       toast({
