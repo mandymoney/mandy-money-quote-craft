@@ -1,60 +1,25 @@
+
 import React, { useState, useEffect } from 'react';
 import { VolumeSelector } from '@/components/VolumeSelector';
 import { ProgramStartDate } from '@/components/ProgramStartDate';
 import { PricingDisplay } from '@/components/PricingDisplay';
 import { InclusionsDisplay } from '@/components/InclusionsDisplay';
 import { ActionButtons } from '@/components/ActionButtons';
-import { SchoolInfo as SchoolInfoType } from '@/types';
 import { AddressInput } from '@/components/AddressInput';
 import { Button } from '@/components/ui/button';
 import { FormCompletionIndicator } from '@/components/FormCompletionIndicator';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { ExpandableSection } from '@/components/ExpandableSection';
+import { 
+  AddressComponents, 
+  SchoolInfo, 
+  QuoteItem, 
+  Pricing,
+  PricingTier,
+  UnlimitedTier
+} from '@/types';
 
-interface AddressComponents {
-  streetNumber: string;
-  streetName: string;
-  suburb: string;
-  state: string;
-  postcode: string;
-  country: string;
-}
-
-interface SchoolInfo {
-  schoolName: string;
-  schoolAddress: AddressComponents;
-  schoolABN: string;
-  contactPhone: string;
-  deliveryAddress: AddressComponents;
-  deliveryIsSameAsSchool: boolean;
-  billingAddress: AddressComponents;
-  billingIsSameAsSchool: boolean;
-  accountsEmail: string;
-  coordinatorEmail: string;
-  coordinatorName: string;
-  coordinatorPosition: string;
-  purchaseOrderNumber: string;
-  paymentPreference: string;
-  supplierSetupForms: string;
-  questionsComments: string;
-}
-
-interface QuoteItem {
-  item: string;
-  count: number;
-  unitPrice: number;
-  totalPrice: number;
-  type: string;
-  description: string;
-  savings?: number;
-}
-
-interface Pricing {
-  subtotal: number;
-  gst: number;
-  total: number;
-  shipping: number;
-}
+export type { PricingTier, UnlimitedTier };
 
 export const QuoteBuilder = () => {
   const [teacherCount, setTeacherCount] = useState(10);
@@ -138,6 +103,19 @@ export const QuoteBuilder = () => {
     return endDate;
   };
 
+  // Check if form is complete for FormCompletionIndicator
+  const isFormComplete = () => {
+    return !!(
+      schoolInfo.schoolName &&
+      schoolInfo.coordinatorName &&
+      schoolInfo.coordinatorEmail &&
+      schoolInfo.schoolAddress.streetName &&
+      schoolInfo.schoolAddress.suburb &&
+      schoolInfo.schoolAddress.state &&
+      schoolInfo.schoolAddress.postcode
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header Section */}
@@ -152,20 +130,21 @@ export const QuoteBuilder = () => {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Volume Selection */}
         <VolumeSelector
-          teacherCount={teacherCount}
-          studentCount={studentCount}
-          onTeacherCountChange={setTeacherCount}
-          onStudentCountChange={setStudentCount}
-          selectedTier={selectedTier}
-          onTierChange={setSelectedTier}
+          label="Volume Selection"
+          value={teacherCount}
+          onChange={setTeacherCount}
+          min={1}
+          max={100}
+          color="teal"
         />
 
         {selectedTier && (
           <>
             {/* Program Start Date */}
             <ProgramStartDate
-              programStartDate={programStartDate}
-              onDateChange={setProgramStartDate}
+              startDate={programStartDate}
+              onStartDateChange={setProgramStartDate}
+              endDate={getEndDate(programStartDate, accessPeriod)}
             />
 
             {/* What's Included and Pricing */}
@@ -174,10 +153,16 @@ export const QuoteBuilder = () => {
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">What's Included</h2>
                 <InclusionsDisplay 
-                  selectedTier={selectedTier}
+                  teacherTier={selectedTier.type === 'teacher' ? selectedTier : undefined}
+                  studentTier={selectedTier.type === 'student' ? selectedTier : undefined}
+                  pricing={pricing}
                   teacherCount={teacherCount}
                   studentCount={studentCount}
+                  studentPrice={selectedTier.basePrice?.student || 0}
                   isUnlimited={selectedTier.id === 'unlimited'}
+                  programStartDate={programStartDate}
+                  onStartDateChange={setProgramStartDate}
+                  programEndDate={getEndDate(programStartDate, accessPeriod)}
                 />
               </div>
 
@@ -185,16 +170,30 @@ export const QuoteBuilder = () => {
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Investment Breakdown</h2>
                 <PricingDisplay 
-                  selectedTier={selectedTier}
-                  teacherCount={teacherCount}
-                  studentCount={studentCount}
-                  onQuoteItemsChange={setQuoteItems}
-                  onPricingChange={setPricing}
-                  customPricing={{
-                    teacherDigitalTextbookBundle: 198
-                  }}
+                  price={pricing.total}
+                  tierType={selectedTier.type}
+                  showSavings={false}
+                  savings={0}
+                  colorScheme="teal"
                 />
               </div>
+            </div>
+
+            {/* First Action Buttons - "Ready to Get Started?" */}
+            <div className="mb-8">
+              <ActionButtons
+                selectedTier={selectedTier}
+                totalPrice={pricing.total}
+                teacherCount={teacherCount}
+                studentCount={studentCount}
+                schoolInfo={schoolInfo}
+                quoteItems={quoteItems}
+                pricing={pricing}
+                programStartDate={programStartDate}
+                isUnlimited={selectedTier.id === 'unlimited'}
+                titleOverride="Ready to Get Started?"
+                descriptionOverride="Complete your information below to proceed"
+              />
             </div>
 
             {/* Official Program Quote Section with Access Period */}
@@ -282,28 +281,11 @@ export const QuoteBuilder = () => {
               </div>
             </div>
 
-            {/* First Action Buttons - "Ready to Get Started?" */}
-            <div className="mb-8">
-              <ActionButtons
-                selectedTier={selectedTier}
-                totalPrice={pricing.total}
-                teacherCount={teacherCount}
-                studentCount={studentCount}
-                schoolInfo={schoolInfo}
-                quoteItems={quoteItems}
-                pricing={pricing}
-                programStartDate={programStartDate}
-                isUnlimited={selectedTier.id === 'unlimited'}
-                titleOverride="Ready to Get Started?"
-                descriptionOverride="Complete your information below to proceed"
-              />
-            </div>
-
             {/* School Information Section */}
             <div className="bg-white rounded-lg shadow-lg p-6 mb-8" data-form-section>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">School Information</h2>
-                <FormCompletionIndicator schoolInfo={schoolInfo} />
+                <FormCompletionIndicator schoolInfo={schoolInfo} isComplete={isFormComplete()} />
               </div>
               
               {/* Basic School Details */}
@@ -364,11 +346,14 @@ export const QuoteBuilder = () => {
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">School Address</h3>
                 <AddressInput
-                  address={schoolInfo.schoolAddress}
+                  streetNumber={schoolInfo.schoolAddress.streetNumber}
+                  streetName={schoolInfo.schoolAddress.streetName}
+                  suburb={schoolInfo.schoolAddress.suburb}
+                  state={schoolInfo.schoolAddress.state}
+                  postcode={schoolInfo.schoolAddress.postcode}
+                  country={schoolInfo.schoolAddress.country}
                   onAddressChange={(address) => setSchoolInfo(prev => ({ ...prev, schoolAddress: address }))}
                   placeholder="Enter school address"
-                  errors={errors}
-                  fieldPrefix="schoolAddress"
                 />
               </div>
 
@@ -424,7 +409,13 @@ export const QuoteBuilder = () => {
               </div>
 
               {/* Additional Details for Orders */}
-              <ExpandableSection title="Additional Details for Orders" defaultExpanded={false}>
+              <ExpandableSection 
+                title="Additional Details for Orders" 
+                defaultExpanded={false}
+                items={[]}
+                colorScheme="teal"
+                isPositive={true}
+              >
                 <div className="space-y-6">
                   {/* Purchase Order and Payment Information */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -510,11 +501,14 @@ export const QuoteBuilder = () => {
                       <div>
                         <h4 className="text-md font-semibold text-gray-800 mb-3">Delivery Address</h4>
                         <AddressInput
-                          address={schoolInfo.deliveryAddress}
+                          streetNumber={schoolInfo.deliveryAddress.streetNumber}
+                          streetName={schoolInfo.deliveryAddress.streetName}
+                          suburb={schoolInfo.deliveryAddress.suburb}
+                          state={schoolInfo.deliveryAddress.state}
+                          postcode={schoolInfo.deliveryAddress.postcode}
+                          country={schoolInfo.deliveryAddress.country}
                           onAddressChange={(address) => setSchoolInfo(prev => ({ ...prev, deliveryAddress: address }))}
                           placeholder="Enter delivery address"
-                          errors={errors}
-                          fieldPrefix="deliveryAddress"
                         />
                       </div>
                     )}
@@ -542,11 +536,14 @@ export const QuoteBuilder = () => {
                       <div>
                         <h4 className="text-md font-semibold text-gray-800 mb-3">Billing Address</h4>
                         <AddressInput
-                          address={schoolInfo.billingAddress}
+                          streetNumber={schoolInfo.billingAddress.streetNumber}
+                          streetName={schoolInfo.billingAddress.streetName}
+                          suburb={schoolInfo.billingAddress.suburb}
+                          state={schoolInfo.billingAddress.state}
+                          postcode={schoolInfo.billingAddress.postcode}
+                          country={schoolInfo.billingAddress.country}
                           onAddressChange={(address) => setSchoolInfo(prev => ({ ...prev, billingAddress: address }))}
                           placeholder="Enter billing address"
-                          errors={errors}
-                          fieldPrefix="billingAddress"
                         />
                       </div>
                     )}
@@ -559,6 +556,9 @@ export const QuoteBuilder = () => {
                 title="Any Questions or Comments?" 
                 defaultExpanded={false}
                 className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
+                items={[]}
+                colorScheme="green"
+                isPositive={true}
               >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
