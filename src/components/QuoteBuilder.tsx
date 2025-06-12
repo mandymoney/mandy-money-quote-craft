@@ -960,34 +960,8 @@ export const QuoteBuilder = () => {
                 </div>
               </div>
 
-              {/* Right Column - Program Inclusions with Program Access Period */}
+              {/* Right Column - Program Inclusions */}
               <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 border border-green-200/50">
-                {/* Program Access Period moved here */}
-                <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Clock className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <h4 className="text-sm font-semibold text-blue-900">Program Access Period</h4>
-                  </div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className={cn("w-48 justify-start text-left font-normal bg-white shadow-sm hover:shadow-md transition-shadow text-xs", !programStartDate && "text-muted-foreground")}>
-                          <CalendarIcon className="mr-2 h-3 w-3" />
-                          {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar mode="single" selected={programStartDate} onSelect={date => date && setProgramStartDate(date)} initialFocus className="p-3 pointer-events-auto" />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div className="text-xs text-blue-700 bg-blue-100/50 p-2 rounded">
-                    <strong>Access:</strong> {format(programStartDate, 'MMM d, yyyy')} to {format(addMonths(programStartDate, 12), 'MMM d, yyyy')}
-                  </div>
-                </div>
-
                 <h3 className="text-lg font-semibold mb-4 text-slate-800">What's Included</h3>
                 
                 <div className="space-y-3 mb-6">
@@ -1014,25 +988,14 @@ export const QuoteBuilder = () => {
                   }
                 })}
                 </div>
-              </div>
-            </div>
-
-            {/* Top Ready to Get Started Section */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-xl shadow-lg border-2 border-orange-300">
-              <div className="text-center text-white">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <div className="p-3 bg-white/20 rounded-full">
-                    <RotateCw className="h-6 w-6" />
+                
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-2">Access Period Summary</h4>
+                  <div className="text-sm text-green-700 space-y-1">
+                    <div><strong>Program starts:</strong> {format(programStartDate, 'MMMM d, yyyy')}</div>
+                    <div><strong>Access ends:</strong> {format(addMonths(programStartDate, 12), 'MMMM d, yyyy')}</div>
+                    <div className="text-xs mt-2 text-green-600">Full 12-month access to all digital content and resources</div>
                   </div>
-                  <h3 className="text-2xl font-bold">Ready to Get Started?</h3>
-                </div>
-                <p className="text-lg mb-6 opacity-95">
-                  Complete your information below to proceed with your enquiry or order
-                </p>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <p className="text-sm font-medium">
-                    📋 Fill out the school information form below to generate your official quote PDF
-                  </p>
                 </div>
               </div>
             </div>
@@ -1047,6 +1010,32 @@ export const QuoteBuilder = () => {
                   <h3 className="text-2xl font-bold text-gray-800">School Information</h3>
                 </div>
                 <FormCompletionIndicator schoolInfo={schoolInfo} isComplete={isFormComplete} />
+              </div>
+              
+              {/* Program Start Date with enhanced styling */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Clock className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-blue-900">Program Access Period</h4>
+                </div>
+                <div className="flex items-center gap-4 mb-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn("w-72 justify-start text-left font-normal bg-white shadow-sm hover:shadow-md transition-shadow", !programStartDate && "text-muted-foreground")}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={programStartDate} onSelect={date => date && setProgramStartDate(date)} initialFocus className="p-3 pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="text-sm text-blue-700 bg-blue-100/50 p-3 rounded-lg">
+                  <strong>Access period:</strong> {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
+                </div>
               </div>
 
               {/* Essential Information Section with enhanced styling */}
@@ -1286,76 +1275,74 @@ export const QuoteBuilder = () => {
                 </div>
               </div>
                 
-              {/* Delivery and Billing Addresses - Only show if physical items - Compact grey styling */}
+              {/* Delivery and Billing Addresses - Only show if physical items */}
               {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && (
-                <>
-                  <div className="mb-6 p-4 bg-gray-100/60 border border-gray-200 rounded-lg shadow-sm">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="p-1 bg-gray-200 rounded">
-                        <MapPin className="h-4 w-4 text-gray-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-800 text-sm">Delivery Address</h4>
+                <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl shadow-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <MapPin className="h-5 w-5 text-purple-600" />
                     </div>
-                    <div className="flex items-center space-x-3 mb-3 p-2 bg-white/80 rounded">
-                      <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
-                      ...prev,
-                      deliveryIsSameAsSchool: checked as boolean
-                    }))} className="data-[state=checked]:bg-gray-600" />
-                      <label htmlFor="deliveryIsSame" className="text-xs font-medium cursor-pointer">Same as school address</label>
-                    </div>
-                    {!schoolInfo.deliveryIsSameAsSchool && (
-                      <div className="p-3 bg-white/90 rounded border border-gray-200">
-                        <AddressInput
-                          label=""
-                          value={schoolInfo.deliveryAddress}
-                          onChange={(address) => setSchoolInfo(prev => ({
-                            ...prev,
-                            deliveryAddress: address
-                          }))}
-                          placeholder="Start typing your delivery address..."
-                        />
-                      </div>
-                    )}
+                    <h4 className="font-bold text-purple-900 text-lg">Delivery Address</h4>
                   </div>
-                  
-                  <div className="mb-6 p-4 bg-gray-100/60 border border-gray-200 rounded-lg shadow-sm">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="p-1 bg-gray-200 rounded">
-                        <CreditCard className="h-4 w-4 text-gray-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-800 text-sm">Billing Address</h4>
-                    </div>
-                    <div className="flex items-center space-x-3 mb-3 p-2 bg-white/80 rounded">
-                      <Checkbox id="billingIsSame" checked={schoolInfo.billingIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
-                      ...prev,
-                      billingIsSameAsSchool: checked as boolean
-                    }))} className="data-[state=checked]:bg-gray-600" />
-                      <label htmlFor="billingIsSame" className="text-xs font-medium cursor-pointer">Same as school address</label>
-                    </div>
-                    {!schoolInfo.billingIsSameAsSchool && (
-                      <div className="p-3 bg-white/90 rounded border border-gray-200">
-                        <AddressInput
-                          label=""
-                          value={schoolInfo.billingAddress}
-                          onChange={(address) => setSchoolInfo(prev => ({
-                            ...prev,
-                            billingAddress: address
-                          }))}
-                          placeholder="Start typing your billing address..."
-                        />
-                      </div>
-                    )}
+                  <div className="flex items-center space-x-3 mb-4 p-3 bg-white/60 rounded-lg">
+                    <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
+                    ...prev,
+                    deliveryIsSameAsSchool: checked as boolean
+                  }))} className="data-[state=checked]:bg-purple-600" />
+                    <label htmlFor="deliveryIsSame" className="text-sm font-medium cursor-pointer">Delivery address same as school address</label>
                   </div>
-                </>
+                  {!schoolInfo.deliveryIsSameAsSchool && (
+                    <div className="p-4 bg-white/70 rounded-lg border border-gray-200">
+                      <AddressInput
+                        label=""
+                        value={schoolInfo.deliveryAddress}
+                        onChange={(address) => setSchoolInfo(prev => ({
+                          ...prev,
+                          deliveryAddress: address
+                        }))}
+                        placeholder="Start typing your delivery address..."
+                      />
+                    </div>
+                  )}
+                </div>
               )}
-
-              {/* Questions/Comments Section - Updated to match community styling */}
-              <div className="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl shadow-sm">
+              
+              <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-200 rounded-xl shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-emerald-100 rounded-lg">
-                    <MessageCircle className="h-5 w-5 text-emerald-600" />
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <CreditCard className="h-5 w-5 text-green-600" />
                   </div>
-                  <label className="text-lg font-bold text-emerald-900">Any Questions or Comments?</label>
+                  <h4 className="font-bold text-green-900 text-lg">Billing Address</h4>
+                </div>
+                <div className="flex items-center space-x-3 mb-4 p-3 bg-white/60 rounded-lg">
+                  <Checkbox id="billingIsSame" checked={schoolInfo.billingIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
+                  ...prev,
+                  billingIsSameAsSchool: checked as boolean
+                }))} className="data-[state=checked]:bg-green-600" />
+                  <label htmlFor="billingIsSame" className="text-sm font-medium cursor-pointer">Billing address same as school address</label>
+                </div>
+                {!schoolInfo.billingIsSameAsSchool && (
+                  <div className="p-4 bg-white/70 rounded-lg border border-gray-200">
+                    <AddressInput
+                      label=""
+                      value={schoolInfo.billingAddress}
+                      onChange={(address) => setSchoolInfo(prev => ({
+                        ...prev,
+                        billingAddress: address
+                      }))}
+                      placeholder="Start typing your billing address..."
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Questions/Comments Section with enhanced styling */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-xl shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-indigo-100 rounded-lg">
+                    <MessageCircle className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <label className="text-lg font-bold text-indigo-900">Any Questions or Comments?</label>
                 </div>
                 <Textarea 
                   placeholder="Please share any questions, special requirements, or additional information..." 
@@ -1364,7 +1351,7 @@ export const QuoteBuilder = () => {
                   ...prev,
                   questionsComments: e.target.value
                 }))} 
-                  className="min-h-24 bg-white/80 hover:bg-white transition-all duration-200 focus:ring-2 focus:ring-emerald-200" 
+                  className="min-h-24 bg-white/80 hover:bg-white transition-all duration-200 focus:ring-2 focus:ring-indigo-200" 
                 />
               </div>
 
@@ -1394,26 +1381,6 @@ export const QuoteBuilder = () => {
                 </div>
               </div>
             </Card>
-
-            {/* Bottom Ready to Get Started Section */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 rounded-xl shadow-lg border-2 border-orange-300">
-              <div className="text-center text-white">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <div className="p-3 bg-white/20 rounded-full">
-                    <CheckCircle className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-2xl font-bold">You're Ready to Get Started!</h3>
-                </div>
-                <p className="text-lg mb-6 opacity-95">
-                  Complete your information above to proceed with your enquiry or order
-                </p>
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                  <p className="text-sm font-medium">
-                    🎉 All set! Choose your next step below to generate your official quote PDF
-                  </p>
-                </div>
-              </div>
-            </div>
 
             <div className="mt-8">
               <ActionButtons 
