@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon, BarChart3, MessageCircle, Plus } from 'lucide-react';
+import { X, ArrowDown, ChevronDown, Upload, RotateCw, Check, CalendarIcon, BarChart3, MessageCircle, Plus, Building2, User, Mail, Phone, MapPin, CreditCard, FileText, Users, Clock, CheckCircle } from 'lucide-react';
 import { addMonths, format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { FormCompletionIndicator } from './FormCompletionIndicator';
@@ -239,7 +239,7 @@ export const QuoteBuilder = () => {
     posterA0: 0
   });
   const [programStartDate, setProgramStartDate] = useState<Date>(new Date());
-  const [joinCommunity, setJoinCommunity] = useState<boolean>(true); // Add missing state variable
+  const [joinCommunity, setJoinCommunity] = useState<boolean>(true);
   const [schoolInfo, setSchoolInfo] = useState<SchoolInfo>({
     schoolName: '',
     schoolAddress: {
@@ -1000,20 +1000,30 @@ export const QuoteBuilder = () => {
               </div>
             </div>
 
-            {/* School Information Form */}
-            <Card className="mb-8 p-6 bg-white/80 backdrop-blur-sm border border-green-200/50" data-form-section>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">School Information</h3>
+            {/* Enhanced School Information Form */}
+            <Card className="mb-8 p-8 bg-white/90 backdrop-blur-sm border-2 border-green-300/50 shadow-xl" data-form-section>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <FileText className="h-6 w-6 text-green-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800">School Information</h3>
+                </div>
                 <FormCompletionIndicator schoolInfo={schoolInfo} isComplete={isFormComplete} />
               </div>
               
-              {/* Program Start Date */}
-              <div className="mb-6">
-                <h4 className="text-md font-semibold text-gray-700 mb-3">Program Access Period</h4>
+              {/* Program Start Date with enhanced styling */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Clock className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-blue-900">Program Access Period</h4>
+                </div>
                 <div className="flex items-center gap-4 mb-3">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-64 justify-start text-left font-normal", !programStartDate && "text-muted-foreground")}>
+                      <Button variant="outline" className={cn("w-72 justify-start text-left font-normal bg-white shadow-sm hover:shadow-md transition-shadow", !programStartDate && "text-muted-foreground")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {programStartDate ? format(programStartDate, 'PPP') : <span>Pick start date</span>}
                       </Button>
@@ -1023,236 +1033,352 @@ export const QuoteBuilder = () => {
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="text-sm text-gray-600">
-                  Access period: {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
+                <div className="text-sm text-blue-700 bg-blue-100/50 p-3 rounded-lg">
+                  <strong>Access period:</strong> {format(programStartDate, 'PPP')} to {format(addMonths(programStartDate, 12), 'PPP')}
                 </div>
               </div>
 
-              {/* Essential Information Section */}
-              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h4 className="font-semibold text-yellow-800 mb-3 flex items-center">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Essential for Enquiries & Orders
-                </h4>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
+              {/* Essential Information Section with enhanced styling */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-xl shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-amber-100 rounded-lg">
+                    <MessageCircle className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <h4 className="font-bold text-amber-900 text-lg">Essential for Enquiries & Orders</h4>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <Building2 className="h-4 w-4" />
+                      <span>School Name *</span>
+                    </div>
                     <Input 
-                      placeholder="School Name *" 
+                      placeholder="Enter your school name" 
                       value={schoolInfo.schoolName} 
                       onChange={e => setSchoolInfo(prev => ({
                         ...prev,
                         schoolName: e.target.value
                       }))} 
-                      className={`font-medium ${errors.schoolName ? 'border-red-300 focus:border-red-500' : isEssentialComplete ? 'border-green-300' : ''}`}
+                      className={`font-medium transition-all duration-200 ${errors.schoolName ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.schoolName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.schoolName}</p>
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <X className="h-3 w-3" />
+                        {errors.schoolName}
+                      </p>
                     )}
                   </div>
-                  <div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <User className="h-4 w-4" />
+                      <span>Coordinator Name *</span>
+                    </div>
                     <Input 
-                      placeholder="Coordinator Name *" 
+                      placeholder="Primary contact person" 
                       value={schoolInfo.coordinatorName} 
                       onChange={e => setSchoolInfo(prev => ({
                         ...prev,
                         coordinatorName: e.target.value
                       }))} 
-                      className={`${errors.coordinatorName ? 'border-red-300 focus:border-red-500' : isEssentialComplete ? 'border-green-300' : ''}`}
+                      className={`transition-all duration-200 ${errors.coordinatorName ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.coordinatorName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.coordinatorName}</p>
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <X className="h-3 w-3" />
+                        {errors.coordinatorName}
+                      </p>
                     )}
                   </div>
-                  <div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <Mail className="h-4 w-4" />
+                      <span>Coordinator Email *</span>
+                    </div>
                     <Input 
-                      placeholder="Coordinator Email *" 
+                      type="email"
+                      placeholder="email@school.edu.au" 
                       value={schoolInfo.coordinatorEmail} 
                       onChange={e => setSchoolInfo(prev => ({
                         ...prev,
                         coordinatorEmail: e.target.value
                       }))} 
-                      className={`${errors.coordinatorEmail ? 'border-red-300 focus:border-red-500' : isEssentialComplete ? 'border-green-300' : ''}`}
+                      className={`transition-all duration-200 ${errors.coordinatorEmail ? 'border-red-300 focus:border-red-500 bg-red-50' : isEssentialComplete ? 'border-green-300 bg-green-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.coordinatorEmail && (
-                      <p className="text-red-500 text-xs mt-1">{errors.coordinatorEmail}</p>
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <X className="h-3 w-3" />
+                        {errors.coordinatorEmail}
+                      </p>
                     )}
                   </div>
-                  <Input 
-                    placeholder="Coordinator Position" 
-                    value={schoolInfo.coordinatorPosition} 
-                    onChange={e => setSchoolInfo(prev => ({
-                      ...prev,
-                      coordinatorPosition: e.target.value
-                    }))} 
-                  />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <User className="h-4 w-4" />
+                      <span>Position/Title</span>
+                    </div>
+                    <Input 
+                      placeholder="e.g. Business Manager, Teacher" 
+                      value={schoolInfo.coordinatorPosition} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        coordinatorPosition: e.target.value
+                      }))} 
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Additional Information Section - Required for Orders */}
-              <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <h4 className="font-semibold text-orange-800 mb-3 flex items-center">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Additional Details for Orders
-                </h4>
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <Input 
-                    placeholder="School ABN" 
-                    value={schoolInfo.schoolABN} 
-                    onChange={e => setSchoolInfo(prev => ({
-                      ...prev,
-                      schoolABN: e.target.value
-                    }))} 
-                  />
-                  <div>
+              {/* Additional Information Section with enhanced styling */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Plus className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <h4 className="font-bold text-orange-900 text-lg">Additional Details for Orders</h4>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <Building2 className="h-4 w-4" />
+                      <span>School ABN</span>
+                    </div>
                     <Input 
-                      placeholder="Contact Phone *" 
+                      placeholder="XX XXX XXX XXX" 
+                      value={schoolInfo.schoolABN} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        schoolABN: e.target.value
+                      }))} 
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <Phone className="h-4 w-4" />
+                      <span>Contact Phone *</span>
+                    </div>
+                    <Input 
+                      placeholder="(XX) XXXX XXXX" 
                       value={schoolInfo.contactPhone} 
                       onChange={e => setSchoolInfo(prev => ({
                         ...prev,
                         contactPhone: e.target.value
                       }))} 
-                      className={errors.contactPhone ? 'border-red-300 focus:border-red-500' : ''}
+                      className={`transition-all duration-200 ${errors.contactPhone ? 'border-red-300 focus:border-red-500 bg-red-50' : 'bg-white hover:bg-gray-50'} focus:ring-2 focus:ring-opacity-20`}
                     />
                     {errors.contactPhone && (
-                      <p className="text-red-500 text-xs mt-1">{errors.contactPhone}</p>
+                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <X className="h-3 w-3" />
+                        {errors.contactPhone}
+                      </p>
                     )}
                   </div>
                 </div>
 
-                {/* School Address */}
-                <div className="mb-4">
+                {/* Enhanced School Address */}
+                <div className="mb-6 p-4 bg-white/70 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                    <MapPin className="h-4 w-4" />
+                    <span className="font-medium">School Address *</span>
+                  </div>
                   <AddressInput
-                    label="School Address *"
+                    label=""
                     value={schoolInfo.schoolAddress}
                     onChange={(address) => setSchoolInfo(prev => ({
                       ...prev,
                       schoolAddress: address
                     }))}
-                    placeholder="Search for your school address..."
+                    placeholder="Start typing your school address..."
                   />
                   {errors.schoolAddress && (
-                    <p className="text-red-500 text-xs mt-1">{errors.schoolAddress}</p>
+                    <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                      <X className="h-3 w-3" />
+                      {errors.schoolAddress}
+                    </p>
                   )}
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <Input 
-                    placeholder="Accounts Email" 
-                    value={schoolInfo.accountsEmail} 
-                    onChange={e => setSchoolInfo(prev => ({
-                      ...prev,
-                      accountsEmail: e.target.value
-                    }))} 
-                  />
-                  <Input 
-                    placeholder="Purchase Order Number" 
-                    value={schoolInfo.purchaseOrderNumber} 
-                    onChange={e => setSchoolInfo(prev => ({
-                      ...prev,
-                      purchaseOrderNumber: e.target.value
-                    }))} 
-                  />
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <Mail className="h-4 w-4" />
+                      <span>Accounts Email</span>
+                    </div>
+                    <Input 
+                      type="email"
+                      placeholder="accounts@school.edu.au" 
+                      value={schoolInfo.accountsEmail} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        accountsEmail: e.target.value
+                      }))} 
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <FileText className="h-4 w-4" />
+                      <span>Purchase Order Number</span>
+                    </div>
+                    <Input 
+                      placeholder="PO-2024-XXXX" 
+                      value={schoolInfo.purchaseOrderNumber} 
+                      onChange={e => setSchoolInfo(prev => ({
+                        ...prev,
+                        purchaseOrderNumber: e.target.value
+                      }))} 
+                      className="bg-white hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-opacity-20"
+                    />
+                  </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Select value={schoolInfo.paymentPreference} onValueChange={value => setSchoolInfo(prev => ({
-                  ...prev,
-                  paymentPreference: value
-                }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Payment Preference" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="card">Card Payment</SelectItem>
-                      <SelectItem value="invoice">Invoice</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <CreditCard className="h-4 w-4" />
+                      <span>Payment Preference</span>
+                    </div>
+                    <Select value={schoolInfo.paymentPreference} onValueChange={value => setSchoolInfo(prev => ({
+                    ...prev,
+                    paymentPreference: value
+                  }))}>
+                      <SelectTrigger className="bg-white hover:bg-gray-50 transition-all duration-200">
+                        <SelectValue placeholder="How would you like to pay?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="card">Card Payment</SelectItem>
+                        <SelectItem value="invoice">Invoice</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   
-                  <Select value={schoolInfo.supplierSetupForms} onValueChange={value => setSchoolInfo(prev => ({
-                  ...prev,
-                  supplierSetupForms: value
-                }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Supplier Setup Forms Required?" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
-                      <SelectItem value="not-sure">Not Sure</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <FileText className="h-4 w-4" />
+                      <span>Supplier Setup Forms Required?</span>
+                    </div>
+                    <Select value={schoolInfo.supplierSetupForms} onValueChange={value => setSchoolInfo(prev => ({
+                    ...prev,
+                    supplierSetupForms: value
+                  }))}>
+                      <SelectTrigger className="bg-white hover:bg-gray-50 transition-all duration-200">
+                        <SelectValue placeholder="Do you need supplier forms?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">Yes</SelectItem>
+                        <SelectItem value="no">No</SelectItem>
+                        <SelectItem value="not-sure">Not Sure</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
                 
               {/* Delivery and Billing Addresses - Only show if physical items */}
               {(hasPhysicalItems() || (useUnlimited && (unlimitedAddOns.teacherBooks > 0 || unlimitedAddOns.studentBooks > 0 || unlimitedAddOns.posterA0 > 0))) && (
-                <div className="mb-6">
-                  <div className="flex items-center space-x-2 mb-4">
+                <div className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl shadow-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <MapPin className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <h4 className="font-bold text-purple-900 text-lg">Delivery Address</h4>
+                  </div>
+                  <div className="flex items-center space-x-3 mb-4 p-3 bg-white/60 rounded-lg">
                     <Checkbox id="deliveryIsSame" checked={schoolInfo.deliveryIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
                     ...prev,
                     deliveryIsSameAsSchool: checked as boolean
-                  }))} />
-                    <label htmlFor="deliveryIsSame" className="text-sm">Delivery address same as school address</label>
+                  }))} className="data-[state=checked]:bg-purple-600" />
+                    <label htmlFor="deliveryIsSame" className="text-sm font-medium cursor-pointer">Delivery address same as school address</label>
                   </div>
                   {!schoolInfo.deliveryIsSameAsSchool && (
-                    <AddressInput
-                      label="Delivery Address"
-                      value={schoolInfo.deliveryAddress}
-                      onChange={(address) => setSchoolInfo(prev => ({
-                        ...prev,
-                        deliveryAddress: address
-                      }))}
-                      placeholder="Search for your delivery address..."
-                    />
+                    <div className="p-4 bg-white/70 rounded-lg border border-gray-200">
+                      <AddressInput
+                        label=""
+                        value={schoolInfo.deliveryAddress}
+                        onChange={(address) => setSchoolInfo(prev => ({
+                          ...prev,
+                          deliveryAddress: address
+                        }))}
+                        placeholder="Start typing your delivery address..."
+                      />
+                    </div>
                   )}
                 </div>
               )}
               
-              <div className="mb-6">
-                <div className="flex items-center space-x-2 mb-4">
+              <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-200 rounded-xl shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <CreditCard className="h-5 w-5 text-green-600" />
+                  </div>
+                  <h4 className="font-bold text-green-900 text-lg">Billing Address</h4>
+                </div>
+                <div className="flex items-center space-x-3 mb-4 p-3 bg-white/60 rounded-lg">
                   <Checkbox id="billingIsSame" checked={schoolInfo.billingIsSameAsSchool} onCheckedChange={checked => setSchoolInfo(prev => ({
                   ...prev,
                   billingIsSameAsSchool: checked as boolean
-                }))} />
-                  <label htmlFor="billingIsSame" className="text-sm">Billing address same as school address</label>
+                }))} className="data-[state=checked]:bg-green-600" />
+                  <label htmlFor="billingIsSame" className="text-sm font-medium cursor-pointer">Billing address same as school address</label>
                 </div>
                 {!schoolInfo.billingIsSameAsSchool && (
-                  <AddressInput
-                    label="Billing Address"
-                    value={schoolInfo.billingAddress}
-                    onChange={(address) => setSchoolInfo(prev => ({
-                      ...prev,
-                      billingAddress: address
-                    }))}
-                    placeholder="Search for your billing address..."
-                  />
+                  <div className="p-4 bg-white/70 rounded-lg border border-gray-200">
+                    <AddressInput
+                      label=""
+                      value={schoolInfo.billingAddress}
+                      onChange={(address) => setSchoolInfo(prev => ({
+                        ...prev,
+                        billingAddress: address
+                      }))}
+                      placeholder="Start typing your billing address..."
+                    />
+                  </div>
                 )}
               </div>
 
-              {/* Questions/Comments Section */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Any Questions or Comments?</label>
-                <Textarea placeholder="Please share any questions, special requirements, or additional information..." value={schoolInfo.questionsComments} onChange={e => setSchoolInfo(prev => ({
-                ...prev,
-                questionsComments: e.target.value
-              }))} className="min-h-20" />
+              {/* Questions/Comments Section with enhanced styling */}
+              <div className="mb-8 p-6 bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 rounded-xl shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-indigo-100 rounded-lg">
+                    <MessageCircle className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <label className="text-lg font-bold text-indigo-900">Any Questions or Comments?</label>
+                </div>
+                <Textarea 
+                  placeholder="Please share any questions, special requirements, or additional information..." 
+                  value={schoolInfo.questionsComments} 
+                  onChange={e => setSchoolInfo(prev => ({
+                  ...prev,
+                  questionsComments: e.target.value
+                }))} 
+                  className="min-h-24 bg-white/80 hover:bg-white transition-all duration-200 focus:ring-2 focus:ring-indigo-200" 
+                />
               </div>
 
-              {/* Join Community Checkbox */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
-                <div className="flex items-center space-x-3">
+              {/* Join Community Checkbox with enhanced styling */}
+              <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-6 shadow-sm">
+                <div className="flex items-center space-x-4">
                   <Checkbox 
                     id="joinCommunity" 
                     checked={joinCommunity} 
                     onCheckedChange={checked => setJoinCommunity(checked as boolean)}
+                    className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                   />
-                  <label htmlFor="joinCommunity" className="text-sm font-medium text-green-800 cursor-pointer">
-                    Join The Mandy Money Community
-                  </label>
+                  <div className="flex-1">
+                    <label htmlFor="joinCommunity" className="text-lg font-bold text-emerald-900 cursor-pointer flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Join The Mandy Money Community
+                    </label>
+                    <p className="text-sm text-emerald-700 mt-1">
+                      Get updates on new resources, teaching tips, and exclusive offers for educators
+                    </p>
+                  </div>
+                  {joinCommunity && (
+                    <div className="p-2 bg-emerald-100 rounded-full">
+                      <CheckCircle className="h-6 w-6 text-emerald-600" />
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-green-600 mt-2 ml-6">
-                  Get updates on new resources, teaching tips, and exclusive offers for educators
-                </p>
               </div>
             </Card>
 
