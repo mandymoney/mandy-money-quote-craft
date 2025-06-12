@@ -139,7 +139,7 @@ const teacherTiers: PricingTier[] = [{
   name: 'Digital Pass + Textbook Bundle',
   description: 'Complete teacher package',
   basePrice: {
-    teacher: 189,
+    teacher: 198,
     student: 0
   },
   volumeDiscounts: {
@@ -859,26 +859,6 @@ export const QuoteBuilder = () => {
           </div>
         </div>
 
-        {/* First Ready to Get Started Section - Above School Information */}
-        <div className="mb-8">
-          <ActionButtons 
-            selectedTier={{
-              name: 'Custom Selection',
-              id: 'combined'
-            }} 
-            totalPrice={finalPricing.total} 
-            teacherCount={getTotalTeacherCount()} 
-            studentCount={getTotalStudentCount()}
-            schoolInfo={schoolInfo}
-            quoteItems={getDetailedBreakdown()}
-            pricing={finalPricing}
-            programStartDate={programStartDate}
-            isUnlimited={useUnlimited}
-            titleOverride="Ready to Get Started"
-            descriptionOverride="Complete your information below to proceed"
-          />
-        </div>
-
         {/* Official Quote Section with Light Green Background */}
         <div className="bg-gradient-to-b from-green-50 to-emerald-50 rounded-lg shadow-lg overflow-hidden border border-green-100 pb-8 md:pb-0">
           {/* Navy Header Banner */}
@@ -1042,6 +1022,26 @@ export const QuoteBuilder = () => {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* First Ready to Get Started Section - Moved above School Information */}
+            <div className="mb-8">
+              <ActionButtons 
+                selectedTier={{
+                  name: 'Custom Selection',
+                  id: 'combined'
+                }} 
+                totalPrice={finalPricing.total} 
+                teacherCount={getTotalTeacherCount()} 
+                studentCount={getTotalStudentCount()}
+                schoolInfo={schoolInfo}
+                quoteItems={getDetailedBreakdown()}
+                pricing={finalPricing}
+                programStartDate={programStartDate}
+                isUnlimited={useUnlimited}
+                titleOverride="Ready to Get Started"
+                descriptionOverride="Complete your information below to proceed"
+              />
             </div>
 
             {/* Enhanced School Information Form */}
