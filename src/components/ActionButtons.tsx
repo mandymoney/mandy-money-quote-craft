@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, MessageCircle, AlertTriangle } from 'lucide-react';
@@ -256,15 +257,31 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         const result = await generateAndUploadQuote();
         pdfUrl = result.pdfUrl;
       }
+
+      // Ensure PDF was uploaded successfully before proceeding
+      if (!pdfUrl) {
+        toast({
+          title: "PDF Upload Failed",
+          description: "Failed to upload PDF to storage. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
     } catch (error) {
       console.error('Error generating/uploading PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate or upload PDF. Please try again.",
+        variant: "destructive",
+      });
+      return;
     }
     
-    // Store quote attempt
-    await storeQuoteAttempt(type, pdfUrl || undefined);
+    // Store quote attempt with PDF URL
+    await storeQuoteAttempt(type, pdfUrl);
     
     const subject = createEmailSubject(type, schoolInfo.schoolName);
-    const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount, pdfUrl || undefined);
+    const body = createEmailBody(type, schoolInfo, pricing, teacherCount, studentCount, pdfUrl);
     
     const mailtoUrl = `mailto:hello@mandymoney.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
