@@ -161,7 +161,7 @@ const studentTiers: PricingTier[] = [{
   description: 'Digital access for students',
   basePrice: {
     teacher: 0,
-    student: 21
+    student: 25
   },
   volumeDiscounts: {
     students12Plus: 18,
@@ -181,7 +181,7 @@ const studentTiers: PricingTier[] = [{
   description: 'Physical textbook for students',
   basePrice: {
     teacher: 0,
-    student: 49
+    student: 25
   },
   volumeDiscounts: {
     students12Plus: 42,
@@ -201,7 +201,7 @@ const studentTiers: PricingTier[] = [{
   description: 'Complete student package',
   basePrice: {
     teacher: 0,
-    student: 55
+    student: 25
   },
   volumeDiscounts: {
     students12Plus: 49,
