@@ -181,7 +181,7 @@ const studentTiers: PricingTier[] = [{
   description: 'Physical textbook for students',
   basePrice: {
     teacher: 0,
-    student: 25
+    student: 49
   },
   volumeDiscounts: {
     students12Plus: 42,
