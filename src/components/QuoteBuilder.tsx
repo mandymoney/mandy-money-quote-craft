@@ -220,7 +220,7 @@ const unlimitedTier: UnlimitedTier = {
   id: 'unlimited',
   name: 'Unlimited School Access',
   description: 'Complete digital access for entire school',
-  basePrice: 3199,
+  basePrice: 3499,
   addOns: {
     teacherBooks: 79,
     studentBooks: 42,
