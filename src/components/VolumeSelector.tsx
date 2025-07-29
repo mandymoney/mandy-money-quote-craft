@@ -66,7 +66,24 @@ export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseInt(e.target.value) || min;
+    const inputValue = e.target.value;
+    
+    // If empty string, set to minimum
+    if (inputValue === '') {
+      onChange(min);
+      return;
+    }
+    
+    // Parse the number and ensure no leading zeros
+    const newValue = parseInt(inputValue, 10);
+    
+    // If it's NaN, set to minimum
+    if (isNaN(newValue)) {
+      onChange(min);
+      return;
+    }
+    
+    // Clamp the value between min and max
     const clampedValue = Math.min(Math.max(newValue, min), max);
     onChange(clampedValue);
   };
@@ -89,7 +106,7 @@ export const VolumeSelector: React.FC<VolumeSelectorProps> = ({
         </Button>
         <Input
           type="number"
-          value={value}
+          value={value.toString()}
           onChange={handleInputChange}
           min={min}
           max={max}
