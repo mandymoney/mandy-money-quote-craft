@@ -704,7 +704,7 @@ export const QuoteBuilder = () => {
                 return <PricingCard key={tier.id} tier={{
                   ...tier,
                   bestFor: tier.bestFor ? tier.bestFor : undefined
-                }} price={currentPrice} isSelected={selectedStudentTiers[tier.id] > 0} onSelect={() => {}} teacherCount={0} studentCount={selectedStudentTiers[tier.id] || 0} animationDelay={index * 100} showImages={true} studentPrice={currentPrice} includeGST={true} colorScheme="yellow" customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)" showSavings={false} volumeSelector={<VolumeSelector label="Students" value={selectedStudentTiers[tier.id] || 0} onChange={count => handleStudentSelection(tier.id, count)} min={0} max={200} color="yellow" />} />;
+                }} price={currentPrice} isSelected={selectedStudentTiers[tier.id] > 0} onSelect={() => {}} teacherCount={0} studentCount={selectedStudentTiers[tier.id] || 0} animationDelay={index * 100} showImages={true} studentPrice={currentPrice} includeGST={true} colorScheme="yellow" customGradient="linear-gradient(135deg, #ffb512, #ffde5a, #fea100)" showSavings={false} volumeSelector={<VolumeSelector label="Students" value={selectedStudentTiers[tier.id] || 0} onChange={count => handleStudentSelection(tier.id, count)} min={0} max={999} color="yellow" />} />;
               })}
               </div>
 
