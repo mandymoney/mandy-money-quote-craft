@@ -203,9 +203,10 @@ const studentTiers: PricingTier[] = [{
   description: 'Complete student package',
   basePrice: {
     teacher: 0,
-    student: 55
+    student: 84
   },
   volumeDiscounts: {
+    students5Plus: 55,
     students12Plus: 49,
     students50Plus: 46
   },
