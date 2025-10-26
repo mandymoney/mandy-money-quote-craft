@@ -31,6 +31,7 @@ export interface PricingTier {
     student: number;
   };
   volumeDiscounts: {
+    students5Plus?: number;
     students12Plus: number;
     students50Plus: number;
   };
@@ -181,9 +182,10 @@ const studentTiers: PricingTier[] = [{
   description: 'Physical textbook for students',
   basePrice: {
     teacher: 0,
-    student: 49
+    student: 69
   },
   volumeDiscounts: {
+    students5Plus: 49,
     students12Plus: 42,
     students50Plus: 40
   },
@@ -306,6 +308,8 @@ export const QuoteBuilder = () => {
       studentPrice = tier.volumeDiscounts.students50Plus;
     } else if (currentStudentCount >= 12) {
       studentPrice = tier.volumeDiscounts.students12Plus;
+    } else if (currentStudentCount >= 5 && tier.volumeDiscounts.students5Plus) {
+      studentPrice = tier.volumeDiscounts.students5Plus;
     }
     return studentPrice;
   };
